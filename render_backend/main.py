@@ -110,16 +110,23 @@ def get_status():
         except Exception as e:
             errs.append(str(e))
             
-        # Tentativa 2: Manual DSN
+        # Tentativa 2: Parse Manual e Conexão via Parâmetros (Mais robusto)
         if "://" in uri:
             try:
                 import urllib.parse
                 clean_url = uri.replace("postgres://", "postgresql://")
                 res = urllib.parse.urlparse(clean_url)
-                dsn = f"host={res.hostname} port={res.port or 5432} dbname={res.path[1:]} user={res.username} password={res.password} sslmode=require"
-                return psycopg2.connect(dsn), None
+                # Passando parâmetros individuais (kwargs) - Evita erros de "missing ="
+                return psycopg2.connect(
+                    host=res.hostname,
+                    port=res.port or 5432,
+                    database=res.path[1:],
+                    user=res.username,
+                    password=res.password,
+                    sslmode="require"
+                ), None
             except Exception as e:
-                errs.append(f"DSN Fallback Error: {e}")
+                errs.append(f"Param-Connect Error: {e}")
                 
         return None, " | ".join(errs)
 
