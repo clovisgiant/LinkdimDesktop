@@ -102,17 +102,14 @@ def get_status():
 
     def get_dsn(url_str):
         if not url_str: return None
+        url_str = url_str.strip().strip('"').strip("'")
         if "://" in url_str:
             try:
-                # Converte postgresql://user:pass@host/db para formato DSN
+                # Trata postgres:// e postgresql://
+                clean_url = url_str.replace("postgres://", "postgresql://")
                 from urllib.parse import urlparse
-                result = urlparse(url_str)
-                username = result.username
-                password = result.password
-                database = result.path[1:]
-                hostname = result.hostname
-                port = result.port or 5432
-                return f"host={hostname} port={port} dbname={database} user={username} password={password} sslmode=require"
+                result = urlparse(clean_url)
+                return f"host={result.hostname} port={result.port or 5432} dbname={result.path[1:]} user={result.username} password={result.password} sslmode=require"
             except:
                 return url_str
         return url_str
