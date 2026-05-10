@@ -122,12 +122,14 @@ async def start_crawler(req: StartRequest):
         env["WEBCRAWLER_JOB_SEARCH_TERMS"] = req.search_terms
 
     try:
+        # O caminho correto dentro do container Docker é /app/crawler/
         proc = subprocess.Popen(
-            ["dotnet", "/app/WebCrawler.dll"],  # Caminho no container
+            ["dotnet", "/app/crawler/WebCrawler.dll"], 
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             env=env,
-            bufsize=1
+            bufsize=1,
+            universal_newlines=False # Garante leitura binária para não dar erro de encoding
         )
         state.process = proc
         state.status  = "running"
