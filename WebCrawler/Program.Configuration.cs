@@ -5,9 +5,34 @@ using System.Linq;
 
 partial class Program
 {
-    private static string ConnectionString =>
-        Environment.GetEnvironmentVariable("WEBCRAWLER_DB_CONNECTION")
-        ?? throw new InvalidOperationException("Defina a variável de ambiente WEBCRAWLER_DB_CONNECTION.");
+    private static string ConnectionString
+    {
+        get
+        {
+            var raw = Environment.GetEnvironmentVariable("WEBCRAWLER_DB_CONNECTION")
+                      ?? throw new InvalidOperationException("Defina a variável de ambiente WEBCRAWLER_DB_CONNECTION.");
+
+            if (raw.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    var uri = new Uri(raw);
+                    var userInfo = uri.UserInfo.Split(':');
+                    var user = userInfo[0];
+                    var pass = userInfo.Length > 1 ? userInfo[1] : "";
+                    var host = uri.Host;
+                    var port = uri.Port > 0 ? uri.Port : 5432;
+                    var db = uri.AbsolutePath.TrimStart('/');
+                    return $"Host={host};Port={port};Database={db};Username={user};Password={pass};SSL Mode=Require;Trust Server Certificate=true";
+                }
+                catch
+                {
+                    return raw;
+                }
+            }
+            return raw;
+        }
+    }
 
     private static string GetRequiredEnv(string name)
     {

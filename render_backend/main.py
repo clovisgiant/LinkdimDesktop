@@ -100,20 +100,37 @@ def get_status():
         last_hb = "Erro: Variável WEBCRAWLER_DB_CONNECTION não configurada no Render."
         return {"status": state.status, "pid": state.process.pid if state.process else None, "last_heartbeat": last_hb, "config": state.config}
 
+    def get_dsn(url_str):
+        if not url_str: return None
+        if "://" in url_str:
+            try:
+                # Converte postgresql://user:pass@host/db para formato DSN
+                from urllib.parse import urlparse
+                result = urlparse(url_str)
+                username = result.username
+                password = result.password
+                database = result.path[1:]
+                hostname = result.hostname
+                port = result.port or 5432
+                return f"host={hostname} port={port} dbname={database} user={username} password={password} sslmode=require"
+            except:
+                return url_str
+        return url_str
+
+    dsn = get_dsn(conn_str)
     try:
-        conn = psycopg2.connect(conn_str)
+        conn = psycopg2.connect(dsn)
         cur = conn.cursor()
         cur.execute("SELECT last_heartbeat FROM crawler_jobs ORDER BY last_heartbeat DESC LIMIT 1")
         row = cur.fetchone()
         if row and row[0]:
             last_hb = row[0].isoformat()
-            # Se heartbeat < 5 min → considera online
             delta = (datetime.utcnow() - row[0]).total_seconds() / 60
-            if state.status != "running" and delta < 5:
+            if delta < 5:
                 state.status = "running"
         conn.close()
     except Exception as e:
-        last_hb = f"DB Connection Error: {e}"
+        last_hb = f"Erro de Conexão: {e}"
 
     return {
         "status":         state.status,
@@ -146,14 +163,19 @@ async def start_crawler(req: StartRequest):
         env["WEBCRAWLER_JOB_SEARCH_TERMS"] = req.search_terms
 
     try:
-        # O caminho correto dentro do container Docker é /app/crawler/
+        # Prepara conexão mastigada para o C# (Npgsql)
+        dsn = get_dsn(os.environ.get("WEBCRAWLER_DB_CONNECTION"))
+        env["WEBCRAWLER_DB_CONNECTION"] = dsn
+        
+        await broadcast_log("🔍 Validando conexão com o banco de dados...")
+        
         proc = subprocess.Popen(
             ["dotnet", "/app/crawler/WebCrawler.dll"], 
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             env=env,
             bufsize=1,
-            universal_newlines=False # Garante leitura binária para não dar erro de encoding
+            universal_newlines=False
         )
         state.process = proc
         state.status  = "running"
