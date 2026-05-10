@@ -40,7 +40,8 @@ COPY --from=build-cs /app/crawler /app/crawler
 # ── Instala dependências Python do orquestrador ─────────────
 WORKDIR /api
 COPY render_backend/requirements.txt .
-RUN pip3 install --no-cache-dir -r requirements.txt
+RUN pip3 install --no-cache-dir --upgrade pip && \
+    pip3 install --no-cache-dir --break-system-packages -r requirements.txt
 
 # Copia o código FastAPI
 COPY render_backend/main.py .
