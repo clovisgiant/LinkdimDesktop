@@ -100,27 +100,30 @@ def get_status():
         return {"status": state.status, "pid": state.process.pid if state.process else None, "last_heartbeat": last_hb, "config": state.config}
 
     def connect_to_db(uri):
-        if not uri: return None
+        if not uri: return None, "URI vazia"
         uri = uri.strip().strip('"').strip("'")
-        # Tentativa 1: Conexão Direta (psycopg2 aceita URLs postgresql://)
+        errs = []
+        
+        # Tentativa 1: Direta
         try:
-            return psycopg2.connect(uri)
-        except:
-            pass
+            return psycopg2.connect(uri), None
+        except Exception as e:
+            errs.append(str(e))
             
-        # Tentativa 2: Conversão Manual (Fallback)
+        # Tentativa 2: Manual DSN
         if "://" in uri:
             try:
                 import urllib.parse
                 clean_url = uri.replace("postgres://", "postgresql://")
                 res = urllib.parse.urlparse(clean_url)
                 dsn = f"host={res.hostname} port={res.port or 5432} dbname={res.path[1:]} user={res.username} password={res.password} sslmode=require"
-                return psycopg2.connect(dsn)
-            except:
-                return None
-        return None
+                return psycopg2.connect(dsn), None
+            except Exception as e:
+                errs.append(f"DSN Fallback Error: {e}")
+                
+        return None, " | ".join(errs)
 
-    conn = connect_to_db(conn_str)
+    conn, db_err = connect_to_db(conn_str)
     try:
         if conn:
             cur = conn.cursor()
@@ -133,7 +136,7 @@ def get_status():
                     state.status = "running"
             conn.close()
         else:
-            last_hb = "Erro: Não foi possível estabelecer conexão com o banco."
+            last_hb = f"Erro de Conexão: {db_err}"
     except Exception as e:
         last_hb = f"Erro de Operação: {e}"
 
