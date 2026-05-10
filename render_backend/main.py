@@ -94,8 +94,14 @@ def stream_process_output(proc: subprocess.Popen):
 def get_status():
     # Verifica último heartbeat no banco
     last_hb = None
+    conn_str = os.environ.get("WEBCRAWLER_DB_CONNECTION")
+    
+    if not conn_str:
+        last_hb = "Erro: Variável WEBCRAWLER_DB_CONNECTION não configurada no Render."
+        return {"status": state.status, "pid": state.process.pid if state.process else None, "last_heartbeat": last_hb, "config": state.config}
+
     try:
-        conn = psycopg2.connect(os.environ["WEBCRAWLER_DB_CONNECTION"])
+        conn = psycopg2.connect(conn_str)
         cur = conn.cursor()
         cur.execute("SELECT last_heartbeat FROM crawler_jobs ORDER BY last_heartbeat DESC LIMIT 1")
         row = cur.fetchone()
@@ -107,7 +113,7 @@ def get_status():
                 state.status = "running"
         conn.close()
     except Exception as e:
-        last_hb = f"DB error: {e}"
+        last_hb = f"DB Connection Error: {e}"
 
     return {
         "status":         state.status,
