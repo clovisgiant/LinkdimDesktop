@@ -18,7 +18,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 # ── Instala Python, Chrome e ChromeDriver ───────────────────
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-pip python3-venv python3-dev \
-    gcc libc6-dev libpq-dev \
+    build-essential libpq-dev \
     wget gnupg curl unzip ca-certificates \
     # Chrome headless
     chromium chromium-driver \
@@ -38,11 +38,11 @@ ENV DISPLAY=:99
 # ── Copia binários C# do estágio anterior ───────────────────
 COPY --from=build-cs /app/crawler /app/crawler
 
-# ── Instala dependências Python (Direto no comando para evitar erros de CRLF) ──
+# ── Instala dependências Python (Direto no comando - Estilo Ultra-Safe) ──
 WORKDIR /api
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
-RUN pip install --no-cache-dir --upgrade pip && \
+RUN pip install --no-cache-dir --upgrade pip setuptools wheel && \
     pip install --no-cache-dir fastapi uvicorn psycopg2-binary websockets python-multipart
 
 # Copia o código FastAPI
