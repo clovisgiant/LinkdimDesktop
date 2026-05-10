@@ -1,0 +1,52 @@
+# ── Binários e build ────────────────────────────────────────
+build/
+build_*/
+*.exe
+*.obj
+*.o
+*.a
+*.lib
+*.dll
+*.pdb
+*.ilk
+*.exp
+
+# ── Qt / CMake ───────────────────────────────────────────────
+_deps/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+*.ninja
+*.ninja_deps
+*.ninja_log
+mocs_compilation.cpp
+*.moc
+*.moc.d
+moc_*.cpp
+moc_predefs.h
+*_autogen/
+.qt/
+QtDeployTargets.cmake
+
+# ── Credenciais (NUNCA no git!) ──────────────────────────────
+.env
+*.env
+!.env.example
+
+# ── Windows ──────────────────────────────────────────────────
+desktop.ini
+Thumbs.db
+$RECYCLE.BIN/
+
+# ── IDEs ─────────────────────────────────────────────────────
+.vscode/
+.vs/
+*.user
+*.suo
+.idea/
+
+# ── Empacotamento / Deploy temporário ────────────────────────
+*.zip
+Dashboard_Standalone/
+Deploy/

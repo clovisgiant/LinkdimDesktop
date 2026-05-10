@@ -1,0 +1,42 @@
+# ============================================================
+# render.yaml — Infraestrutura como código para Render.com
+# "Blueprint" que cria todos os serviços automaticamente
+# ============================================================
+services:
+
+  # ── Serviço 1: API + Worker (Docker unificado) ───────────
+  - type: web
+    name: linkdim-crawler-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter          # $7/mês — muda para "standard" se precisar de mais RAM
+    region: oregon
+    healthCheckPath: /health
+
+    # Variáveis de ambiente (configure no painel do Render!)
+    envVars:
+      - key: LINKEDIN_USERNAME
+        sync: false        # Você preenche manualmente no Render Dashboard
+      - key: LINKEDIN_PASSWORD
+        sync: false
+      - key: WEBCRAWLER_DB_CONNECTION
+        fromDatabase:
+          name: linkdim-postgres
+          property: connectionString
+      - key: WEBCRAWLER_TEST_MODE
+        value: "false"
+      - key: WEBCRAWLER_DISABLE_DATABASE
+        value: "false"
+      - key: WEBCRAWLER_USE_PERSISTENT_PROFILE
+        value: "false"      # Sem perfil persistente no container
+      - key: WEBCRAWLER_AUTO_FILL_MANDATORY_FIELDS
+        value: "true"
+      - key: PYTHONUNBUFFERED
+        value: "1"
+
+  # ── Banco de Dados PostgreSQL gerenciado ─────────────────
+  - type: pserv
+    name: linkdim-postgres
+    plan: free             # Banco gratuito (90 dias) ou $7/mês para persistente
+    databaseName: ProjetoDb
+    user: postgres
