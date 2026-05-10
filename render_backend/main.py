@@ -127,13 +127,17 @@ def get_status():
     try:
         if conn:
             cur = conn.cursor()
-            cur.execute("SELECT last_heartbeat FROM crawler_jobs ORDER BY last_heartbeat DESC LIMIT 1")
+            cur.execute("SELECT state, last_heartbeat, is_running FROM crawler_runtime_status WHERE instance_name = 'default' LIMIT 1")
             row = cur.fetchone()
-            if row and row[0]:
-                last_hb = row[0].isoformat()
-                delta = (datetime.utcnow() - row[0]).total_seconds() / 60
-                if delta < 5:
+            if row:
+                st, lb, is_run = row
+                last_hb = lb.isoformat()
+                delta = (datetime.utcnow() - lb).total_seconds() / 60
+                # Se is_running for true e heartbeat for recente (< 5 min)
+                if is_run and delta < 5:
                     state.status = "running"
+                else:
+                    state.status = "stopped"
             conn.close()
         else:
             last_hb = f"Erro de Conexão: {db_err}"
