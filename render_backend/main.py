@@ -100,34 +100,43 @@ def get_status():
         last_hb = "Erro: Variável WEBCRAWLER_DB_CONNECTION não configurada no Render."
         return {"status": state.status, "pid": state.process.pid if state.process else None, "last_heartbeat": last_hb, "config": state.config}
 
-    def get_dsn(url_str):
-        if not url_str: return None
-        url_str = url_str.strip().strip('"').strip("'")
-        if "://" in url_str:
+    def connect_to_db(uri):
+        if not uri: return None
+        uri = uri.strip().strip('"').strip("'")
+        # Tentativa 1: Conexão Direta (psycopg2 aceita URLs postgresql://)
+        try:
+            return psycopg2.connect(uri)
+        except:
+            pass
+            
+        # Tentativa 2: Conversão Manual (Fallback)
+        if "://" in uri:
             try:
-                # Trata postgres:// e postgresql://
-                clean_url = url_str.replace("postgres://", "postgresql://")
-                from urllib.parse import urlparse
-                result = urlparse(clean_url)
-                return f"host={result.hostname} port={result.port or 5432} dbname={result.path[1:]} user={result.username} password={result.password} sslmode=require"
+                import urllib.parse
+                clean_url = uri.replace("postgres://", "postgresql://")
+                res = urllib.parse.urlparse(clean_url)
+                dsn = f"host={res.hostname} port={res.port or 5432} dbname={res.path[1:]} user={res.username} password={res.password} sslmode=require"
+                return psycopg2.connect(dsn)
             except:
-                return url_str
-        return url_str
+                return None
+        return None
 
-    dsn = get_dsn(conn_str)
+    conn = connect_to_db(conn_str)
     try:
-        conn = psycopg2.connect(dsn)
-        cur = conn.cursor()
-        cur.execute("SELECT last_heartbeat FROM crawler_jobs ORDER BY last_heartbeat DESC LIMIT 1")
-        row = cur.fetchone()
-        if row and row[0]:
-            last_hb = row[0].isoformat()
-            delta = (datetime.utcnow() - row[0]).total_seconds() / 60
-            if delta < 5:
-                state.status = "running"
-        conn.close()
+        if conn:
+            cur = conn.cursor()
+            cur.execute("SELECT last_heartbeat FROM crawler_jobs ORDER BY last_heartbeat DESC LIMIT 1")
+            row = cur.fetchone()
+            if row and row[0]:
+                last_hb = row[0].isoformat()
+                delta = (datetime.utcnow() - row[0]).total_seconds() / 60
+                if delta < 5:
+                    state.status = "running"
+            conn.close()
+        else:
+            last_hb = "Erro: Não foi possível estabelecer conexão com o banco."
     except Exception as e:
-        last_hb = f"Erro de Conexão: {e}"
+        last_hb = f"Erro de Operação: {e}"
 
     return {
         "status":         state.status,
@@ -160,11 +169,12 @@ async def start_crawler(req: StartRequest):
         env["WEBCRAWLER_JOB_SEARCH_TERMS"] = req.search_terms
 
     try:
-        # Prepara conexão mastigada para o C# (Npgsql)
-        dsn = get_dsn(os.environ.get("WEBCRAWLER_DB_CONNECTION"))
-        env["WEBCRAWLER_DB_CONNECTION"] = dsn
+        # Passa a conexão limpa para o C#
+        raw_conn = os.environ.get("WEBCRAWLER_DB_CONNECTION", "")
+        clean_conn = raw_conn.strip().strip('"').strip("'")
+        env["WEBCRAWLER_DB_CONNECTION"] = clean_conn
         
-        await broadcast_log("🔍 Validando conexão com o banco de dados...")
+        await broadcast_log("🔍 Preparando inicialização do robô...")
         
         proc = subprocess.Popen(
             ["dotnet", "/app/crawler/WebCrawler.dll"], 
