@@ -38,11 +38,13 @@ ENV DISPLAY=:99
 # ── Copia binários C# do estágio anterior ───────────────────
 COPY --from=build-cs /app/crawler /app/crawler
 
-# ── Instala dependências Python do orquestrador ─────────────
+# ── Instala dependências Python via VENV (Mais robusto) ─────
 WORKDIR /api
 COPY render_backend/requirements.txt .
-RUN pip3 install --no-cache-dir --upgrade pip && \
-    pip3 install --no-cache-dir --break-system-packages -r requirements.txt
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copia o código FastAPI
 COPY render_backend/main.py .
