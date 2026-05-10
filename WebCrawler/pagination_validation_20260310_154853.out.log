@@ -1,0 +1,37 @@
+Arquivo .env carregado: C:\Users\CLOVIS\Documents\Projeto_Linkdim\.env
+Links ignorados carregados de arquivo: 68
+Links de candidaturas com sucesso carregados do historico: 25
+Configuração: TEST_MODE=False, DISABLE_DATABASE=True, MAX_PAGES_PER_CYCLE=3, MAX_APPLY_PER_CYCLE=1, CYCLE_WAIT_MINUTES=1, PERSIST_IGNORED_LINKS=True, PERSIST_SUCCESSFUL_LINKS=True, AUTO_FILL_MANDATORY_FIELDS=True
+Iniciando nova execução...
+Abrindo LinkedIn...
+Título da página: Feed | LinkedIn
+Sessão já autenticada detectada. Pulando preenchimento de login.
+Login bem-sucedido! Página atual: https://www.linkedin.com/feed/
+Abrindo coleção Easy Apply...
+Cards encontrados na página inicial: 14
+Extraindo vagas da página inicial...
+Iniciando paginação...
+Indo para próxima página... (indicador index=1, texto='', aria-label='Página 2')
+Página atual após paginação: 2
+Cards encontrados na página: 14
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Indo para próxima página... (indicador index=2, texto='', aria-label='Página 3')
+Página atual após paginação: 3
+Cards encontrados na página: 14
+Vaga encontrada: Rust (Edge) Senior Engineer - Latin America - Remote | Azumo | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4346037180/
+Vaga encontrada: Cloud Engineer | BIP Brasil | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4375237321/
+Vaga encontrada: Customer Service Representative (Portuguese) | BingX | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4378837196/
+Vaga encontrada: Software Architect (Up to 150K USD annually) | LawnStarter | São Paulo, São Paulo, Brasil (Remoto) | https://www.linkedin.com/jobs/view/4374528374/
+Limite de páginas por ciclo atingido (3).
+
+Vagas coletadas de todas as páginas:
+Total de vagas coletadas: 4
+Total bruto antes de normalização/deduplicação: 4
+
+Vagas exportadas para vagas_linkedin.txt
+Modo sem banco ativo. Aplicando candidaturas diretamente na lista coletada do ciclo.
+Total de links para candidatura direta: 4
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4346037180/
+[ETAPA] Procurando botão de candidatura simplificada...

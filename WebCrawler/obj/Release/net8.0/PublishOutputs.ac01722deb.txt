@@ -1,0 +1,14 @@
+C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\publish-heartbeat\WebCrawler.exe
+C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\publish-heartbeat\WebCrawler.dll
+C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\publish-heartbeat\WebCrawler.deps.json
+C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\publish-heartbeat\WebCrawler.runtimeconfig.json
+C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\publish-heartbeat\WebCrawler.pdb
+C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\publish-heartbeat\HtmlAgilityPack.dll
+C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\publish-heartbeat\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\publish-heartbeat\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\publish-heartbeat\Npgsql.dll
+C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\publish-heartbeat\WebDriver.Support.dll
+C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\publish-heartbeat\WebDriver.dll
+C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\publish-heartbeat\runtimes\linux\native\selenium-manager
+C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\publish-heartbeat\runtimes\osx\native\selenium-manager
+C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\publish-heartbeat\runtimes\win\native\selenium-manager.exe

@@ -1,0 +1,26 @@
+Arquivo .env carregado: C:\Users\CLOVIS\Documents\Projeto_Linkdim\.env
+Links ignorados carregados de arquivo: 68
+Links de candidaturas com sucesso carregados do historico: 24
+Configuração: TEST_MODE=False, DISABLE_DATABASE=True, MAX_PAGES_PER_CYCLE=1, MAX_APPLY_PER_CYCLE=0, CYCLE_WAIT_MINUTES=1, PERSIST_IGNORED_LINKS=True, PERSIST_SUCCESSFUL_LINKS=True, AUTO_FILL_MANDATORY_FIELDS=True
+Iniciando nova execução...
+Abrindo LinkedIn...
+Título da página: Feed | LinkedIn
+Sessão já autenticada detectada. Pulando preenchimento de login.
+Login bem-sucedido! Página atual: https://www.linkedin.com/feed/
+Abrindo coleção Easy Apply...
+Cards encontrados na página inicial: 14
+Extraindo vagas da página inicial...
+Vaga encontrada: Solution Engineer - Integrations & Implementation (Latam) | Wati | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4344493394/
+Solution Engineer - Integrations & Implementation (Latam) | Wati | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4344493394/
+Iniciando paginação...
+Limite de páginas por ciclo atingido (1).
+
+Vagas coletadas de todas as páginas:
+Total de vagas coletadas: 1
+Total bruto antes de normalização/deduplicação: 1
+
+Vagas exportadas para vagas_linkedin.txt
+Modo sem banco ativo. Aplicando candidaturas diretamente na lista coletada do ciclo.
+Total de links para candidatura direta: 1
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4344493394/
+[ETAPA] Procurando botão de candidatura simplificada...

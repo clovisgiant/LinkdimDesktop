@@ -1,0 +1,61 @@
+Arquivo .env carregado: C:\Users\CLOVIS\Documents\Projeto_Linkdim\.env
+Links ignorados carregados de arquivo: 68
+Links de candidaturas com sucesso carregados do historico: 24
+Configuração: TEST_MODE=False, DISABLE_DATABASE=True, MAX_PAGES_PER_CYCLE=0, MAX_APPLY_PER_CYCLE=0, CYCLE_WAIT_MINUTES=60, PERSIST_IGNORED_LINKS=True, PERSIST_SUCCESSFUL_LINKS=True, AUTO_FILL_MANDATORY_FIELDS=True
+Iniciando nova execução...
+Abrindo LinkedIn...
+Título da página: Feed | LinkedIn
+Sessão já autenticada detectada. Pulando preenchimento de login.
+Login bem-sucedido! Página atual: https://www.linkedin.com/feed/
+Abrindo coleção Easy Apply...
+Cards encontrados na página inicial: 14
+Extraindo vagas da página inicial...
+Vaga encontrada: Solution Engineer - Integrations & Implementation (Latam) | Wati | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4344493394/
+Solution Engineer - Integrations & Implementation (Latam) | Wati | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4344493394/
+Iniciando paginação...
+Próximo botão de paginação não ficou clicável a tempo. Encerrando paginação desta execução.
+
+Vagas coletadas de todas as páginas:
+Total de vagas coletadas: 1
+Total bruto antes de normalização/deduplicação: 1
+
+Vagas exportadas para vagas_linkedin.txt
+Modo sem banco ativo. Aplicando candidaturas diretamente na lista coletada do ciclo.
+Total de links para candidatura direta: 1
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4344493394/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4344493394/apply/?openSDUIApplyFlow=true&trackingId=dD6QomTBSzKezWuEYEkkQQ%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember102', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember102', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (4) em 'submit_not_found'.
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Botão 'Enviar candidatura' encontrado após preenchimento automático.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4344493394/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+
+Candidaturas enviadas com sucesso no ciclo: 1
+[SUCESSO] https://www.linkedin.com/jobs/view/4344493394/
+Arquivo de sucesso do ciclo: C:\Users\CLOVIS\Documents\Projeto_Linkdim\vagas_enviadas_sucesso.txt
+Arquivo historico de sucesso: C:\Users\CLOVIS\Documents\Projeto_Linkdim\vagas_enviadas_sucesso_historico.txt
+
+Resumo das vagas coletadas:
+| Título                                   | Empresa                        | Localização               | Link
+|------------------------------------------|--------------------------------|---------------------------|------
+| Solution Engineer - Integrations & Impl… | Wati                           | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4344493394/
+Encerrando driver...
+Execução finalizada. Aguardando 60 minuto(s) para próxima execução...

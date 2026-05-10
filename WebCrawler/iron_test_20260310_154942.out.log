@@ -1,0 +1,1724 @@
+Arquivo .env carregado: C:\Users\CLOVIS\Documents\Projeto_Linkdim\.env
+Links ignorados carregados de arquivo: 68
+Links de candidaturas com sucesso carregados do historico: 25
+Configuração: TEST_MODE=False, DISABLE_DATABASE=True, MAX_PAGES_PER_CYCLE=0, MAX_APPLY_PER_CYCLE=0, CYCLE_WAIT_MINUTES=60, PERSIST_IGNORED_LINKS=True, PERSIST_SUCCESSFUL_LINKS=True, AUTO_FILL_MANDATORY_FIELDS=True
+Iniciando nova execução...
+Abrindo LinkedIn...
+Título da página: Feed | LinkedIn
+Sessão já autenticada detectada. Pulando preenchimento de login.
+Login bem-sucedido! Página atual: https://www.linkedin.com/feed/
+Abrindo coleção Easy Apply...
+Cards encontrados na página inicial: 14
+Extraindo vagas da página inicial...
+Iniciando paginação...
+Indo para próxima página... (indicador index=1, texto='', aria-label='Página 2')
+Página atual após paginação: 2
+Cards encontrados na página: 14
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga encontrada: KYB Operations Analyst | MoonPay | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4369490511/
+Vaga encontrada: Python Engineer - Latin America - Remote | Azumo | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4365331762/
+Vaga encontrada: Desenvolvedor Inteligência Artificial (IA) - Sênior | Develcode | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4382092335/
+Indo para próxima página... (indicador index=2, texto='', aria-label='Página 3')
+Página atual após paginação: 3
+Cards encontrados na página: 14
+Vaga encontrada: Rust (Edge) Senior Engineer - Latin America - Remote | Azumo | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4346037180/
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga encontrada: Cloud Engineer | BIP Brasil | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4375237321/
+Vaga encontrada: Customer Service Representative (Portuguese) | BingX | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4378837196/
+Indo para próxima página... (indicador index=3, texto='', aria-label='Página 4')
+Página atual após paginação: 4
+Cards encontrados na página: 14
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 5')
+Página atual após paginação: 5
+Cards encontrados na página: 14
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Vaga encontrada: Integrations & B2B Connectivity | Microtalent is becoming INSPYR Global Solutions | Argentina (Remoto) | https://www.linkedin.com/jobs/view/4378834598/
+Vaga encontrada: Golang Developer - Remote | INDI Staffing Services | Rio de Janeiro, Brasil (Remoto) | https://www.linkedin.com/jobs/view/4383751157/
+Vaga encontrada: Senior Full-Stack Engineer (NextJS) - Independent Contractor | SeedTrust Escrow | São Paulo e Região (Remoto) | https://www.linkedin.com/jobs/view/4354200315/
+Vaga encontrada: Especialista de Sistemas TI | L'OCCITANE Group | São Paulo, São Paulo, Brasil (Híbrido) | https://www.linkedin.com/jobs/view/4373715144/
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 6')
+Página atual após paginação: 6
+Cards encontrados na página: 14
+Vaga encontrada: Software Engineer Sênior - Vaga afirmativa para pessoas LGBTQIAPN+ | Artefact | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4314905941/
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Vaga encontrada: Lead Java Developer - Relocation to Portugal | Aubay Portugal | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4370568150/
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 7')
+Página atual após paginação: 7
+Cards encontrados na página: 14
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga encontrada: Assistente Administrativo - PcD | Stefanini Group | São Paulo, São Paulo, Brasil (Presencial) | https://www.linkedin.com/jobs/view/4371894176/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga encontrada: AI Training Experts - Rio de Janeiro | Prolific | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4366857033/
+Vaga encontrada: Call Center Representative | Genesis Orthopedics & Sports Medicine | Brasília, Distrito Federal, Brasil (Remoto) | https://www.linkedin.com/jobs/view/4365566423/
+Vaga encontrada: Adobe Developer (AEM) | Specialist | Compass UOL | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4372551198/
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 8')
+Página atual após paginação: 8
+Cards encontrados na página: 14
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Vaga encontrada: Mobile Engineer | Astra AI | Minas Gerais, Brasil (Remoto) | https://www.linkedin.com/jobs/view/4305724523/
+Vaga encontrada: ANALISTA DE SISTEMAS ORACLE PL - BARUERI/SP | SGS | Barueri, São Paulo, Brasil (Presencial) | https://www.linkedin.com/jobs/view/4358140550/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga encontrada: Staff Data Engineer (Regulatory) | RecargaPay | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4382995780/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 9')
+Página atual após paginação: 9
+Cards encontrados na página: 14
+Vaga encontrada: Senior QA Engineer - Desktop and Distributed Systems | Sur Global | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4369770821/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga encontrada: Desenvolvedor Java - Híbrido | Foursys | São Paulo, São Paulo, Brasil (Híbrido) | https://www.linkedin.com/jobs/view/4382981078/
+Vaga encontrada: PKI Security Engineer | MatchPoint | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4380025170/
+Vaga encontrada: Fullstack Android Developer - Remote | INDI Staffing Services | Florianópolis, Santa Catarina, Brasil (Remoto) | https://www.linkedin.com/jobs/view/4383747447/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga encontrada: FBS Power Platform Developer | Capgemini | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4360500441/
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 10')
+Página atual após paginação: 10
+Cards encontrados na página: 14
+Vaga encontrada: Especialista Java | Solutis Tecnologias | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4235522712/
+Vaga encontrada: FBS Business Solution Analyst (Data Analyst) | Capgemini | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4354034708/
+Vaga encontrada: Research Staff, Voice AI Foundations | Jobgether | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4383723568/
+Vaga encontrada: Manual QA Engineer | Oowlish | Fortaleza e Região (Remoto) | https://www.linkedin.com/jobs/view/4366173382/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Indo para próxima página... (aria-next, texto='', aria-label='Exibir próximas coleções')
+Primeira tentativa de paginação não avançou. Tentando novamente...
+Próximo botão de paginação não avançou a lista a tempo. Encerrando paginação desta execução.
+
+Vagas coletadas de todas as páginas:
+Total de vagas coletadas: 28
+Total bruto antes de normalização/deduplicação: 28
+
+Vagas exportadas para vagas_linkedin.txt
+Modo sem banco ativo. Aplicando candidaturas diretamente na lista coletada do ciclo.
+Total de links para candidatura direta: 28
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4369490511/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4369490511/apply/?openSDUIApplyFlow=true&trackingId=Ya%2FZW1BtQg26pv%2B5symV8Q%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember117', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember117', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Detectada etapa adicional. Tentando 'Avançar' extra #1...
+[DEBUG NEXT] Clique sem progressão confirmada na etapa 'etapa extra 1'. before='modal:open|title:Candidate-se na MoonPay|progress:25|progressText:Valor atual: 25|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:additional questions do you have at least 1 year of hands-on experience conducting kyb (corporate onboarding), not only individual kyc?do you have at least 1 year of hands-on experience conducting kyb (corporate onboarding), not only individual kyc? obrigatóri' after='modal:open|title:Candidate-se na MoonPay|progress:25|progressText:Valor atual: 25|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:additional questions do you have at least 1 year of hands-on experience conducting kyb (corporate onboarding), not only individual kyc?do you have at least 1 year of hands-on experience conducting kyb (corporate onboarding), not only individual kyc? obrigatóri'
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_155226_618_4369490511_next_clicked_but_not_progressed_etapa extra 1.html
+[ETAPA] 'Avançar' extra #1 não pôde ser concluído.
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=4, required_selects=4, unresolved_selects=4, unresolved_required_selects=4, please=4, select_option=4, required_pt=4, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (4) em 'screening_before_review'.
+[AUTO-FILL] Tentando avançar após preencher perguntas obrigatórias.
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: screening_autofill_advance.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember117', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Perguntas obrigatórias ainda bloqueando envio. Pulando vaga por enquanto.
+[DEBUG SCREENING] screening_gate_detected: visible_selects=1, required_selects=1, unresolved_selects=1, unresolved_required_selects=1, please=0, select_option=1, required_pt=5, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4369490511/ (motivo: REQUIRES_SELECT_QUESTIONNAIRE)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4365331762/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4365331762/apply/?openSDUIApplyFlow=true&trackingId=sc6BT8zMTK2q7iinqhKuwQ%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember104', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember104', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=3, required_selects=3, unresolved_selects=3, unresolved_required_selects=3, please=0, select_option=3, required_pt=6, required_en=0, years_q=2, additional=1, screening=0, hear_about_us=0
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (4) em 'screening_before_review'.
+[ETAPA] Perguntas obrigatórias ainda bloqueando envio. Pulando vaga por enquanto.
+[DEBUG SCREENING] screening_gate_detected: visible_selects=3, required_selects=3, unresolved_selects=0, unresolved_required_selects=0, please=0, select_option=3, required_pt=6, required_en=0, years_q=2, additional=1, screening=0, hear_about_us=0
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4365331762/ (motivo: REQUIRES_SELECT_QUESTIONNAIRE)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4382092335/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4382092335/apply/?openSDUIApplyFlow=true&trackingId=a8iyvJ2NT9qf2gX93qSSTw%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember92', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember92', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (2) em 'submit_not_found'.
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Botão 'Enviar candidatura' encontrado após preenchimento automático.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4382092335/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4346037180/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4346037180/apply/?openSDUIApplyFlow=true&trackingId=7hv3nOMMQTO6QXaxaTfgLQ%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember103', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember103', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=3, required_selects=3, unresolved_selects=3, unresolved_required_selects=3, please=0, select_option=3, required_pt=5, required_en=0, years_q=2, additional=1, screening=0, hear_about_us=0
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (4) em 'screening_before_review'.
+[ETAPA] Perguntas obrigatórias ainda bloqueando envio. Pulando vaga por enquanto.
+[DEBUG SCREENING] screening_gate_detected: visible_selects=3, required_selects=3, unresolved_selects=0, unresolved_required_selects=0, please=0, select_option=3, required_pt=5, required_en=0, years_q=2, additional=1, screening=0, hear_about_us=0
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4346037180/ (motivo: REQUIRES_SELECT_QUESTIONNAIRE)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4375237321/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4375237321/apply/?openSDUIApplyFlow=true&trackingId=i61rB4pmT9uQvdhu25vG1w%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember92', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember92', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (1) em 'submit_not_found'.
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Botão 'Enviar candidatura' encontrado após preenchimento automático.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4375237321/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4378837196/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4378837196/apply/?openSDUIApplyFlow=true&trackingId=grTNb%2BpUQzeE2l4ZdmTKJg%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember93', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember93', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=5, required_selects=5, unresolved_selects=3, unresolved_required_selects=3, please=0, select_option=5, required_pt=5, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (3) em 'screening_before_review'.
+[ETAPA] Perguntas obrigatórias ainda bloqueando envio. Pulando vaga por enquanto.
+[DEBUG SCREENING] screening_gate_detected: visible_selects=5, required_selects=5, unresolved_selects=0, unresolved_required_selects=0, please=0, select_option=5, required_pt=5, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4378837196/ (motivo: REQUIRES_SELECT_QUESTIONNAIRE)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4378834598/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4378834598/apply/?openSDUIApplyFlow=true&trackingId=CgVx%2FHuWSM2N%2BSm5ssjJLg%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup esperado não foi validado antes do Avançar.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_155901_104_4378834598_popup_contact_info_not_found_before_next.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4383751157/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4383751157/apply/?openSDUIApplyFlow=true&trackingId=jR729%2FOtRX2BRt9MQS1ByA%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: modal_visible.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='footer button.artdeco-button--primary', id='ember96', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Enviar candidatura', text='Enviar candidatura'
+[ETAPA] Transição após primeiro Avançar detectada: submit_visible.
+[ETAPA] Tentando selecionar currículo...
+Nenhuma opção de currículo encontrada nesta etapa (pode não ser necessária). 
+[ETAPA] Tentando segundo 'Avançar'...
+Modal de candidatura não encontrado na etapa: etapa de currículo. Tentando captura global do botão.
+Botão 'Avançar' não encontrado na etapa: etapa de currículo.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_160118_637_4383751157_next_not_found_etapa de currículo.html
+[ETAPA] Segundo 'Avançar' falhou na primeira tentativa; aguardando e tentando novamente...
+Nenhuma opção de currículo encontrada nesta etapa (pode não ser necessária). 
+Modal de candidatura não encontrado na etapa: etapa de currículo_retry. Tentando captura global do botão.
+Botão 'Avançar' não encontrado na etapa: etapa de currículo_retry.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_160218_308_4383751157_next_not_found_etapa de currículo_retry.html
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4354200315/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4354200315/apply/?openSDUIApplyFlow=true&trackingId=5bqheS8eTOy2B4f%2B5hlruA%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember105', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember105', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=0, required_selects=0, unresolved_selects=0, unresolved_required_selects=0, please=0, select_option=0, required_pt=6, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+[ETAPA] Perguntas obrigatórias ainda bloqueando envio. Pulando vaga por enquanto.
+[DEBUG SCREENING] screening_gate_detected: visible_selects=0, required_selects=0, unresolved_selects=0, unresolved_required_selects=0, please=0, select_option=0, required_pt=6, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4354200315/ (motivo: REQUIRES_SELECT_QUESTIONNAIRE)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4373715144/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4373715144/apply/?openSDUIApplyFlow=true&trackingId=LCPsE3rsSfC7GiXRZpuq%2BA%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember92', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: review_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='footer button.artdeco-button--primary', id='ember202', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Revise sua candidatura', text='Revisar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4373715144/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4314905941/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4314905941/apply/?openSDUIApplyFlow=true&trackingId=IPYXO5QbQqeedX7Ka5DzsQ%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup esperado não foi validado antes do Avançar.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_160519_283_4314905941_popup_contact_info_not_found_before_next.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4370568150/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4370568150/apply/?openSDUIApplyFlow=true&trackingId=PmzYezDLRbCWaCG%2BzaxSQw%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember92', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember92', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (2) em 'submit_not_found'.
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Botão 'Enviar candidatura' encontrado após preenchimento automático.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4370568150/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4371894176/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4371894176/apply/?openSDUIApplyFlow=true&trackingId=75aPC89jReSaF5QK0DEsnA%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember86', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember86', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (3) em 'submit_not_found'.
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Botão 'Enviar candidatura' encontrado após preenchimento automático.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4371894176/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4366857033/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4366857033/apply/?openSDUIApplyFlow=true&trackingId=U%2FsNgjElSXOV9wbAHVhkyg%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember97', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember97', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=1, required_selects=1, unresolved_selects=1, unresolved_required_selects=1, please=0, select_option=1, required_pt=1, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (1) em 'screening_before_review'.
+[AUTO-FILL] Gate de questionário obrigatório removido. Continuando fluxo.
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4366857033/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4365566423/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4365566423/apply/?openSDUIApplyFlow=true&trackingId=bGV4dv5%2BRICxu7TRvIruCw%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember99', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember99', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Detectada etapa adicional. Tentando 'Avançar' extra #1...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa extra 1.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember231', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+Nenhuma opção de currículo encontrada nesta etapa (pode não ser necessária). 
+[ETAPA] Detectada etapa adicional. Tentando 'Avançar' extra #2...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa extra 2.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember231', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+Nenhuma opção de currículo encontrada nesta etapa (pode não ser necessária). 
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (3) em 'submit_not_found'.
+Botão 'Revisar' clicado com sucesso.
+Vaga com etapas obrigatórias adicionais detectada. Ignorando por enquanto.
+[ETAPA] Questionário obrigatório detectado (sem botão de envio). Pulando vaga por enquanto.
+[DEBUG SCREENING] screening_gate_detected: visible_selects=0, required_selects=0, unresolved_selects=0, unresolved_required_selects=0, please=2, select_option=0, required_pt=2, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4365566423/ (motivo: REQUIRES_SELECT_QUESTIONNAIRE)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4372551198/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4372551198/apply/?openSDUIApplyFlow=true&trackingId=aZf02IgyTTGyAIoG19ytuw%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember89', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember89', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (2) em 'submit_not_found'.
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Botão 'Enviar candidatura' encontrado após preenchimento automático.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4372551198/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4305724523/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4305724523/apply/?openSDUIApplyFlow=true&trackingId=TqOrmAOiRmGVahSt47RJIQ%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember93', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember93', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4305724523/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4358140550/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4358140550/apply/?openSDUIApplyFlow=true&trackingId=uXM5rQsMSiikalvCJFBQPA%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember94', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember94', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Detectada etapa adicional. Tentando 'Avançar' extra #1...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa extra 1.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember94', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+Nenhuma opção de currículo encontrada nesta etapa (pode não ser necessária). 
+[ETAPA] Detectada etapa adicional. Tentando 'Avançar' extra #2...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa extra 2.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember231', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+Nenhuma opção de currículo encontrada nesta etapa (pode não ser necessária). 
+[ETAPA] Detectada etapa adicional. Tentando 'Avançar' extra #3...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa extra 3.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember231', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+Nenhuma opção de currículo encontrada nesta etapa (pode não ser necessária). 
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (8) em 'submit_not_found'.
+[AUTO-FILL] Tentando 'Avançar' após preenchimento automático (tentativa 1/2)...
+[DEBUG NEXT] Clique sem progressão confirmada na etapa 'autofill_no_submit_1'. before='modal:open|title:Candidate-se na SGS|progress:71|progressText:Valor atual: 71|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:perguntas adicionais prezada pessoa candidata, agradecemos pelo seu interesse em fazer parte da sgs! como parte do nosso processo seletivo, pedimos que você preencha o questionário a seguir. este que nos ajudará a conhecer melhor suas qualificações, e expectat' after='modal:open|title:Candidate-se na SGS|progress:71|progressText:Valor atual: 71|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:perguntas adicionais prezada pessoa candidata, agradecemos pelo seu interesse em fazer parte da sgs! como parte do nosso processo seletivo, pedimos que você preencha o questionário a seguir. este que nos ajudará a conhecer melhor suas qualificações, e expectat'
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_161504_109_4358140550_next_clicked_but_not_progressed_autofill_no_submit_1.html
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Vaga com etapas obrigatórias adicionais detectada. Ignorando por enquanto.
+[DEBUG REQUIRED] (nenhum campo obrigatório vazio detectado automaticamente)
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_161515_803_4358140550_submit_not_found_or_required_questions.html
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4358140550/ (motivo: REQUIRES_MANDATORY_FIELDS)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4382995780/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4382995780/apply/?openSDUIApplyFlow=true&trackingId=yD45gxlYQ16PDkZzGOz4QA%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember101', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember101', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Detectada etapa adicional. Tentando 'Avançar' extra #1...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa extra 1.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember226', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+Nenhuma opção de currículo encontrada nesta etapa (pode não ser necessária). 
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4382995780/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4369770821/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4369770821/apply/?openSDUIApplyFlow=true&trackingId=FfF%2BqPLARBSJ9ZWILbPvsw%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+[DEBUG NEXT] Clique sem progressão confirmada na etapa 'primeira etapa'. before='modal:open|title:Candidate-se na Sur Global|progress:0|progressText:Valor atual: 0|buttons:Avançar para próxima etapa|Avançar|content:informações de contato clovis silva senior .net developer | c# | asp.net | apis rest | sql server | aws | microservices | data & cloud são paulo, são paulo, brasil first name last name phone country codephone country code obrigatório select an option brazil (+' after='modal:open|title:Candidate-se na Sur Global|progress:0|progressText:Valor atual: 0|buttons:Avançar para próxima etapa|Avançar|content:informações de contato clovis silva senior .net developer | c# | asp.net | apis rest | sql server | aws | microservices | data & cloud são paulo, são paulo, brasil first name last name phone country codephone country code obrigatório select an option brazil (+'
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_161658_982_4369770821_next_clicked_but_not_progressed_primeira etapa.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+[ETAPA] Campos obrigatórios detectados. Pulando vaga por enquanto.
+[DEBUG REQUIRED] missing=[input:text:single-typeahead-entity-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4369770821-28494887218-location-GEO-LOCATION], messages=[Please enter a valid answer]
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4369770821/ (motivo: REQUIRES_MANDATORY_FIELDS)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4382981078/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4382981078/apply/?openSDUIApplyFlow=true&trackingId=wvHD1abnQTikWBUCW0Qg9A%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember92', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember92', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4382981078/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4380025170/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4380025170/apply/?openSDUIApplyFlow=true&trackingId=kv2FQ9twTWi9lYmey3hF7Q%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember99', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember99', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Detectada etapa adicional. Tentando 'Avançar' extra #1...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa extra 1.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember99', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+Nenhuma opção de currículo encontrada nesta etapa (pode não ser necessária). 
+[ETAPA] Detectada etapa adicional. Tentando 'Avançar' extra #2...
+[DEBUG NEXT] Clique sem progressão confirmada na etapa 'etapa extra 2'. before='modal:open|title:Candidate-se na MatchPoint|progress:50|progressText:Valor atual: 50|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:additional questions do you have a valid driver's license?do you have a valid driver's license? obrigatório yes no please make a selection' after='modal:open|title:Candidate-se na MatchPoint|progress:50|progressText:Valor atual: 50|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:additional questions do you have a valid driver's license?do you have a valid driver's license? obrigatório yes no please make a selection'
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_161918_629_4380025170_next_clicked_but_not_progressed_etapa extra 2.html
+[ETAPA] 'Avançar' extra #2 não pôde ser concluído.
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=0, required_selects=0, unresolved_selects=0, unresolved_required_selects=0, please=1, select_option=0, required_pt=1, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+[ETAPA] Perguntas obrigatórias ainda bloqueando envio. Pulando vaga por enquanto.
+[DEBUG SCREENING] screening_gate_detected: visible_selects=0, required_selects=0, unresolved_selects=0, unresolved_required_selects=0, please=1, select_option=0, required_pt=1, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4380025170/ (motivo: REQUIRES_SELECT_QUESTIONNAIRE)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4383747447/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4383747447/apply/?openSDUIApplyFlow=true&trackingId=FnN5iP55QFOqVTWyvazt%2Bg%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember96', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: review_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='footer button.artdeco-button--primary', id='ember205', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Revise sua candidatura', text='Revisar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4383747447/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4360500441/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4360500441/apply/?openSDUIApplyFlow=true&trackingId=noFCyIbmSGSnTwRdB4fQJw%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+[DEBUG NEXT] Clique sem progressão confirmada na etapa 'primeira etapa'. before='modal:open|title:Candidate-se na Capgemini|progress:0|progressText:Valor atual: 0|buttons:Avançar para próxima etapa|Avançar|content:informações de contato clovis silva senior .net developer | c# | asp.net | apis rest | sql server | aws | microservices | data & cloud são paulo, são paulo, brasil first name last name phone country codephone country code obrigatório select an option brazil (+' after='modal:open|title:Candidate-se na Capgemini|progress:0|progressText:Valor atual: 0|buttons:Avançar para próxima etapa|Avançar|content:informações de contato clovis silva senior .net developer | c# | asp.net | apis rest | sql server | aws | microservices | data & cloud são paulo, são paulo, brasil first name last name phone country codephone country code obrigatório select an option brazil (+'
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_162126_690_4360500441_next_clicked_but_not_progressed_primeira etapa.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+[ETAPA] Campos obrigatórios detectados. Pulando vaga por enquanto.
+[DEBUG REQUIRED] missing=[input:text:single-typeahead-entity-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4360500441-18362767817-location-GEO-LOCATION], messages=[Please enter a valid answer]
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4360500441/ (motivo: REQUIRES_MANDATORY_FIELDS)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4235522712/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4235522712/apply/?openSDUIApplyFlow=true&trackingId=nY1V2HKxTPGiJ43dUFx0bA%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: modal_visible.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='button[aria-label*="Avançar"]', id='ember105', class='artdeco-button artdeco-button--muted artdeco-button--icon-right artdeco-button--1 artdeco-button--tertiary ember-view artdeco-pagination__button artdeco-pagination__button--next', aria-label='Avançar', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: submit_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='button[aria-label*="Avançar"]', id='ember105', class='artdeco-button artdeco-button--muted artdeco-button--icon-right artdeco-button--1 artdeco-button--tertiary ember-view artdeco-pagination__button artdeco-pagination__button--next', aria-label='Avançar', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4235522712/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4354034708/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4354034708/apply/?openSDUIApplyFlow=true&trackingId=k1Z25AMDQgWMG8c7vbDpBw%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember100', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+[DEBUG NEXT] Clique sem progressão confirmada na etapa 'etapa de currículo'. before='modal:open|title:Candidate-se na Capgemini|progress:20|progressText:Valor atual: 20|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:resume be sure to include an updated resume clovis_silva.pdf 65 kb · última utilização em 10/03/2026 desmarcar seleção de resume clovis_silva.pdf doc-20240822-wa0044..pdf 65 kb · última utilização em 07/02/2025 selecionar resume doc-20240822-wa0044..pdf upload' after='modal:open|title:Candidate-se na Capgemini|progress:20|progressText:Valor atual: 20|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:resume be sure to include an updated resume clovis_silva.pdf 65 kb · última utilização em 10/03/2026 desmarcar seleção de resume clovis_silva.pdf doc-20240822-wa0044..pdf 65 kb · última utilização em 07/02/2025 selecionar resume doc-20240822-wa0044..pdf upload'
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_162408_691_4354034708_next_clicked_but_not_progressed_etapa de currículo.html
+[ETAPA] Segundo 'Avançar' falhou na primeira tentativa; aguardando e tentando novamente...
+Currículo já selecionado no popup.
+[DEBUG NEXT] Clique sem progressão confirmada na etapa 'etapa de currículo_retry'. before='modal:open|title:Candidate-se na Capgemini|progress:20|progressText:Valor atual: 20|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:resume be sure to include an updated resume clovis_silva.pdf 65 kb · última utilização em 10/03/2026 desmarcar seleção de resume clovis_silva.pdf doc-20240822-wa0044..pdf 65 kb · última utilização em 07/02/2025 selecionar resume doc-20240822-wa0044..pdf upload' after='modal:open|title:Candidate-se na Capgemini|progress:20|progressText:Valor atual: 20|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:resume be sure to include an updated resume clovis_silva.pdf 65 kb · última utilização em 10/03/2026 desmarcar seleção de resume clovis_silva.pdf doc-20240822-wa0044..pdf 65 kb · última utilização em 07/02/2025 selecionar resume doc-20240822-wa0044..pdf upload'
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_162418_601_4354034708_next_clicked_but_not_progressed_etapa de currículo_retry.html
+[ETAPA] Campos obrigatórios detectados. Pulando vaga por enquanto.
+[DEBUG REQUIRED] missing=[textarea:textarea:Cover letter], messages=[Please enter a valid answer]
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4354034708/ (motivo: REQUIRES_MANDATORY_FIELDS)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4383723568/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4383723568/apply/?openSDUIApplyFlow=true&trackingId=oXk5V0xpQpKxiKhuQMWkww%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember98', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember98', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4383723568/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4366173382/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4366173382/apply/?openSDUIApplyFlow=true&trackingId=%2BKr%2Bj227RZWR8HJQW0nHLg%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember115', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember115', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Detectada etapa adicional. Tentando 'Avançar' extra #1...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa extra 1.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember115', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+Nenhuma opção de currículo encontrada nesta etapa (pode não ser necessária). 
+[ETAPA] Detectada etapa adicional. Tentando 'Avançar' extra #2...
+[DEBUG NEXT] Clique sem progressão confirmada na etapa 'etapa extra 2'. before='modal:open|title:Candidate-se na Oowlish|progress:29|progressText:Valor atual: 29|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:additional questions what is your level of english?what is your level of english? obrigatório i don't know english at all basic intermediate (intermediate reading and writing) intermediate + (i can have a fluid conversation in english) advanced native please m' after='modal:open|title:Candidate-se na Oowlish|progress:29|progressText:Valor atual: 29|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:additional questions what is your level of english?what is your level of english? obrigatório i don't know english at all basic intermediate (intermediate reading and writing) intermediate + (i can have a fluid conversation in english) advanced native please m'
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_162605_871_4366173382_next_clicked_but_not_progressed_etapa extra 2.html
+[ETAPA] 'Avançar' extra #2 não pôde ser concluído.
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=0, required_selects=0, unresolved_selects=0, unresolved_required_selects=0, please=1, select_option=0, required_pt=1, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+[ETAPA] Perguntas obrigatórias ainda bloqueando envio. Pulando vaga por enquanto.
+[DEBUG SCREENING] screening_gate_detected: visible_selects=0, required_selects=0, unresolved_selects=0, unresolved_required_selects=0, please=1, select_option=0, required_pt=1, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4366173382/ (motivo: REQUIRES_SELECT_QUESTIONNAIRE)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+
+Candidaturas enviadas com sucesso no ciclo: 13
+[SUCESSO] https://www.linkedin.com/jobs/view/4382092335/
+[SUCESSO] https://www.linkedin.com/jobs/view/4375237321/
+[SUCESSO] https://www.linkedin.com/jobs/view/4373715144/
+[SUCESSO] https://www.linkedin.com/jobs/view/4370568150/
+[SUCESSO] https://www.linkedin.com/jobs/view/4371894176/
+[SUCESSO] https://www.linkedin.com/jobs/view/4366857033/
+[SUCESSO] https://www.linkedin.com/jobs/view/4372551198/
+[SUCESSO] https://www.linkedin.com/jobs/view/4305724523/
+[SUCESSO] https://www.linkedin.com/jobs/view/4382995780/
+[SUCESSO] https://www.linkedin.com/jobs/view/4382981078/
+[SUCESSO] https://www.linkedin.com/jobs/view/4383747447/
+[SUCESSO] https://www.linkedin.com/jobs/view/4235522712/
+[SUCESSO] https://www.linkedin.com/jobs/view/4383723568/
+Arquivo de sucesso do ciclo: C:\Users\CLOVIS\Documents\Projeto_Linkdim\vagas_enviadas_sucesso.txt
+Arquivo historico de sucesso: C:\Users\CLOVIS\Documents\Projeto_Linkdim\vagas_enviadas_sucesso_historico.txt
+
+Resumo das vagas coletadas:
+| Título                                   | Empresa                        | Localização               | Link
+|------------------------------------------|--------------------------------|---------------------------|------
+| KYB Operations Analyst                   | MoonPay                        | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4369490511/
+| Python Engineer - Latin America - Remote | Azumo                          | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4365331762/
+| Desenvolvedor Inteligência Artificial (… | Develcode                      | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4382092335/
+| Rust (Edge) Senior Engineer - Latin Ame… | Azumo                          | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4346037180/
+| Cloud Engineer                           | BIP Brasil                     | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4375237321/
+| Customer Service Representative (Portug… | BingX                          | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4378837196/
+| Integrations & B2B Connectivity          | Microtalent is becoming INSPY… | Argentina (Remoto)        | https://www.linkedin.com/jobs/view/4378834598/
+| Golang Developer - Remote                | INDI Staffing Services         | Rio de Janeiro, Brasil (… | https://www.linkedin.com/jobs/view/4383751157/
+| Senior Full-Stack Engineer (NextJS) - I… | SeedTrust Escrow               | São Paulo e Região (Remo… | https://www.linkedin.com/jobs/view/4354200315/
+| Especialista de Sistemas TI              | L'OCCITANE Group               | São Paulo, São Paulo, Br… | https://www.linkedin.com/jobs/view/4373715144/
+| Software Engineer Sênior - Vaga afirmat… | Artefact                       | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4314905941/
+| Lead Java Developer - Relocation to Por… | Aubay Portugal                 | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4370568150/
+| Assistente Administrativo - PcD          | Stefanini Group                | São Paulo, São Paulo, Br… | https://www.linkedin.com/jobs/view/4371894176/
+| AI Training Experts - Rio de Janeiro     | Prolific                       | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4366857033/
+| Call Center Representative               | Genesis Orthopedics & Sports … | Brasília, Distrito Feder… | https://www.linkedin.com/jobs/view/4365566423/
+| Adobe Developer (AEM) | Specialist       | Compass UOL                    | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4372551198/
+| Mobile Engineer                          | Astra AI                       | Minas Gerais, Brasil (Re… | https://www.linkedin.com/jobs/view/4305724523/
+| ANALISTA DE SISTEMAS ORACLE PL - BARUER… | SGS                            | Barueri, São Paulo, Bras… | https://www.linkedin.com/jobs/view/4358140550/
+| Staff Data Engineer (Regulatory)         | RecargaPay                     | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4382995780/
+| Senior QA Engineer - Desktop and Distri… | Sur Global                     | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4369770821/
+| Desenvolvedor Java - Híbrido             | Foursys                        | São Paulo, São Paulo, Br… | https://www.linkedin.com/jobs/view/4382981078/
+| PKI Security Engineer                    | MatchPoint                     | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4380025170/
+| Fullstack Android Developer - Remote     | INDI Staffing Services         | Florianópolis, Santa Cat… | https://www.linkedin.com/jobs/view/4383747447/
+| FBS Power Platform Developer             | Capgemini                      | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4360500441/
+| Especialista Java                        | Solutis Tecnologias            | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4235522712/
+| FBS Business Solution Analyst (Data Ana… | Capgemini                      | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4354034708/
+| Research Staff, Voice AI Foundations     | Jobgether                      | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4383723568/
+| Manual QA Engineer                       | Oowlish                        | Fortaleza e Região (Remo… | https://www.linkedin.com/jobs/view/4366173382/
+Encerrando driver...
+Execução finalizada. Aguardando 60 minuto(s) para próxima execução...
+Iniciando nova execução...
+Abrindo LinkedIn...
+Título da página: Feed | LinkedIn
+Sessão já autenticada detectada. Pulando preenchimento de login.
+Login bem-sucedido! Página atual: https://www.linkedin.com/feed/
+Abrindo coleção Easy Apply...
+Cards encontrados na página inicial: 14
+Extraindo vagas da página inicial...
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga encontrada: Software Architect (Up to 150K USD annually) | LawnStarter | São Paulo, São Paulo, Brasil (Remoto) | https://www.linkedin.com/jobs/view/4374528374/
+Vaga encontrada: [Tech] Engenharia de Software Sênior - ADVPL | TOTVS | São Paulo, São Paulo, Brasil (Híbrido) | https://www.linkedin.com/jobs/view/4381717867/
+Software Architect (Up to 150K USD annually) | LawnStarter | São Paulo, São Paulo, Brasil (Remoto) | https://www.linkedin.com/jobs/view/4374528374/
+[Tech] Engenharia de Software Sênior - ADVPL | TOTVS | São Paulo, São Paulo, Brasil (Híbrido) | https://www.linkedin.com/jobs/view/4381717867/
+Iniciando paginação...
+Indo para próxima página... (indicador index=1, texto='', aria-label='Página 2')
+Página atual após paginação: 2
+Cards encontrados na página: 14
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Indo para próxima página... (indicador index=2, texto='', aria-label='Página 3')
+Página atual após paginação: 3
+Cards encontrados na página: 14
+Vaga encontrada: Especialista SAP MM (Importação e Centro de Distribuição) | Atos | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4379898057/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Indo para próxima página... (indicador index=3, texto='', aria-label='Página 4')
+Página atual após paginação: 4
+Cards encontrados na página: 14
+Vaga encontrada: Senior Software Engineer (.NET, Angular) - OP02019 | Dev.Pro | São Paulo, São Paulo, Brasil (Remoto) | https://www.linkedin.com/jobs/view/4364651714/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 5')
+Página atual após paginação: 5
+Cards encontrados na página: 14
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga encontrada: Manual QA Engineer | Oowlish | Porto Alegre e Região (Remoto) | https://www.linkedin.com/jobs/view/4366171436/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 6')
+Página atual após paginação: 6
+Cards encontrados na página: 14
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Vaga encontrada: Data Security Engineer | Adium Brasil | São Paulo, São Paulo, Brasil (Híbrido) | https://www.linkedin.com/jobs/view/4379893380/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga encontrada: Senior Data Scientist (MDM) | Amaris Consulting | São Paulo, Brasil (Remoto) | https://www.linkedin.com/jobs/view/4381730602/
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Vaga encontrada: Desenvolvedor (full stack) Sênior - AWS | DataEX | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4383314080/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 7')
+Página atual após paginação: 7
+Cards encontrados na página: 14
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Vaga encontrada: AI Engineer Specialist | Full-Stack [Python/Node.js/React] | Getnet | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4376829918/
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga encontrada: Data Scientist / Machine Learning Engineer | Talent | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4363114847/
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 8')
+Página atual após paginação: 8
+Cards encontrados na página: 14
+Vaga encontrada: Desenvolvedor Mobile IOS SR - Remoto | Spread Tecnologia | São Paulo, Brasil (Remoto) | https://www.linkedin.com/jobs/view/4382457124/
+Vaga encontrada: Senior Android Software Engineer (Remote) | ClassPass | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4358002682/
+Vaga encontrada: Analista de Monitoramento Pleno | Presencial - Faria Lima/ SP | Solutis Tecnologias | São Paulo, São Paulo, Brasil (Híbrido) | https://www.linkedin.com/jobs/view/4368650884/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Vaga encontrada: Dev SR Mobile iOS | T-Systems do Brasil | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4381842026/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 9')
+Página atual após paginação: 9
+Cards encontrados na página: 14
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga encontrada: DevOps Engineer | Mosten | Santos, São Paulo, Brasil (Presencial) | https://www.linkedin.com/jobs/view/4378635059/
+Vaga encontrada: Analista de compras - Júnior | Webmotors | São Paulo, São Paulo, Brasil (Híbrido) | https://www.linkedin.com/jobs/view/4379685055/
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Vaga encontrada: Full Stack Software Engineer - AI and Internal Tools | Push Operations | Florianópolis, Santa Catarina, Brasil (Remoto) | https://www.linkedin.com/jobs/view/4383397015/
+Vaga encontrada: Machine Learning Developer (Freelance) | Mindrift | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4383765149/
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 10')
+Página atual após paginação: 10
+Cards encontrados na página: 14
+Vaga encontrada: Senior Backend Engineer | SumUp | São Paulo, São Paulo, Brasil (Híbrido) | https://www.linkedin.com/jobs/view/4366601680/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga encontrada: Senior Full-Stack Mobile Engineer (React Native) | FlyMeOut | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4382333546/
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Vaga encontrada: Executive Assistant - LATAM | US Media | São Paulo e Região (Híbrido) | https://www.linkedin.com/jobs/view/4375569846/
+Indo para próxima página... (aria-next, texto='', aria-label='Exibir próximas coleções')
+Primeira tentativa de paginação não avançou. Tentando novamente...
+Próximo botão de paginação não avançou a lista a tempo. Encerrando paginação desta execução.
+
+Vagas coletadas de todas as páginas:
+Total de vagas coletadas: 21
+Total bruto antes de normalização/deduplicação: 21
+
+Vagas exportadas para vagas_linkedin.txt
+Modo sem banco ativo. Aplicando candidaturas diretamente na lista coletada do ciclo.
+Total de links para candidatura direta: 21
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4374528374/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4374528374/apply/?openSDUIApplyFlow=true&trackingId=ZzEBtbqRSm65YOnfrtw4CQ%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember113', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember113', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=0, required_selects=0, unresolved_selects=0, unresolved_required_selects=0, please=0, select_option=0, required_pt=6, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (2) em 'screening_before_review'.
+[ETAPA] Perguntas obrigatórias ainda bloqueando envio. Pulando vaga por enquanto.
+[DEBUG SCREENING] screening_gate_detected: visible_selects=0, required_selects=0, unresolved_selects=0, unresolved_required_selects=0, please=0, select_option=0, required_pt=6, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4374528374/ (motivo: REQUIRES_SELECT_QUESTIONNAIRE)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4381717867/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4381717867/apply/?openSDUIApplyFlow=true&trackingId=fogGCtCmR4uxfMxcJdMkkA%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember90', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember90', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (2) em 'submit_not_found'.
+Botão 'Revisar' clicado com sucesso.
+Vaga com etapas obrigatórias adicionais detectada. Ignorando por enquanto.
+[DEBUG REQUIRED] missing=[input:text:single-line-text-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4381717867-19715806721-numeric]
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_173030_430_4381717867_submit_not_found_or_required_questions.html
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4381717867/ (motivo: REQUIRES_MANDATORY_FIELDS)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4379898057/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4379898057/apply/?openSDUIApplyFlow=true&trackingId=ku3mHFD0S3qFHZth8JXT3Q%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember92', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember92', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (4) em 'submit_not_found'.
+Botão 'Revisar' clicado com sucesso.
+Vaga com etapas obrigatórias adicionais detectada. Ignorando por enquanto.
+[DEBUG REQUIRED] missing=[input:text:single-line-text-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4379898057-19659388897-numeric]
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_173158_051_4379898057_submit_not_found_or_required_questions.html
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4379898057/ (motivo: REQUIRES_MANDATORY_FIELDS)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4364651714/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4364651714/apply/?openSDUIApplyFlow=true&trackingId=PK9CtaRdRsuxkG9dIT8hWw%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember98', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember98', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=0, required_selects=0, unresolved_selects=0, unresolved_required_selects=0, please=0, select_option=0, required_pt=3, required_en=4, years_q=0, additional=1, screening=0, hear_about_us=0
+[ETAPA] Perguntas obrigatórias ainda bloqueando envio. Pulando vaga por enquanto.
+[DEBUG SCREENING] screening_gate_detected: visible_selects=0, required_selects=0, unresolved_selects=0, unresolved_required_selects=0, please=0, select_option=0, required_pt=3, required_en=4, years_q=0, additional=1, screening=0, hear_about_us=0
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4364651714/ (motivo: REQUIRES_SELECT_QUESTIONNAIRE)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4366171436/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4366171436/apply/?openSDUIApplyFlow=true&trackingId=CFSFlkGwT0KD69A4FkVMaA%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember117', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember117', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Detectada etapa adicional. Tentando 'Avançar' extra #1...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa extra 1.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember117', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+Nenhuma opção de currículo encontrada nesta etapa (pode não ser necessária). 
+[ETAPA] Detectada etapa adicional. Tentando 'Avançar' extra #2...
+[DEBUG NEXT] Clique sem progressão confirmada na etapa 'etapa extra 2'. before='modal:open|title:Candidate-se na Oowlish|progress:29|progressText:Valor atual: 29|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:additional questions what is your level of english?what is your level of english? obrigatório i don't know english at all basic intermediate (intermediate reading and writing) intermediate + (i can have a fluid conversation in english) advanced native please m' after='modal:open|title:Candidate-se na Oowlish|progress:29|progressText:Valor atual: 29|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:additional questions what is your level of english?what is your level of english? obrigatório i don't know english at all basic intermediate (intermediate reading and writing) intermediate + (i can have a fluid conversation in english) advanced native please m'
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_173348_238_4366171436_next_clicked_but_not_progressed_etapa extra 2.html
+[ETAPA] 'Avançar' extra #2 não pôde ser concluído.
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=0, required_selects=0, unresolved_selects=0, unresolved_required_selects=0, please=1, select_option=0, required_pt=1, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+[ETAPA] Perguntas obrigatórias ainda bloqueando envio. Pulando vaga por enquanto.
+[DEBUG SCREENING] screening_gate_detected: visible_selects=0, required_selects=0, unresolved_selects=0, unresolved_required_selects=0, please=1, select_option=0, required_pt=1, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4366171436/ (motivo: REQUIRES_SELECT_QUESTIONNAIRE)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4379893380/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4379893380/apply/?openSDUIApplyFlow=true&trackingId=o2iemS2eS2a6v69l94bE2Q%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember87', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember87', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (9) em 'submit_not_found'.
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Botão 'Enviar candidatura' encontrado após preenchimento automático.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4379893380/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4381730602/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4381730602/apply/?openSDUIApplyFlow=true&trackingId=8ilI2Y3DSoa1aSGUyrJrVg%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember104', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember104', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=1, required_selects=1, unresolved_selects=1, unresolved_required_selects=1, please=0, select_option=1, required_pt=1, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (2) em 'screening_before_review'.
+[AUTO-FILL] Gate de questionário obrigatório removido. Continuando fluxo.
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4381730602/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4383314080/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4383314080/apply/?openSDUIApplyFlow=true&trackingId=tGl%2FL7RhS3uaNkDNc%2BTwMQ%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember90', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember90', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (2) em 'submit_not_found'.
+Botão 'Revisar' clicado com sucesso.
+Vaga com etapas obrigatórias adicionais detectada. Ignorando por enquanto.
+[DEBUG REQUIRED] missing=[input:text:single-line-text-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4383314080-29602091690-numeric; input:text:single-line-text-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4383314080-29602091674-numeric; input:text:single-line-text-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4383314080-29602091730-numeric; input:text:single-line-text-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4383314080-29602091722-numeric; input:text:single-line-text-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4383314080-29602091714-numeric; input:text:single-line-text-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4383314080-29602091706-numeric; input:text:single-line-text-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4383314080-29602091746-numeric; input:text:single-line-text-form-component-formElement-urn-li-jobs-applyformcommon-easyApplyFormElement-4383314080-29602091738-numeric]
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_173748_441_4383314080_submit_not_found_or_required_questions.html
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4383314080/ (motivo: REQUIRES_MANDATORY_FIELDS)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4376829918/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4376829918/apply/?openSDUIApplyFlow=true&trackingId=nNGZI6oOR3aIMFuZ7VPuoQ%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember84', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember84', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (2) em 'submit_not_found'.
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Botão 'Enviar candidatura' encontrado após preenchimento automático.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4376829918/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4363114847/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4363114847/apply/?openSDUIApplyFlow=true&trackingId=WKkiN0a0TVeupzQE%2FRUuVA%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember92', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember92', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=2, required_selects=2, unresolved_selects=2, unresolved_required_selects=2, please=0, select_option=2, required_pt=2, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (3) em 'screening_before_review'.
+[AUTO-FILL] Gate de questionário obrigatório removido. Continuando fluxo.
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4363114847/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4382457124/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4382457124/apply/?openSDUIApplyFlow=true&trackingId=bbTslnb9TWaZsFk0FKTgvQ%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember108', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember108', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4382457124/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4358002682/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4358002682/apply/?openSDUIApplyFlow=true&trackingId=3iYYKjepTvCt68qsqGrS7Q%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember99', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember99', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Detectada etapa adicional. Tentando 'Avançar' extra #1...
+[DEBUG NEXT] Clique sem progressão confirmada na etapa 'etapa extra 1'. before='modal:open|title:Candidate-se na ClassPass|progress:50|progressText:Valor atual: 50|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:additional questions what is your current country of residence?what is your current country of residence? obrigatório select an option afghanistan albania algeria andorra angola antigua and barbuda argentina armenia australia austria azerbaijan bahamas bahrain' after='modal:open|title:Candidate-se na ClassPass|progress:50|progressText:Valor atual: 50|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:additional questions what is your current country of residence?what is your current country of residence? obrigatório select an option afghanistan albania algeria andorra angola antigua and barbuda argentina armenia australia austria azerbaijan bahamas bahrain'
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_174201_353_4358002682_next_clicked_but_not_progressed_etapa extra 1.html
+[ETAPA] 'Avançar' extra #1 não pôde ser concluído.
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=3, required_selects=3, unresolved_selects=3, unresolved_required_selects=3, please=7, select_option=3, required_pt=7, required_en=0, years_q=2, additional=1, screening=0, hear_about_us=0
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (4) em 'screening_before_review'.
+[AUTO-FILL] Tentando avançar após preencher perguntas obrigatórias.
+[DEBUG NEXT] Clique sem progressão confirmada na etapa 'screening_autofill_advance'. before='modal:open|title:Candidate-se na ClassPass|progress:50|progressText:Valor atual: 50|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:additional questions what is your current country of residence?what is your current country of residence? obrigatório select an option afghanistan albania algeria andorra angola antigua and barbuda argentina armenia australia austria azerbaijan bahamas bahrain' after='modal:open|title:Candidate-se na ClassPass|progress:50|progressText:Valor atual: 50|buttons:Voltar para etapa anterior|Voltar||Avançar para próxima etapa|Avançar|content:additional questions what is your current country of residence?what is your current country of residence? obrigatório select an option afghanistan albania algeria andorra angola antigua and barbuda argentina armenia australia austria azerbaijan bahamas bahrain'
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_174232_998_4358002682_next_clicked_but_not_progressed_screening_autofill_advance.html
+[ETAPA] Perguntas obrigatórias ainda bloqueando envio. Pulando vaga por enquanto.
+[DEBUG SCREENING] screening_gate_detected: visible_selects=3, required_selects=3, unresolved_selects=0, unresolved_required_selects=0, please=4, select_option=3, required_pt=7, required_en=0, years_q=2, additional=1, screening=0, hear_about_us=0
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4358002682/ (motivo: REQUIRES_SELECT_QUESTIONNAIRE)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4368650884/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4368650884/apply/?openSDUIApplyFlow=true&trackingId=qey3xAkjRMituDdLsGgWbw%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: modal_visible.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='button[aria-label*="Avançar"]', id='ember104', class='artdeco-button artdeco-button--muted artdeco-button--icon-right artdeco-button--1 artdeco-button--tertiary ember-view artdeco-pagination__button artdeco-pagination__button--next', aria-label='Avançar', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: submit_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='button[aria-label*="Avançar"]', id='ember104', class='artdeco-button artdeco-button--muted artdeco-button--icon-right artdeco-button--1 artdeco-button--tertiary ember-view artdeco-pagination__button artdeco-pagination__button--next', aria-label='Avançar', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4368650884/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4381842026/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4381842026/apply/?openSDUIApplyFlow=true&trackingId=9%2B1jVRPjSOW%2FeoWhZNvVLA%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember91', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember91', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (3) em 'submit_not_found'.
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Botão 'Enviar candidatura' encontrado após preenchimento automático.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4381842026/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4378635059/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4378635059/apply/?openSDUIApplyFlow=true&trackingId=R4nUBWhWS7KjCGoMQNTwMg%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember91', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember91', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4378635059/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4379685055/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4379685055/apply/?openSDUIApplyFlow=true&trackingId=f7SOTVvJQXKxBTPjvCC7Bw%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember88', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember88', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (4) em 'submit_not_found'.
+Botão 'Revisar' clicado com sucesso.
+[AUTO-FILL] Botão 'Enviar candidatura' encontrado após preenchimento automático.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4379685055/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4383397015/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4383397015/apply/?openSDUIApplyFlow=true&trackingId=Et40cJonSmqq0%2F2RjETVkg%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember96', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember96', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=0, required_selects=0, unresolved_selects=0, unresolved_required_selects=0, please=0, select_option=0, required_pt=5, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (1) em 'screening_before_review'.
+[ETAPA] Perguntas obrigatórias ainda bloqueando envio. Pulando vaga por enquanto.
+[DEBUG SCREENING] screening_gate_detected: visible_selects=0, required_selects=0, unresolved_selects=0, unresolved_required_selects=0, please=0, select_option=0, required_pt=5, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+Link adicionado à lista de ignorados desta execução: https://www.linkedin.com/jobs/view/4383397015/ (motivo: REQUIRES_SELECT_QUESTIONNAIRE)
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4383765149/
+[ETAPA] Procurando botão de candidatura simplificada...
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+Botão/link 'Continuar' clicado antes da etapa 'Avançar'.
+URL após 'Continuar': https://www.linkedin.com/jobs/view/4383765149/
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura não ficou pronto no tempo esperado.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_174939_879_4383765149_apply_flow_not_ready_after_easy_apply.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4366601680/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4366601680/apply/?openSDUIApplyFlow=true&trackingId=zWDZ7d2aQmOvPPxRrGK77g%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember120', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember120', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=2, required_selects=2, unresolved_selects=1, unresolved_required_selects=1, please=0, select_option=2, required_pt=2, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (2) em 'screening_before_review'.
+[AUTO-FILL] Gate de questionário obrigatório removido. Continuando fluxo.
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4366601680/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4382333546/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4382333546/apply/?openSDUIApplyFlow=true&trackingId=HTRfdhCMTlukZq1sGdXmKQ%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: next_button_ready.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember91', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Transição após primeiro Avançar detectada: resume_visible.
+[ETAPA] Tentando selecionar currículo...
+Currículo já selecionado no popup.
+[ETAPA] Tentando segundo 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: etapa de currículo.
+[DEBUG NEXT] selector='div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]', id='ember91', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Avançar para próxima etapa', text='Avançar'
+[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...
+[DEBUG SCREENING] screening_gate_detected: visible_selects=2, required_selects=2, unresolved_selects=1, unresolved_required_selects=1, please=0, select_option=2, required_pt=2, required_en=0, years_q=0, additional=1, screening=0, hear_about_us=0
+[AUTO-FILL] Campos obrigatórios preenchidos automaticamente (2) em 'screening_before_review'.
+[AUTO-FILL] Gate de questionário obrigatório removido. Continuando fluxo.
+[ETAPA] Tentando etapa 'Revisar' (quando existir)...
+Botão 'Revisar' clicado com sucesso.
+Botão 'Enviar candidatura' clicado com sucesso.
+Vaga registrada como enviada com sucesso: https://www.linkedin.com/jobs/view/4382333546/ (origem: DIRECT_LIST_FLOW)
+Fluxo concluído para a vaga na lista direta.
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4375569846/
+[ETAPA] Procurando botão de candidatura simplificada...
+Clique não abriu popup; usando fallback SDUI navigate para: https://www.linkedin.com/jobs/view/4375569846/apply/?openSDUIApplyFlow=true&trackingId=ARpjD%2BBZSjaaTcLryyusQQ%3D%3D
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura pronto: modal_visible.
+[CHECK POPUP] Validando conteúdo do popup antes do botão 'Avançar'...
+[CHECK POPUP] Popup validado com sucesso (Informações de contato + botão Avançar).
+[ETAPA] Tentando primeiro 'Avançar'...
+Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: primeira etapa.
+[DEBUG NEXT] selector='footer button.artdeco-button--primary', id='ember95', class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view', aria-label='Enviar candidatura', text='Enviar candidatura'
+[ETAPA] Transição após primeiro Avançar detectada: submit_visible.
+[ETAPA] Tentando selecionar currículo...
+Nenhuma opção de currículo encontrada nesta etapa (pode não ser necessária). 
+[ETAPA] Tentando segundo 'Avançar'...
+Modal de candidatura não encontrado na etapa: etapa de currículo. Tentando captura global do botão.
+Botão 'Avançar' não encontrado na etapa: etapa de currículo.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_175356_461_4375569846_next_not_found_etapa de currículo.html
+[ETAPA] Segundo 'Avançar' falhou na primeira tentativa; aguardando e tentando novamente...
+Nenhuma opção de currículo encontrada nesta etapa (pode não ser necessária). 
+Modal de candidatura não encontrado na etapa: etapa de currículo_retry. Tentando captura global do botão.
+Botão 'Avançar' não encontrado na etapa: etapa de currículo_retry.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_175456_109_4375569846_next_not_found_etapa de currículo_retry.html
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+
+Candidaturas enviadas com sucesso no ciclo: 11
+[SUCESSO] https://www.linkedin.com/jobs/view/4379893380/
+[SUCESSO] https://www.linkedin.com/jobs/view/4381730602/
+[SUCESSO] https://www.linkedin.com/jobs/view/4376829918/
+[SUCESSO] https://www.linkedin.com/jobs/view/4363114847/
+[SUCESSO] https://www.linkedin.com/jobs/view/4382457124/
+[SUCESSO] https://www.linkedin.com/jobs/view/4368650884/
+[SUCESSO] https://www.linkedin.com/jobs/view/4381842026/
+[SUCESSO] https://www.linkedin.com/jobs/view/4378635059/
+[SUCESSO] https://www.linkedin.com/jobs/view/4379685055/
+[SUCESSO] https://www.linkedin.com/jobs/view/4366601680/
+[SUCESSO] https://www.linkedin.com/jobs/view/4382333546/
+Arquivo de sucesso do ciclo: C:\Users\CLOVIS\Documents\Projeto_Linkdim\vagas_enviadas_sucesso.txt
+Arquivo historico de sucesso: C:\Users\CLOVIS\Documents\Projeto_Linkdim\vagas_enviadas_sucesso_historico.txt
+
+Resumo das vagas coletadas:
+| Título                                   | Empresa                        | Localização               | Link
+|------------------------------------------|--------------------------------|---------------------------|------
+| Software Architect (Up to 150K USD annu… | LawnStarter                    | São Paulo, São Paulo, Br… | https://www.linkedin.com/jobs/view/4374528374/
+| [Tech] Engenharia de Software Sênior - … | TOTVS                          | São Paulo, São Paulo, Br… | https://www.linkedin.com/jobs/view/4381717867/
+| Especialista SAP MM (Importação e Centr… | Atos                           | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4379898057/
+| Senior Software Engineer (.NET, Angular… | Dev.Pro                        | São Paulo, São Paulo, Br… | https://www.linkedin.com/jobs/view/4364651714/
+| Manual QA Engineer                       | Oowlish                        | Porto Alegre e Região (R… | https://www.linkedin.com/jobs/view/4366171436/
+| Data Security Engineer                   | Adium Brasil                   | São Paulo, São Paulo, Br… | https://www.linkedin.com/jobs/view/4379893380/
+| Senior Data Scientist (MDM)              | Amaris Consulting              | São Paulo, Brasil (Remot… | https://www.linkedin.com/jobs/view/4381730602/
+| Desenvolvedor (full stack) Sênior - AWS  | DataEX                         | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4383314080/
+| AI Engineer Specialist | Full-Stack [Py… | Getnet                         | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4376829918/
+| Data Scientist / Machine Learning Engin… | Talent                         | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4363114847/
+| Desenvolvedor Mobile IOS SR - Remoto     | Spread Tecnologia              | São Paulo, Brasil (Remot… | https://www.linkedin.com/jobs/view/4382457124/
+| Senior Android Software Engineer (Remot… | ClassPass                      | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4358002682/
+| Analista de Monitoramento Pleno | Prese… | Solutis Tecnologias            | São Paulo, São Paulo, Br… | https://www.linkedin.com/jobs/view/4368650884/
+| Dev SR Mobile iOS                        | T-Systems do Brasil            | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4381842026/
+| DevOps Engineer                          | Mosten                         | Santos, São Paulo, Brasi… | https://www.linkedin.com/jobs/view/4378635059/
+| Analista de compras - Júnior             | Webmotors                      | São Paulo, São Paulo, Br… | https://www.linkedin.com/jobs/view/4379685055/
+| Full Stack Software Engineer - AI and I… | Push Operations                | Florianópolis, Santa Cat… | https://www.linkedin.com/jobs/view/4383397015/
+| Machine Learning Developer (Freelance)   | Mindrift                       | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4383765149/
+| Senior Backend Engineer                  | SumUp                          | São Paulo, São Paulo, Br… | https://www.linkedin.com/jobs/view/4366601680/
+| Senior Full-Stack Mobile Engineer (Reac… | FlyMeOut                       | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4382333546/
+| Executive Assistant - LATAM              | US Media                       | São Paulo e Região (Híbr… | https://www.linkedin.com/jobs/view/4375569846/
+Encerrando driver...
+Execução finalizada. Aguardando 60 minuto(s) para próxima execução...
+Iniciando nova execução...
+Abrindo LinkedIn...
+Título da página: Feed | LinkedIn
+Sessão já autenticada detectada. Pulando preenchimento de login.
+Login bem-sucedido! Página atual: https://www.linkedin.com/feed/
+Abrindo coleção Easy Apply...
+Cards encontrados na página inicial: 14
+Extraindo vagas da página inicial...
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Iniciando paginação...
+Indo para próxima página... (indicador index=1, texto='', aria-label='Página 2')
+Página atual após paginação: 2
+Cards encontrados na página: 14
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga encontrada: Software Engineer Sênior | Artefact | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4314912837/
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Indo para próxima página... (indicador index=2, texto='', aria-label='Página 3')
+Página atual após paginação: 3
+Cards encontrados na página: 14
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Indo para próxima página... (indicador index=3, texto='', aria-label='Página 4')
+Página atual após paginação: 4
+Cards encontrados na página: 14
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Vaga encontrada: Manual QA Engineer | Oowlish | Brasília, Distrito Federal, Brasil (Remoto) | https://www.linkedin.com/jobs/view/4366164641/
+Vaga encontrada: Delphi Developer | Solas IT Recruitment | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4383734168/
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 5')
+Página atual após paginação: 5
+Cards encontrados na página: 14
+Vaga encontrada: Integrations & B2B Connectivity | Microtalent is becoming INSPYR Global Solutions | Argentina (Remoto) | https://www.linkedin.com/jobs/view/4378834598/
+Vaga encontrada: Desenvolvedor full stack - RPA | CHALFIN, GOLDBERG & VAINBOIM Advogados | Rio de Janeiro, Brasil (Remoto) | https://www.linkedin.com/jobs/view/4378524923/
+Vaga encontrada: Engenheiro de Dados e ML Sênior | GRUPO LPJ | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4380353224/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 6')
+Página atual após paginação: 6
+Cards encontrados na página: 14
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Vaga encontrada: Mainframe Storage Engineer (CA tools specialist) | ITTConnect | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4365325802/
+Vaga encontrada: AI Operations Executive (Full Time) | Darwin AI | São Paulo, São Paulo, Brasil (Híbrido) | https://www.linkedin.com/jobs/view/4370368758/
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 7')
+Página atual após paginação: 7
+Cards encontrados na página: 14
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga encontrada: ATM Tech Support Specialist | Bitcoin Depot | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4308020774/
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 8')
+Página atual após paginação: 8
+Cards encontrados na página: 14
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Vaga encontrada: Associate II - Capital Formation | Prisma Capital (Brasil) | São Paulo, São Paulo, Brasil (Presencial) | https://www.linkedin.com/jobs/view/4373706264/
+Vaga encontrada: Analista de Experiência do Cliente Pleno / Client Insights | Serasa Experian | São Paulo, São Paulo, Brasil (Híbrido) | https://www.linkedin.com/jobs/view/4383356551/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 9')
+Página atual após paginação: 9
+Cards encontrados na página: 14
+Vaga encontrada: Lead Data DevOps Specialist (Azure) | EPAM Systems | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4360514282/
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Indo para próxima página... (indicador index=4, texto='', aria-label='Página 10')
+Página atual após paginação: 10
+Cards encontrados na página: 14
+Vaga encontrada: Desenvolvedor(a) Back End Java SR | Remoto | Solutis Tecnologias | Brasil (Remoto) | https://www.linkedin.com/jobs/view/4379966461/
+Vaga encontrada: Analista de Processos e Curadoria de Agent AI | Vammo | São Paulo e Região (Híbrido) | https://www.linkedin.com/jobs/view/4382099275/
+Card ignorado na coleta por estar na lista de links ignorados desta execução.
+Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.
+Indo para próxima página... (aria-next, texto='', aria-label='Exibir próximas coleções')
+Primeira tentativa de paginação não avançou. Tentando novamente...
+Próximo botão de paginação não avançou a lista a tempo. Encerrando paginação desta execução.
+
+Vagas coletadas de todas as páginas:
+Total de vagas coletadas: 14
+Total bruto antes de normalização/deduplicação: 14
+
+Vagas exportadas para vagas_linkedin.txt
+Modo sem banco ativo. Aplicando candidaturas diretamente na lista coletada do ciclo.
+Total de links para candidatura direta: 14
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4314912837/
+[ETAPA] Procurando botão de candidatura simplificada...
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura não ficou pronto no tempo esperado.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_191431_059_4314912837_apply_flow_not_ready_after_easy_apply.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4366164641/
+[ETAPA] Procurando botão de candidatura simplificada...
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura não ficou pronto no tempo esperado.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_191606_906_4366164641_apply_flow_not_ready_after_easy_apply.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4383734168/
+[ETAPA] Procurando botão de candidatura simplificada...
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura não ficou pronto no tempo esperado.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_191740_122_4383734168_apply_flow_not_ready_after_easy_apply.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4378834598/
+[ETAPA] Procurando botão de candidatura simplificada...
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura não ficou pronto no tempo esperado.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_191913_329_4378834598_apply_flow_not_ready_after_easy_apply.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4378524923/
+[ETAPA] Procurando botão de candidatura simplificada...
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura não ficou pronto no tempo esperado.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_192046_133_4378524923_apply_flow_not_ready_after_easy_apply.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4380353224/
+[ETAPA] Procurando botão de candidatura simplificada...
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura não ficou pronto no tempo esperado.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_192218_621_4380353224_apply_flow_not_ready_after_easy_apply.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4365325802/
+[ETAPA] Procurando botão de candidatura simplificada...
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura não ficou pronto no tempo esperado.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_192351_183_4365325802_apply_flow_not_ready_after_easy_apply.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4370368758/
+[ETAPA] Procurando botão de candidatura simplificada...
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura não ficou pronto no tempo esperado.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_192525_725_4370368758_apply_flow_not_ready_after_easy_apply.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4308020774/
+[ETAPA] Procurando botão de candidatura simplificada...
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura não ficou pronto no tempo esperado.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_192700_351_4308020774_apply_flow_not_ready_after_easy_apply.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4373706264/
+[ETAPA] Procurando botão de candidatura simplificada...
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura não ficou pronto no tempo esperado.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_192834_968_4373706264_apply_flow_not_ready_after_easy_apply.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4383356551/
+[ETAPA] Procurando botão de candidatura simplificada...
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura não ficou pronto no tempo esperado.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_193007_790_4383356551_apply_flow_not_ready_after_easy_apply.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4360514282/
+[ETAPA] Procurando botão de candidatura simplificada...
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura não ficou pronto no tempo esperado.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_193142_352_4360514282_apply_flow_not_ready_after_easy_apply.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4379966461/
+[ETAPA] Procurando botão de candidatura simplificada...
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura não ficou pronto no tempo esperado.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_193313_955_4379966461_apply_flow_not_ready_after_easy_apply.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+Abrindo vaga da lista direta: https://www.linkedin.com/jobs/view/4382099275/
+[ETAPA] Procurando botão de candidatura simplificada...
+Ação de candidatura simplificada executada (click com fallback navigate quando aplicável).
+[ETAPA] Aguardando carregamento do fluxo de candidatura...
+Fluxo de candidatura não ficou pronto no tempo esperado.
+Diagnóstico salvo em: C:\Users\CLOVIS\Documents\Projeto_Linkdim\WebCrawler\bin\Debug\net8.0\diagnostics\20260310_193448_933_4382099275_apply_flow_not_ready_after_easy_apply.html
+[FALLBACK] Tentando finalizar sem etapa 'Avançar'...
+Etapa 'Revisar' não apareceu nesta vaga; seguindo fluxo.
+Fluxo de candidatura não concluído para esta vaga (seguindo para a próxima).
+
+Candidaturas enviadas com sucesso no ciclo: 0
+Arquivo de sucesso do ciclo: C:\Users\CLOVIS\Documents\Projeto_Linkdim\vagas_enviadas_sucesso.txt
+Arquivo historico de sucesso: C:\Users\CLOVIS\Documents\Projeto_Linkdim\vagas_enviadas_sucesso_historico.txt
+
+Resumo das vagas coletadas:
+| Título                                   | Empresa                        | Localização               | Link
+|------------------------------------------|--------------------------------|---------------------------|------
+| Software Engineer Sênior                 | Artefact                       | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4314912837/
+| Manual QA Engineer                       | Oowlish                        | Brasília, Distrito Feder… | https://www.linkedin.com/jobs/view/4366164641/
+| Delphi Developer                         | Solas IT Recruitment           | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4383734168/
+| Integrations & B2B Connectivity          | Microtalent is becoming INSPY… | Argentina (Remoto)        | https://www.linkedin.com/jobs/view/4378834598/
+| Desenvolvedor full stack - RPA           | CHALFIN, GOLDBERG & VAINBOIM … | Rio de Janeiro, Brasil (… | https://www.linkedin.com/jobs/view/4378524923/
+| Engenheiro de Dados e ML Sênior          | GRUPO LPJ                      | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4380353224/
+| Mainframe Storage Engineer (CA tools sp… | ITTConnect                     | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4365325802/
+| AI Operations Executive (Full Time)      | Darwin AI                      | São Paulo, São Paulo, Br… | https://www.linkedin.com/jobs/view/4370368758/
+| ATM Tech Support Specialist              | Bitcoin Depot                  | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4308020774/
+| Associate II - Capital Formation         | Prisma Capital (Brasil)        | São Paulo, São Paulo, Br… | https://www.linkedin.com/jobs/view/4373706264/
+| Analista de Experiência do Cliente Plen… | Serasa Experian                | São Paulo, São Paulo, Br… | https://www.linkedin.com/jobs/view/4383356551/
+| Lead Data DevOps Specialist (Azure)      | EPAM Systems                   | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4360514282/
+| Desenvolvedor(a) Back End Java SR | Rem… | Solutis Tecnologias            | Brasil (Remoto)           | https://www.linkedin.com/jobs/view/4379966461/
+| Analista de Processos e Curadoria de Ag… | Vammo                          | São Paulo e Região (Híbr… | https://www.linkedin.com/jobs/view/4382099275/
+Encerrando driver...
+Execução finalizada. Aguardando 60 minuto(s) para próxima execução...
