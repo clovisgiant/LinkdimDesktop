@@ -19,6 +19,7 @@ class CrawlerState:
     process: Optional[subprocess.Popen] = None
     status: str = "stopped"
     last_heartbeat: Optional[str] = None
+    log_buffer: list = [] # Guarda os últimos 100 logs
     config: dict = {
         "max_apply_per_cycle": 15,
         "cycle_wait_minutes":  45,
@@ -47,29 +48,46 @@ class ConfigRequest(BaseModel):
 
 # ── Broadcast de logs para todos os WebSocket conectados ──────
 async def broadcast_log(msg: str):
+    # Salva no buffer
+    ts_msg = f"[{datetime.now().strftime('%H:%M:%S')}] {msg}"
+    state.log_buffer.append(ts_msg)
+    if len(state.log_buffer) > 100:
+        state.log_buffer.pop(0)
+
     dead = []
     for ws in state.log_subscribers:
         try:
-            await ws.send_text(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
+            await ws.send_text(ts_msg)
         except Exception:
             dead.append(ws)
     for ws in dead:
-        state.log_subscribers.remove(ws)
+        if ws in state.log_subscribers:
+            state.log_subscribers.remove(ws)
 
 def sync_broadcast(msg: str):
     """Chama broadcast de threads síncronas (ex: reader do subprocess)"""
-    loop = asyncio.get_event_loop()
-    asyncio.run_coroutine_threadsafe(broadcast_log(msg), loop)
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            asyncio.run_coroutine_threadsafe(broadcast_log(msg), loop)
+    except Exception:
+        pass
 
 # ── Lê stdout/stderr do subprocess e envia via WebSocket ─────
 def stream_process_output(proc: subprocess.Popen):
-    for line in iter(proc.stdout.readline, b""):
-        decoded = line.decode("utf-8", errors="replace").strip()
-        if decoded:
-            sync_broadcast(decoded)
-    proc.wait()
+    sync_broadcast("⚙️ Iniciando leitura de fluxo do processo...")
+    while True:
+        line = proc.stdout.readline()
+        if not line and proc.poll() is not None:
+            break
+        if line:
+            decoded = line.decode("utf-8", errors="replace").strip()
+            if decoded:
+                sync_broadcast(decoded)
+    
+    return_code = proc.wait()
     state.status = "stopped"
-    sync_broadcast("⏹ Processo do crawler encerrado.")
+    sync_broadcast(f"⏹ Processo encerrado (Exit Code: {return_code})")
 
 # ── Endpoints REST ────────────────────────────────────────────
 @app.get("/crawler/status")
@@ -171,7 +189,12 @@ async def update_config(req: ConfigRequest):
 async def ws_logs(ws: WebSocket):
     await ws.accept()
     state.log_subscribers.append(ws)
-    await ws.send_text("✅ Conectado ao servidor LinkDim. Aguardando logs...")
+    
+    # Envia histórico de logs
+    for log_msg in state.log_buffer:
+        await ws.send_text(log_msg)
+        
+    await ws.send_text("✅ Conectado ao servidor LinkDim. Aguardando novos logs...")
     try:
         while True:
             await asyncio.sleep(30)
