@@ -75,19 +75,18 @@ def sync_broadcast(msg: str):
 
 # ── Lê stdout/stderr do subprocess e envia via WebSocket ─────
 def stream_process_output(proc: subprocess.Popen):
-    sync_broadcast("⚙️ Iniciando leitura de fluxo do processo...")
-    while True:
-        line = proc.stdout.readline()
-        if not line and proc.poll() is not None:
-            break
-        if line:
-            decoded = line.decode("utf-8", errors="replace").strip()
-            if decoded:
-                sync_broadcast(decoded)
+    sync_broadcast("🚀 [SISTEMA] Conectado ao fluxo de saída do robô. Aguardando mensagens...")
     
+    # Lendo linha por linha em tempo real
+    for line in iter(proc.stdout.readline, ""):
+        if line:
+            sync_broadcast(line.strip())
+        if proc.poll() is not None:
+            break
+            
     return_code = proc.wait()
     state.status = "stopped"
-    sync_broadcast(f"⏹ Processo encerrado (Exit Code: {return_code})")
+    sync_broadcast(f"🏁 [SISTEMA] Robô finalizou a execução. (Código: {return_code})")
 
 # ── Endpoints REST ────────────────────────────────────────────
 @app.get("/crawler/status")
@@ -182,7 +181,7 @@ async def start_crawler(req: StartRequest):
             stderr=subprocess.STDOUT,
             env=env,
             bufsize=1,
-            universal_newlines=False
+            universal_newlines=True
         )
         state.process = proc
         state.status  = "running"
@@ -232,8 +231,10 @@ async def ws_logs(ws: WebSocket):
     await ws.send_text("✅ Conectado ao servidor LinkDim. Aguardando novos logs...")
     try:
         while True:
-            await asyncio.sleep(30)
-            await ws.send_text("♥ ping")  # keepalive
+            await asyncio.sleep(60)
+            # Ping silencioso (sem texto no log)
+            try: await ws.send_bytes(b"")
+            except: break
     except WebSocketDisconnect:
         if ws in state.log_subscribers:
             state.log_subscribers.remove(ws)
