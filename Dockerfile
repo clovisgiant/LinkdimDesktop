@@ -17,7 +17,8 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 
 # ── Instala Python, Chrome e ChromeDriver ───────────────────
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-pip python3-venv \
+    python3 python3-pip python3-venv python3-dev \
+    gcc libc6-dev libpq-dev \
     wget gnupg curl unzip ca-certificates \
     # Chrome headless
     chromium chromium-driver \
