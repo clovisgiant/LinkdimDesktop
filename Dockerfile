@@ -38,13 +38,12 @@ ENV DISPLAY=:99
 # ── Copia binários C# do estágio anterior ───────────────────
 COPY --from=build-cs /app/crawler /app/crawler
 
-# ── Instala dependências Python via VENV (Mais robusto) ─────
+# ── Instala dependências Python (Direto no comando para evitar erros de CRLF) ──
 WORKDIR /api
-COPY render_backend/requirements.txt .
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir fastapi uvicorn psycopg2-binary websockets python-multipart
 
 # Copia o código FastAPI
 COPY render_backend/main.py .
