@@ -1,0 +1,22 @@
+# Ignorar pastas de build locais
+**/bin/
+**/obj/
+**/build/
+**/build_*/
+**/CMakeFiles/
+**/.vs/
+**/.vscode/
+
+# Ignorar logs e arquivos temporários
+*.log
+*.tmp
+.env
+.git/
+.gitignore
+
+# Ignorar imagens pesadas que não são necessárias no build
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.zip

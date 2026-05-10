@@ -7,8 +7,8 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-cs
 WORKDIR /src
 
-# Copia o projeto C# (ajuste o caminho se necessário)
-COPY WebCrawler/ ./WebCrawler/
+# Copia o projeto C#
+COPY WebCrawler ./WebCrawler/
 WORKDIR /src/WebCrawler
 RUN dotnet publish -c Release -o /app/crawler --self-contained false
 
