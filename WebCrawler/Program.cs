@@ -1,4 +1,4 @@
-﻿using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
@@ -80,6 +80,12 @@ partial class Program
 
     static void Main()
     {
+        // --- GRITO DE PARTIDA (DIAGNÓSTICO) ---
+        Console.WriteLine("========================================");
+        Console.WriteLine("🚀 [C#] ROBÔ LINKDIM INICIADO COM SUCESSO!");
+        Console.WriteLine($"📅 DATA/HORA: {DateTime.Now}");
+        Console.WriteLine("========================================");
+
         LoadEnvFileIfExists();
 
         using var singleInstanceMutex = TryAcquireSingleInstanceMutex();
