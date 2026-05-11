@@ -229,49 +229,68 @@ async def start_crawler(req: StartRequest):
     try:
         crawler_dir = "/app/crawler"
         dll_path = os.path.join(crawler_dir, "WebCrawler.dll")
+        binary_path = os.path.join(crawler_dir, "WebCrawler")
         
+        # --- DIAGNÓSTICO DE BIBLIOTECAS ---
+        if os.path.exists(binary_path):
+            try:
+                await broadcast_log("🔍 [SISTEMA] Verificando dependências do robô (ldd)...")
+                ldd_out = subprocess.check_output(["ldd", binary_path], stderr=subprocess.STDOUT, text=True)
+                missing = [line for line in ldd_out.splitlines() if "not found" in line]
+                if missing:
+                    await broadcast_log(f"❌ BIBLIOTECAS FALTANDO: {', '.join(missing)}")
+                else:
+                    await broadcast_log("✅ Todas as bibliotecas do sistema parecem OK.")
+            except: pass
+
         # Passa a conexão limpa para o C#
         raw_conn = os.environ.get("WEBCRAWLER_DB_CONNECTION", "")
         clean_conn = raw_conn.strip().replace('"', '').replace("'", "")
-        
-        # O robô C# (Npgsql) pode precisar da URL convertida ou limpa
         env["WEBCRAWLER_DB_CONNECTION"] = clean_conn
         
-        # 3. Verifica se o executável nativo existe (mais estável)
-        binary_path = os.path.join(crawler_dir, "WebCrawler")
         cmd = ["dotnet", dll_path]
-        
         if os.path.exists(binary_path):
-            await broadcast_log(f"✅ Executável nativo encontrado em {binary_path}. Usando execução direta.")
-            os.chmod(binary_path, 0o755) # Garante permissão de execução
+            await broadcast_log(f"✅ Usando execução direta: {binary_path}")
+            os.chmod(binary_path, 0o755)
             cmd = [binary_path]
-        elif not os.path.exists(dll_path):
-            await broadcast_log(f"❌ ERRO CRÍTICO: {dll_path} não encontrado!")
-            state.status = "error"
-            return {"ok": False, "msg": "Binário do robô não encontrado."}
 
         await broadcast_log(f"🚀 Lançando processo: {' '.join(cmd)}")
         
-        # Variáveis extras para estabilidade do .NET no Docker/Linux
         env["DOTNET_RUNNING_IN_CONTAINER"] = "true"
         env["COMPlus_EnableDiagnostics"] = "0"
         
+        # Lança com redirecionamento total
         proc = subprocess.Popen(
             cmd, 
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             env=env,
             cwd=crawler_dir,
-            bufsize=1,
-            universal_newlines=True,
-            shell=False
+            text=True,
+            bufsize=1
         )
         state.process = proc
         state.status  = "running"
 
-        # Thread que lê a saída e faz broadcast
-        t = threading.Thread(target=stream_process_output, args=(proc,), daemon=True)
-        t.start()
+        # Captura imediata da primeira saída (evita perder erro de startup)
+        def read_output():
+            try:
+                while True:
+                    line = proc.stdout.readline()
+                    if not line and proc.poll() is not None:
+                        break
+                    if line:
+                        sync_broadcast(line.strip())
+                
+                rc = proc.wait()
+                sync_broadcast(f"🏁 Processo encerrado (Código: {rc})")
+            except Exception as e:
+                sync_broadcast(f"❌ Erro no fluxo de log: {e}")
+            finally:
+                state.status = "stopped"
+                state.process = None
+
+        threading.Thread(target=read_output, daemon=True).start()
 
         await broadcast_log(f"▶ Robô em execução (PID: {proc.pid})")
         return {"ok": True, "pid": proc.pid}
