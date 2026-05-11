@@ -23,8 +23,8 @@ class CrawlerState:
     config: dict = {
         "max_apply_per_cycle": 15,
         "cycle_wait_minutes":  45,
-        "active_hours_start":  8,
-        "active_hours_end":    23,
+        "active_hours_start":  0,
+        "active_hours_end":    0,
         "search_terms":        "C#, Python, Qt"
     }
     log_subscribers: list = []
@@ -35,8 +35,8 @@ state = CrawlerState()
 class StartRequest(BaseModel):
     max_apply_per_cycle: int = 15
     cycle_wait_minutes:  int = 45
-    active_hours_start:  int = 8
-    active_hours_end:    int = 22
+    active_hours_start:  int = 0
+    active_hours_end:    int = 0
     search_terms:        str = ""
 
 class ConfigRequest(BaseModel):
