@@ -12,30 +12,28 @@ partial class Program
 
         try
         {
-            if (!TryOpenJobsAreaByNavigation(driver))
+            Console.WriteLine($"[HUMAN] Iniciando busca humana para: {selectedSearchTerm}");
+            driver.Navigate().GoToUrl("https://www.linkedin.com/jobs/");
+            WaitForJobPageReady(driver);
+            Thread.Sleep(2000);
+
+            if (TrySubmitJobsSearchKeyword(driver, selectedSearchTerm))
             {
-                Console.WriteLine("Não foi possível clicar no menu de Vagas. Usando navegação direta para /jobs/.");
-                driver.Navigate().GoToUrl("https://www.linkedin.com/jobs/");
-                WaitForJobPageReady(driver);
+                Console.WriteLine("[HUMAN] Busca submetida. Tentando ativar filtro Easy Apply manualmente...");
+                Thread.Sleep(3000);
+                if (TryEnableEasyApplyFilterFromResults(driver))
+                {
+                    Console.WriteLine("[HUMAN] Filtro Easy Apply ativado com sucesso!");
+                    return true;
+                }
             }
 
-            if (!TrySubmitJobsSearchKeyword(driver, selectedSearchTerm))
-            {
-                Console.WriteLine("Campo de busca não encontrado/interagível. Usando fallback de URL com termo e filtro Easy Apply.");
-                return TryOpenJobsSearchViaUrl(driver, selectedSearchTerm);
-            }
-
-            if (TryEnableEasyApplyFilterFromResults(driver))
-            {
-                return true;
-            }
-
-            Console.WriteLine("Filtro de Candidatura simplificada não foi confirmado por UI. Aplicando fallback por URL.");
+            Console.WriteLine("[HUMAN] Sequência manual falhou. Usando fallback de URL...");
             return TryOpenJobsSearchViaUrl(driver, selectedSearchTerm);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Falha ao preparar entrada via busca de vagas: {ex.Message}");
+            Console.WriteLine($"Falha na busca humana: {ex.Message}. Usando fallback.");
             return TryOpenJobsSearchViaUrl(driver, selectedSearchTerm);
         }
     }

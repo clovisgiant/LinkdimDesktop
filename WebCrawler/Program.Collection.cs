@@ -519,10 +519,19 @@ partial class Program
         }
         catch
         {
+            // --- DIAGNÓSTICO DE TIMEOUT ---
+            try {
+                string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string diagPath = $"/app/crawler/diagnostics/{timestamp}_timeout_search.html";
+                System.IO.Directory.CreateDirectory("/app/crawler/diagnostics");
+                System.IO.File.WriteAllText(diagPath, driver.PageSource);
+                Console.WriteLine($"⚠️ [DIAG] Timeout na busca. Fonte salva em: {diagPath}");
+            } catch {}
+
             try {
                 driver.Navigate().Refresh();
-                Thread.Sleep(3000);
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(45));
+                Thread.Sleep(5000);
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
                 return wait.Until(d => HasAnyJobCard(d));
             } catch { return false; }
         }
