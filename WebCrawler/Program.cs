@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using OpenQA.Selenium;
 
 partial class Program
 {
@@ -14,13 +15,13 @@ partial class Program
     private static bool AutoFillMandatoryFieldsEnabled = true;
     private static string AutoFillDefaultFirstName = "Clovis";
     private static string AutoFillDefaultLastName = "Silva";
-    private static string AutoFillDefaultPhone = "11959391726";
+    private static string AutoFillDefaultPhone = "11999999999";
     private static string AutoFillDefaultLocation = "Sao Paulo";
     private static string AutoFillDefaultEmail = "clovis.eduardosilva23@gmail.com";
     private static string AutoFillDefaultWebsite = "";
-    private static string AutoFillDefaultLinkedIn = "www.linkedin.com/in/clovis-silva-dev";
+    private static string AutoFillDefaultLinkedIn = "";
     private static string AutoFillDefaultGithub = "";
-    private static string AutoFillDefaultSalary = "7500";
+    private static string AutoFillDefaultSalary = "7000";
     private static string AutoFillDefaultGenericText = "Tenho experiencia compativel com a vaga e disponibilidade para atuar no escopo solicitado.";
     private static int AutoFillDefaultYearsExperience = 10;
     private static bool AutoFillDefaultCheckboxTrue = true;
@@ -44,45 +45,17 @@ partial class Program
     private static readonly string[] DefaultJobSearchTerms =
     {
         "Desenvolvedor Backend .NET - Pleno/Senior",
-        "Engenharia de Software",
         "Desenvolvedor C#",
-        "Analista I de Desenvolvimento de Software",
         "Engenheiro de Software",
-        "Analista de Desenvolvimento de Software FullStack",
-        "Senior Full Stack Developer | .NET",
         "C#",
-        "JavaScript",
         "Python",
-        "VB.NET",
-        "PHP",
-        "VBA",
-        "Angular",
-        "React",
-        "HTML5",
-        "CSS3",
-        ".NET",
-        "APIs REST",
-        "Automacao de processos",
-        "AWS",
-        "EC2",
-        "S3",
-        "Lambda",
-        "Athena",
-        "Glue",
-        "SQL",
-        "PostgreSQL",
-        "MySQL",
-        "Git",
-        "Visual Studio",
-        "VS Code",
-        "Linux"
+        "PostgreSQL"
     };
 
     static void Main()
     {
         try
         {
-            // --- GRITO DE PARTIDA (DIAGNÓSTICO) ---
             Console.WriteLine("========================================");
             Console.WriteLine("🚀 [C#] ROBÔ LINKDIM INICIADO COM SUCESSO!");
             Console.WriteLine($"📅 DATA/HORA: {DateTime.Now}");
@@ -102,7 +75,7 @@ partial class Program
 
             var testMode = GetOptionalBoolEnv("WEBCRAWLER_TEST_MODE", false);
             var disableDatabase = GetOptionalBoolEnv("WEBCRAWLER_DISABLE_DATABASE", true);
-            var maxPagesPerCycle = GetOptionalIntEnv("WEBCRAWLER_MAX_PAGES_PER_CYCLE", testMode ? 1 : 0);
+            var maxPagesPerCycle = GetOptionalIntEnv("WEBCRAWLER_MAX_PAGES_PER_CYCLE", testMode ? 1 : 2);
             var maxJobsToApplyPerCycle = GetOptionalIntEnv("WEBCRAWLER_MAX_APPLY_PER_CYCLE", testMode ? 2 : 15);
             var cycleWaitMinutes = GetOptionalIntEnv("WEBCRAWLER_CYCLE_WAIT_MINUTES", testMode ? 1 : 45);
             var usePersistentProfile = GetOptionalBoolEnv("WEBCRAWLER_USE_PERSISTENT_PROFILE", true);
@@ -117,20 +90,6 @@ partial class Program
             var paginationDelayMaxMs = GetOptionalIntEnv("WEBCRAWLER_PAGINATION_DELAY_MAX_MS", testMode ? 1200 : 2800);
             var activeHoursStart = GetOptionalTimeOfDayEnv("WEBCRAWLER_ACTIVE_HOURS_START");
             var activeHoursEnd = GetOptionalTimeOfDayEnv("WEBCRAWLER_ACTIVE_HOURS_END");
-            var autoFillFirstName = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_FIRST_NAME", "Clovis");
-            var autoFillLastName = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_LAST_NAME", "Silva");
-            var autoFillPhone = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_PHONE", "11999999999");
-            var autoFillLocation = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_LOCATION", "Sao Paulo");
-            var autoFillEmail = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_EMAIL", linkedinUsername);
-            var autoFillWebsite = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_WEBSITE", string.Empty);
-            var autoFillLinkedIn = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_LINKEDIN_URL", string.Empty);
-            var autoFillGithub = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_GITHUB_URL", string.Empty);
-            var autoFillSalary = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_SALARY", "7000");
-            var autoFillGenericText = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_GENERIC_TEXT", "Tenho experiencia compativel com a vaga e disponibilidade para atuar no escopo solicitado.");
-            var autoFillYearsExperience = GetOptionalIntEnv("WEBCRAWLER_DEFAULT_YEARS_EXPERIENCE", 3);
-            var autoFillCheckboxTrue = GetOptionalBoolEnv("WEBCRAWLER_DEFAULT_CHECKBOX_TRUE", true);
-            var autoFillWorkAuthorization = GetOptionalBoolEnv("WEBCRAWLER_DEFAULT_WORK_AUTHORIZATION", true);
-            var autoFillNeedVisaSponsorship = GetOptionalBoolEnv("WEBCRAWLER_DEFAULT_NEED_VISA_SPONSORSHIP", false);
             var useJobsSearchEntry = GetOptionalBoolEnv("WEBCRAWLER_USE_JOBS_SEARCH_ENTRY", true);
             var jobsSearchTerms = GetOptionalCsvEnvList("WEBCRAWLER_JOB_SEARCH_TERMS", DefaultJobSearchTerms);
 
@@ -138,39 +97,12 @@ partial class Program
             PersistIgnoredLinksToFile = persistIgnoredLinks;
             PersistSuccessfulLinksToFile = persistSuccessfulLinks;
             AutoFillMandatoryFieldsEnabled = autoFillMandatoryFields;
-            AutoFillDefaultFirstName = autoFillFirstName;
-            AutoFillDefaultLastName = autoFillLastName;
-            AutoFillDefaultPhone = autoFillPhone;
-            AutoFillDefaultLocation = autoFillLocation;
-            AutoFillDefaultEmail = autoFillEmail;
-            AutoFillDefaultWebsite = autoFillWebsite;
-            AutoFillDefaultLinkedIn = autoFillLinkedIn;
-            AutoFillDefaultGithub = autoFillGithub;
-            AutoFillDefaultSalary = autoFillSalary;
-            AutoFillDefaultGenericText = autoFillGenericText;
-            AutoFillDefaultYearsExperience = autoFillYearsExperience <= 0 ? 1 : autoFillYearsExperience;
-            AutoFillDefaultCheckboxTrue = autoFillCheckboxTrue;
-            AutoFillDefaultWorkAuthorization = autoFillWorkAuthorization;
-            AutoFillDefaultNeedVisaSponsorship = autoFillNeedVisaSponsorship;
-            ConfigureHumanization(
-                interactionDelayMinMs,
-                interactionDelayMaxMs,
-                applyDelayMinMs,
-                applyDelayMaxMs,
-                paginationDelayMinMs,
-                paginationDelayMaxMs,
-                activeHoursStart,
-                activeHoursEnd);
+            ConfigureHumanization(interactionDelayMinMs, interactionDelayMaxMs, applyDelayMinMs, applyDelayMaxMs, paginationDelayMinMs, paginationDelayMaxMs, activeHoursStart, activeHoursEnd);
 
             LoadIgnoredJobLinksFromDisk();
             LoadSuccessfulJobsFromDisk();
 
-            if (activeHoursStart.HasValue ^ activeHoursEnd.HasValue)
-            {
-                Console.WriteLine("Janela ativa ignorada: defina WEBCRAWLER_ACTIVE_HOURS_START e WEBCRAWLER_ACTIVE_HOURS_END em conjunto.");
-            }
-
-            Console.WriteLine($"Configuração: TEST_MODE={testMode}, DISABLE_DATABASE={disableDatabase}, MAX_PAGES_PER_CYCLE={maxPagesPerCycle}, MAX_APPLY_PER_CYCLE={maxJobsToApplyPerCycle}, CYCLE_WAIT_MINUTES={cycleWaitMinutes}, PERSIST_IGNORED_LINKS={persistIgnoredLinks}, PERSIST_SUCCESSFUL_LINKS={persistSuccessfulLinks}, AUTO_FILL_MANDATORY_FIELDS={autoFillMandatoryFields}, INTERACTION_DELAY_MS={InteractionDelayMinMs}-{InteractionDelayMaxMs}, APPLY_DELAY_MS={BetweenApplicationsDelayMinMs}-{BetweenApplicationsDelayMaxMs}, PAGINATION_DELAY_MS={PaginationDelayMinMs}-{PaginationDelayMaxMs}, ACTIVE_HOURS={DescribeActiveHoursWindow()}, USE_JOBS_SEARCH_ENTRY={useJobsSearchEntry}, JOB_SEARCH_TERMS={string.Join(" | ", jobsSearchTerms)}");
+            Console.WriteLine($"Configuração: TEST_MODE={testMode}, DISABLE_DATABASE={disableDatabase}, MAX_PAGES_PER_CYCLE={maxPagesPerCycle}, MAX_APPLY_PER_CYCLE={maxJobsToApplyPerCycle}, CYCLE_WAIT_MINUTES={cycleWaitMinutes}, USE_JOBS_SEARCH_ENTRY={useJobsSearchEntry}, JOB_SEARCH_TERMS={string.Join(" | ", jobsSearchTerms)}");
 
             while (true)
             {
@@ -180,9 +112,9 @@ partial class Program
 
                 if (DatabaseEnabled && !ValidateDatabaseConnection())
                 {
-                    Console.WriteLine("Conexão com o banco indisponível. Aguardando 2 minuto(s) antes da próxima tentativa...");
+                    Console.WriteLine("Conexão com o banco indisponível. Aguardando 2 minuto(s)...");
                     StopRuntimeHeartbeatLoop();
-                    SleepWithRuntimeHeartbeat(TimeSpan.FromMinutes(2), "waiting", "Banco indisponivel. Aguardando nova tentativa.");
+                    SleepWithRuntimeHeartbeat(TimeSpan.FromMinutes(2), "waiting", "Banco indisponivel.");
                     continue;
                 }
 
@@ -197,148 +129,152 @@ partial class Program
                 if (!EnsureAuthenticatedSession(driver, wait, linkedinUsername, linkedinPassword))
                 {
                     StopRuntimeHeartbeatLoop();
-                    SleepWithRuntimeHeartbeat(TimeSpan.FromMinutes(1), "waiting", "Sessao nao autenticada. Aguardando antes de novo login.");
+                    SleepWithRuntimeHeartbeat(TimeSpan.FromMinutes(1), "waiting", "Sessao nao autenticada.");
                     continue;
                 }
 
-                UpdateRuntimeHeartbeatLoopState("running", "Sessao autenticada. Coletando e aplicando vagas.");
-
-                string currentUrl = driver.Url;
-                if (currentUrl.Contains("feed") || currentUrl.Contains("linkedin.com/in"))
-                {
-                    Console.WriteLine("Login bem-sucedido! Página atual: " + currentUrl);
-                }
-                else
-                {
-                    Console.WriteLine("Login falhou ou ainda está na página de login.");
-                }
+                UpdateRuntimeHeartbeatLoopState("running", "Coletando e aplicando vagas.");
+                Console.WriteLine("Login bem-sucedido! Página atual: " + driver.Url);
 
                 var allJobsLines = new List<string>();
                 var allJobsData = new List<(string Titulo, string Empresa, string Localizacao, string Link)>();
                 var collectedFromJobsSearch = false;
 
-                Console.WriteLine($"[DEBUG] useJobsSearchEntry={useJobsSearchEntry}, maxPagesPerCycle={maxPagesPerCycle}");
-
                 if (useJobsSearchEntry)
                 {
                     var cycleSearchTerms = GetJobSearchTermsForCurrentCycle(jobsSearchTerms);
-                    Console.WriteLine($"[DEBUG] Iniciando busca por {cycleSearchTerms.Count} termos: {string.Join(" | ", cycleSearchTerms)}");
-                    Console.WriteLine($"Iniciando busca sequencial por competencias: {string.Join(" | ", cycleSearchTerms)}");
-
                     foreach (var searchTerm in cycleSearchTerms)
                     {
-                        Console.WriteLine($"[DEBUG] Processando termo: '{searchTerm}'");
-                        UpdateRuntimeHeartbeatLoopState("running", $"Coletando vagas para o termo '{searchTerm}'.");
+                        UpdateRuntimeHeartbeatLoopState("running", $"Coletando vagas para '{searchTerm}'.");
                         Console.WriteLine($"Preparando busca de vagas para o termo '{searchTerm}'...");
 
-                        if (!TryPrepareJobsSearchEntry(driver, searchTerm))
-                        {
-                            Console.WriteLine($"Falha ao preparar busca de vagas para o termo '{searchTerm}'.");
-                            continue;
-                        }
+                        if (!TryPrepareJobsSearchEntry(driver, searchTerm)) continue;
 
-                        Console.WriteLine($"Entrada por busca de vagas concluida com termo: '{searchTerm}'.");
+                        if (!TryCollectJobsFromCurrentResults(driver, wait, allJobsLines, allJobsData, maxPagesPerCycle, $"termo '{searchTerm}'")) continue;
 
-                        if (!TryCollectJobsFromCurrentResults(driver, wait, allJobsLines, allJobsData, maxPagesPerCycle, $"termo '{searchTerm}'"))
-                        {
-                            Console.WriteLine($"Nao foi possivel coletar vagas para o termo '{searchTerm}'.");
-                            continue;
-                        }
-
-                        Console.WriteLine($"[DEBUG] Coleta concluída para '{searchTerm}'. Total acumulado: {allJobsData.Count}");
                         collectedFromJobsSearch = true;
                     }
-
-                    if (!collectedFromJobsSearch)
-                    {
-                        Console.WriteLine("Nenhuma busca por competencia foi concluida. Retornando ao fluxo classico da colecao Easy Apply.");
-                    }
-                    else
-                    {
-                        Console.WriteLine($"[DEBUG] Coleta de todas as buscas terminada. Total: {allJobsData.Count} vagas");
-                    }
                 }
-
 
                 if (!collectedFromJobsSearch)
                 {
-                    var collectionUrl = GetEasyApplyCollectionEntryUrlForCycle();
-                    Console.WriteLine($"Abrindo coleção Easy Apply... {collectionUrl}");
-                    driver.Navigate().GoToUrl(collectionUrl);
-
-                    if (!TryCollectJobsFromCurrentResults(driver, wait, allJobsLines, allJobsData, maxPagesPerCycle, "colecao Easy Apply"))
-                    {
-                        Console.WriteLine("Nao foi possivel carregar a lista de vagas (timeout). Tentando novamente na proxima execucao.");
-                        driver.Quit();
-                        StopRuntimeHeartbeatLoop();
-                        SleepWithRuntimeHeartbeat(TimeSpan.FromMinutes(2), "waiting", "Falha ao carregar a lista de vagas. Aguardando nova tentativa.");
-                        continue;
-                    }
+                    driver.Navigate().GoToUrl(GetEasyApplyCollectionEntryUrlForCycle());
+                    TryCollectJobsFromCurrentResults(driver, wait, allJobsLines, allJobsData, maxPagesPerCycle, "colecao Easy Apply");
                 }
 
-                var totalCollectedBeforeNormalization = allJobsData.Count;
                 allJobsData = NormalizeAndDeduplicateJobs(allJobsData);
                 allJobsLines = allJobsData.Select(BuildJobLine).ToList();
 
-                Console.WriteLine("\n[DEBUG] COLETANDO FINALIZANDO...");
-                Console.WriteLine("\nVagas coletadas de todas as páginas:");
-                Console.WriteLine($"Total de vagas coletadas: {allJobsLines.Count}");
-                Console.WriteLine($"Total bruto antes de normalização/deduplicação: {totalCollectedBeforeNormalization}");
-
+                Console.WriteLine($"\nTotal de vagas coletadas: {allJobsLines.Count}");
                 File.WriteAllLines(JobsOutputFileName, allJobsLines);
-                Console.WriteLine($"\nVagas exportadas para {JobsOutputFileName}");
-                var skipApplyForCycle = maxJobsToApplyPerCycle <= 0;
-                Console.WriteLine($"[DEBUG] skipApplyForCycle={skipApplyForCycle}, maxJobsToApplyPerCycle={maxJobsToApplyPerCycle}, disableDatabase={disableDatabase}");
-                UpdateRuntimeHeartbeatLoopState(
-                    "running",
-                    skipApplyForCycle
-                        ? "Vagas coletadas. Candidaturas desabilitadas neste ciclo."
-                        : "Vagas coletadas. Aplicando candidaturas do ciclo atual.");
 
-                if (skipApplyForCycle)
+                if (maxJobsToApplyPerCycle > 0)
                 {
-                    Console.WriteLine("Candidaturas automáticas desabilitadas neste ciclo porque WEBCRAWLER_MAX_APPLY_PER_CYCLE <= 0.");
+                    if (!disableDatabase)
+                    {
+                        SaveCollectedJobsToDatabase(allJobsData);
+                        ApplySimplifiedJobsFromDatabase(driver, maxJobsToApplyPerCycle);
+                    }
+                    else
+                    {
+                        var links = allJobsData.Select(v => v.Link).Where(l => !string.IsNullOrWhiteSpace(l)).Distinct().ToList();
+                        ApplySimplifiedJobsFromLinks(driver, links, maxJobsToApplyPerCycle);
+                    }
                 }
-                else if (!disableDatabase)
-                {
-                    Console.WriteLine("[DEBUG] Entrando em: SaveCollectedJobsToDatabase e ApplySimplifiedJobsFromDatabase");
-                    SaveCollectedJobsToDatabase(allJobsData);
-                    ApplySimplifiedJobsFromDatabase(driver, maxJobsToApplyPerCycle);
-                }
-                else
-                {
-                    Console.WriteLine("[DEBUG] Entrando em: ApplySimplifiedJobsFromLinks");
-                    Console.WriteLine("Modo sem banco ativo. Aplicando candidaturas diretamente na lista coletada do ciclo.");
-                    var linksDiretos = allJobsData
-                        .Select(v => v.Link)
-                        .Where(l => !string.IsNullOrWhiteSpace(l))
-                        .Distinct(StringComparer.OrdinalIgnoreCase)
-                        .ToList();
-
-                    ApplySimplifiedJobsFromLinks(driver, linksDiretos, maxJobsToApplyPerCycle);
-                }
-
 
                 PrintSuccessfulJobsCycleSummary();
-
-                Console.WriteLine("\nResumo das vagas coletadas:");
                 PrintVagasTabela(allJobsData);
 
                 Console.WriteLine("Encerrando driver...");
                 driver.Quit();
-
-                Console.WriteLine($"Execução finalizada. Aguardando {cycleWaitMinutes} minuto(s) para próxima execução...");
                 StopRuntimeHeartbeatLoop();
-                SleepWithRuntimeHeartbeat(TimeSpan.FromMinutes(cycleWaitMinutes), "waiting", $"Aguardando proximo ciclo por {cycleWaitMinutes} minuto(s).");
+                SleepWithRuntimeHeartbeat(TimeSpan.FromMinutes(cycleWaitMinutes), "waiting", "Aguardando proximo ciclo.");
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine("❌ [C#] ERRO CRÍTICO FATAL NO MOTOR:");
             Console.WriteLine("Mensagem: " + ex.Message);
-            if (ex.InnerException != null)
-                Console.WriteLine("Inner: " + ex.InnerException.Message);
             Console.WriteLine("StackTrace: " + ex.StackTrace);
         }
+    }
+
+    private static IReadOnlyCollection<IWebElement> FindJobCards(IWebDriver driver)
+    {
+        try {
+            var js = (IJavaScriptExecutor)driver;
+            js.ExecuteScript(@"
+                var sidebar = document.querySelector('.jobs-search-results-list, .scaffold-layout__list-container');
+                if (sidebar) { sidebar.scrollTop = sidebar.scrollHeight; }
+                window.scrollBy(0, 500);
+            ");
+            Thread.Sleep(1000);
+        } catch {}
+
+        return driver.FindElements(By.CssSelector("ul.jobs-search-results__list > li, ul.scaffold-layout__list-container > li, li.jobs-search-results__list-item, .job-card-container, .job-card-list__entity-lockup"));
+    }
+
+    private static bool HasAnyJobCard(IWebDriver driver)
+    {
+        try
+        {
+            var cards = driver.FindElements(By.CssSelector("li.jobs-search-results__list-item, .job-card-container, .job-card-list__entity-lockup, ul.scaffold-layout__list-container li"));
+            if (cards.Count > 0) return true;
+
+            try {
+                var js = (IJavaScriptExecutor)driver;
+                js.ExecuteScript("window.scrollBy(0, 800);");
+                js.ExecuteScript("var s = document.querySelector('.jobs-search-results-list, .scaffold-layout__list-container'); if(s) s.scrollTop += 500;");
+            } catch {}
+
+            return driver.FindElements(By.CssSelector("li.jobs-search-results__list-item, .job-card-container, .job-card-list__entity-lockup")).Count > 0;
+        }
+        catch { return false; }
+    }
+
+    private static bool WaitForJobsResults(IWebDriver driver)
+    {
+        try
+        {
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(60));
+            return wait.Until(d => HasAnyJobCard(d));
+        }
+        catch
+        {
+            try {
+                driver.Navigate().Refresh();
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(60));
+                return wait.Until(d => HasAnyJobCard(d));
+            } catch { return false; }
+        }
+    }
+
+    private static string GetTextBySelectors(IWebElement root, params string[] selectors)
+    {
+        foreach (var s in selectors) {
+            try {
+                var text = root.FindElement(By.CssSelector(s))?.Text?.Trim();
+                if (!string.IsNullOrWhiteSpace(text)) return text;
+            } catch {}
+        }
+        return string.Empty;
+    }
+
+    private static string GetAttributeBySelectors(IWebElement root, string attr, params string[] selectors)
+    {
+        foreach (var s in selectors) {
+            try {
+                var value = root.FindElement(By.CssSelector(s))?.GetAttribute(attr)?.Trim();
+                if (!string.IsNullOrWhiteSpace(value)) return value;
+            } catch {}
+        }
+        return string.Empty;
+    }
+
+    private static void PrintVagasTabela(List<(string Titulo, string Empresa, string Localizacao, string Link)> vagas)
+    {
+        Console.WriteLine("| Título | Empresa | Localização | Link");
+        Console.WriteLine("|---|---|---|---|");
+        foreach (var v in vagas) Console.WriteLine($"| {v.Titulo} | {v.Empresa} | {v.Localizacao} | {v.Link}");
     }
 }
