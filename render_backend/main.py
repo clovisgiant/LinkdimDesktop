@@ -328,7 +328,33 @@ async def ws_logs(ws: WebSocket):
         if ws in state.log_subscribers:
             state.log_subscribers.remove(ws)
 
-# ── Healthcheck (Render chama isso para manter online) ───────
+@app.get("/crawler/test")
+async def test_env():
+    results = {}
+    # Teste .NET
+    try:
+        dn = subprocess.check_output(["dotnet", "--version"], text=True).strip()
+        results["dotnet"] = f"OK ({dn})"
+    except: results["dotnet"] = "ERRO"
+    
+    # Teste Chrome
+    try:
+        cv = subprocess.check_output(["chromium", "--version"], text=True).strip()
+        results["chrome"] = f"OK ({cv})"
+    except: results["chrome"] = "ERRO (Chromium não encontrado)"
+
+    # Teste DB
+    conn_str = os.environ.get("WEBCRAWLER_DB_CONNECTION")
+    conn, err = connect_to_db(conn_str)
+    if conn:
+        results["database"] = "OK (Conectado)"
+        conn.close()
+    else:
+        results["database"] = f"ERRO ({err})"
+
+    await broadcast_log(f"📋 [DIAGNÓSTICO COMPLETO] .NET: {results['dotnet']} | Chrome: {results['chrome']} | DB: {results['database']}")
+    return {"ok": True, "results": results}
+
 @app.get("/health")
 def health():
     return {"ok": True, "time": datetime.utcnow().isoformat()}

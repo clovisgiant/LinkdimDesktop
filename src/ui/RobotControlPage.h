@@ -123,6 +123,7 @@ private:
     QSpinBox*       m_activeStart = nullptr;
     QSpinBox*       m_activeEnd   = nullptr;
     QLineEdit*      m_termsInput  = nullptr;
+    QPushButton*    m_testBtn     = nullptr;
 
     // ── Membros de rede ──────────────────────────────────────
     QNetworkAccessManager* m_nam = nullptr;
@@ -170,6 +171,18 @@ private:
         auto* apiRow = new QVBoxLayout();
         apiRow->addWidget(apiLbl); apiRow->addWidget(m_apiUrlInput);
         hdr->addLayout(apiRow);
+
+        // BOTÃO DE AUTODIAGNÓSTICO (O "RAIO-X")
+        m_testBtn = new QPushButton("🔍 TESTAR INFRA");
+        m_testBtn->setCursor(Qt::PointingHandCursor);
+        m_testBtn->setFixedSize(140, 40);
+        m_testBtn->setStyleSheet(
+            "QPushButton{background:#3B82F6;color:white;border:none;border-radius:8px;"
+            "font-weight:bold;font-size:11px;}"
+            "QPushButton:hover{background:#60A5FA;}"
+        );
+        connect(m_testBtn, &QPushButton::clicked, this, &RobotControlPage::testInfra);
+        hdr->addWidget(m_testBtn);
         root->addWidget(hdrContainer);
 
         // ── Status Card ──────────────────────────────────────
@@ -471,6 +484,22 @@ private slots:
                 appendLog("❌ Erro ao salvar config: " + reply->errorString());
             else
                 appendLog("✅ Configuração salva com sucesso!");
+        });
+    }
+
+    // GET /crawler/test (O MODO RAIO-X)
+    void testInfra() {
+        appendLog("🔍 [DIAGNÓSTICO] Verificando integridade da infraestrutura...");
+        m_testBtn->setEnabled(false);
+        auto* reply = m_nam->get(makeRequest("/crawler/test"));
+        connect(reply, &QNetworkReply::finished, this, [this, reply]{
+            reply->deleteLater();
+            m_testBtn->setEnabled(true);
+            if (reply->error() != QNetworkReply::NoError) {
+                appendLog("❌ Erro ao conectar na API de Diagnóstico.");
+                return;
+            }
+            appendLog("✅ Diagnóstico concluído! Verifique as mensagens acima.");
         });
     }
 };
