@@ -24,7 +24,7 @@ class CrawlerState:
         "max_apply_per_cycle": 15,
         "cycle_wait_minutes":  45,
         "active_hours_start":  8,
-        "active_hours_end":    22,
+        "active_hours_end":    23,
         "search_terms":        "C#, Python, Qt"
     }
     log_subscribers: list = []
