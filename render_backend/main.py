@@ -102,26 +102,37 @@ def get_status():
     def connect_to_db(uri):
         if not uri: return None, "URI vazia"
         
-        # Limpeza ultra-agressiva (remove espaços, aspas e quebras de linha invisíveis)
-        uri = uri.strip().replace('"', '').replace("'", "")
-        errs = []
+        # Limpeza profunda (remove aspas, espaços e caracteres de escape)
+        uri = uri.strip().strip("'").strip('"').replace("\\n", "").replace("\\r", "")
         
-        # Garante que use 'postgresql://' (psycopg2 prefere assim)
+        # Log de diagnóstico (seguro: oculta senha)
+        masked_uri = uri
+        if "@" in uri:
+            parts = uri.split("@")
+            prefix = parts[0].split("://")
+            if len(prefix) > 1:
+                masked_uri = f"{prefix[0]}://***:***@{parts[1]}"
+        
+        errs = []
+        sync_broadcast(f"🔍 [DB] Tentando conectar ao banco: {masked_uri[:60]}...")
+
+        # Garantir prefixo correto para psycopg2
         if uri.startswith("postgres://"):
             uri = uri.replace("postgres://", "postgresql://", 1)
         
-        # Tentativa 1: Conexão por URL (Padrão)
+        # Tentativa 1: Conexão Direta (LibPQ)
         try:
-            return psycopg2.connect(uri), None
+            return psycopg2.connect(uri, connect_timeout=10), None
         except Exception as e:
-            errs.append(f"URL Error: {e}")
-            
-        # Tentativa 2: Conexão por Parâmetros (Blindada)
+            errs.append(f"Erro URI: {str(e)}")
+
+        # Tentativa 2: Parsing Manual (Blindagem contra erros de DSN do LibPQ)
         if "://" in uri:
             try:
                 import urllib.parse
                 res = urllib.parse.urlparse(uri)
-                return psycopg2.connect(
+                # Extrai componentes manualmente para evitar o erro "missing =" do libpq
+                conn = psycopg2.connect(
                     host=res.hostname,
                     port=res.port or 5432,
                     database=res.path[1:],
@@ -129,27 +140,45 @@ def get_status():
                     password=res.password,
                     connect_timeout=10,
                     sslmode="require"
-                ), None
+                )
+                return conn, None
             except Exception as e:
-                errs.append(f"Param Error: {e}")
-                
+                errs.append(f"Erro Manual: {str(e)}")
+
         return None, " | ".join(errs)
 
     conn, db_err = connect_to_db(conn_str)
     try:
         if conn:
             cur = conn.cursor()
+            # Garante que a tabela de status existe (caso o C# ainda não tenha rodado)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS crawler_runtime_status (
+                    instance_name TEXT PRIMARY KEY,
+                    state TEXT NOT NULL,
+                    detail TEXT NULL,
+                    is_running BOOLEAN NOT NULL DEFAULT TRUE,
+                    process_id INTEGER NULL,
+                    host_name TEXT NULL,
+                    started_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                    last_heartbeat TIMESTAMP NOT NULL DEFAULT NOW(),
+                    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+                );
+            """)
+            conn.commit()
+
+            # Consulta o status
             cur.execute("SELECT state, last_heartbeat, is_running FROM crawler_runtime_status WHERE instance_name = 'default' LIMIT 1")
             row = cur.fetchone()
             if row:
                 st, lb, is_run = row
-                last_hb = lb.isoformat()
-                delta = (datetime.utcnow() - lb).total_seconds() / 60
-                # Se is_running for true e heartbeat for recente (< 5 min)
-                if is_run and delta < 5:
+                last_hb = lb.isoformat() if lb else "N/A"
+                if is_run:
                     state.status = "running"
                 else:
                     state.status = "stopped"
+            else:
+                last_hb = "Aguardando primeira execução do robô..."
             conn.close()
         else:
             last_hb = f"Erro de Conexão: {db_err}"
@@ -189,16 +218,25 @@ async def start_crawler(req: StartRequest):
     try:
         # Passa a conexão limpa para o C#
         raw_conn = os.environ.get("WEBCRAWLER_DB_CONNECTION", "")
-        clean_conn = raw_conn.strip().strip('"').strip("'")
+        clean_conn = raw_conn.strip().replace('"', '').replace("'", "")
+        
+        # O robô C# (Npgsql) pode precisar da URL convertida ou limpa
         env["WEBCRAWLER_DB_CONNECTION"] = clean_conn
         
-        await broadcast_log("🔍 Preparando inicialização do robô...")
+        dll_path = "/app/crawler/WebCrawler.dll"
+        if not os.path.exists(dll_path):
+            await broadcast_log(f"❌ ERRO CRÍTICO: Arquivo {dll_path} não encontrado no container!")
+            state.status = "error"
+            return {"ok": False, "msg": "Binário do robô não encontrado."}
+
+        await broadcast_log("🔍 Iniciando robô C# (.NET 8.0)...")
         
         proc = subprocess.Popen(
-            ["dotnet", "/app/crawler/WebCrawler.dll"], 
+            ["dotnet", dll_path], 
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             env=env,
+            cwd="/app/crawler", # Importante: Rodar na pasta do robô
             bufsize=1,
             universal_newlines=True
         )
@@ -209,7 +247,7 @@ async def start_crawler(req: StartRequest):
         t = threading.Thread(target=stream_process_output, args=(proc,), daemon=True)
         t.start()
 
-        await broadcast_log("▶ Crawler iniciado! PID: " + str(proc.pid))
+        await broadcast_log(f"▶ Robô em execução (PID: {proc.pid})")
         return {"ok": True, "pid": proc.pid}
     except FileNotFoundError:
         state.status = "error"
