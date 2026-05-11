@@ -77,16 +77,27 @@ def sync_broadcast(msg: str):
 def stream_process_output(proc: subprocess.Popen):
     sync_broadcast("🚀 [SISTEMA] Conectado ao fluxo de saída do robô. Aguardando mensagens...")
     
-    # Lendo linha por linha em tempo real
-    for line in iter(proc.stdout.readline, ""):
-        if line:
-            sync_broadcast(line.strip())
-        if proc.poll() is not None:
-            break
+    # Thread para ler logs em tempo real
+    def stream_logs():
+        try:
+            # Lê stdout e stderr (combinados via subprocess.STDOUT)
+            for line in iter(proc.stdout.readline, ""):
+                if line:
+                    clean_line = line.strip()
+                    sync_broadcast(clean_line)
             
-    return_code = proc.wait()
-    state.status = "stopped"
-    sync_broadcast(f"🏁 [SISTEMA] Robô finalizou a execução. (Código: {return_code})")
+            # Se o loop acabar, o processo terminou
+            rc = proc.wait()
+            sync_broadcast(f"⚠️ [C#] Processo encerrado. Código de saída: {rc}")
+        except Exception as e:
+            sync_broadcast(f"❌ [Orquestrador] Erro ao ler logs: {e}")
+        finally:
+            state.process = None
+            state.status = "stopped"
+            sync_broadcast("ℹ️ Crawler parado.")
+
+    thread = threading.Thread(target=stream_logs, daemon=True)
+    thread.start()
 
 # ── Endpoints REST ────────────────────────────────────────────
 @app.get("/crawler/status")

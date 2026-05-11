@@ -52,6 +52,28 @@ partial class Program
     {
         var options = new ChromeOptions();
 
+        // No Render (Linux), precisamos de flags específicas para rodar em container
+        var isLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
+        
+        if (isLinux)
+        {
+            options.AddArgument("--headless=new");
+            options.AddArgument("--no-sandbox");
+            options.AddArgument("--disable-dev-shm-usage");
+            options.AddArgument("--disable-gpu");
+            
+            // Tenta localizar o binário do Chromium no Render
+            var chromePath = Environment.GetEnvironmentVariable("CHROMIUM_PATH") ?? "/usr/bin/chromium";
+            if (File.Exists(chromePath))
+            {
+                options.BinaryLocation = chromePath;
+            }
+        }
+        else if (GetOptionalBoolEnv("WEBCRAWLER_HEADLESS_LOCAL", false))
+        {
+            options.AddArgument("--headless=new");
+        }
+
         if (usePersistentProfile)
         {
             var profileDir = Path.Combine(
@@ -63,11 +85,8 @@ partial class Program
             options.AddArgument("--profile-directory=Default");
         }
 
-        // Se quiser executar sem abrir janela, descomente a linha abaixo.
-        // options.AddArgument("--headless"); // Executa sem abrir janela
-
-        options.AddArgument("--disable-gpu");
-        options.AddArgument("--disable-dev-shm-usage");
+        options.AddArgument("--disable-blink-features=AutomationControlled");
+        options.AddArgument("--window-size=1920,1080");
         return options;
     }
 
