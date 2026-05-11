@@ -153,8 +153,19 @@ partial class Program
 
                 if (!collectedFromJobsSearch)
                 {
-                    driver.Navigate().GoToUrl(GetEasyApplyCollectionEntryUrlForCycle());
-                    TryCollectJobsFromCurrentResults(driver, wait, allJobsLines, allJobsData, maxPagesPerCycle, "colecao Easy Apply");
+                    UpdateRuntimeHeartbeatLoopState("running", "Coletando da colecao Easy Apply.");
+                    Console.WriteLine("\n[C#] Abrindo navegador para colecao Easy Apply...");
+                    
+                    using (var driver = new ChromeDriver(BuildChromeOptions(usePersistentProfile)))
+                    {
+                        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+                        if (EnsureAuthenticatedSession(driver, wait, linkedinUsername, linkedinPassword))
+                        {
+                            driver.Navigate().GoToUrl(GetEasyApplyCollectionEntryUrlForCycle());
+                            TryCollectJobsFromCurrentResults(driver, wait, allJobsLines, allJobsData, maxPagesPerCycle, "colecao Easy Apply");
+                        }
+                        driver.Quit();
+                    }
                 }
 
                 allJobsData = NormalizeAndDeduplicateJobs(allJobsData);

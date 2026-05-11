@@ -132,7 +132,7 @@ partial class Program
     {
         try
         {
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(50));
             var navigated = wait.Until(d => IsJobsPageUrl(d.Url));
             if (!navigated)
             {
@@ -427,7 +427,7 @@ partial class Program
     {
         try
         {
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(50));
             var transitioned = wait.Until(d =>
             {
                 var currentUrl = d.Url ?? string.Empty;
