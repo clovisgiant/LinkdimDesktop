@@ -399,6 +399,28 @@ async def test_env():
 def health():
     return {"ok": True, "time": datetime.utcnow().isoformat()}
 
+@app.get("/crawler/diagnostics")
+async def list_diagnostics():
+    """Lista arquivos de diagnóstico (capturas de tela HTML)"""
+    diag_dir = "/app/crawler/diagnostics"
+    if not os.path.exists(diag_dir):
+        return {"ok": False, "msg": "Diretório de diagnósticos não existe ainda."}
+    
+    files = [f for f in os.listdir(diag_dir) if f.endswith(".html")]
+    files.sort(reverse=True) # Mais recentes primeiro
+    return {"ok": True, "files": files}
+
+@app.get("/crawler/diagnostics/{filename}")
+async def view_diagnostic(filename: str):
+    """Exibe o conteúdo de um arquivo de diagnóstico"""
+    diag_path = os.path.join("/app/crawler/diagnostics", filename)
+    if not os.path.exists(diag_path):
+        return {"error": "Arquivo não encontrado."}
+    
+    from fastapi.responses import HTMLResponse
+    with open(diag_path, "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
+
 @app.get("/")
 def root():
     return {"service": "LinkDim Crawler API", "status": state.status}
