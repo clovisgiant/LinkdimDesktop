@@ -110,53 +110,64 @@ def get_status():
         last_hb = "Erro: Variável WEBCRAWLER_DB_CONNECTION não configurada no Render."
         return {"status": state.status, "pid": state.process.pid if state.process else None, "last_heartbeat": last_hb, "config": state.config}
 
-    def connect_to_db(uri):
-        if not uri: return None, "URI vazia"
-        
-        # Limpeza profunda (remove aspas, espaços e caracteres de escape)
-        uri = uri.strip().strip("'").strip('"').replace("\\n", "").replace("\\r", "")
-        
-        # Log de diagnóstico (seguro: oculta senha)
-        masked_uri = uri
-        if "@" in uri:
-            parts = uri.split("@")
-            prefix = parts[0].split("://")
-            if len(prefix) > 1:
-                masked_uri = f"{prefix[0]}://***:***@{parts[1]}"
-        
-        errs = []
-        sync_broadcast(f"🔍 [DB] Tentando conectar ao banco: {masked_uri[:60]}...")
+def connect_to_db(uri):
+    if not uri: return None, "URI vazia"
+    
+    # Limpeza profunda (remove aspas, espaços e caracteres de escape)
+    uri = uri.strip().strip("'").strip('"').replace("\\n", "").replace("\\r", "")
+    
+    # Log de diagnóstico (seguro: oculta senha)
+    masked_uri = uri
+    if "@" in uri:
+        parts = uri.split("@")
+        prefix = parts[0].split("://")
+        if len(prefix) > 1:
+            masked_uri = f"{prefix[0]}://***:***@{parts[1]}"
+    
+    errs = []
+    sync_broadcast(f"🔍 [DB] Tentando conectar ao banco: {masked_uri[:60]}...")
 
-        # Garantir prefixo correto para psycopg2
-        if uri.startswith("postgres://"):
-            uri = uri.replace("postgres://", "postgresql://", 1)
-        
-        # Tentativa 1: Conexão Direta (LibPQ)
+    # Garantir prefixo correto para psycopg2
+    if uri.startswith("postgres://"):
+        uri = uri.replace("postgres://", "postgresql://", 1)
+    
+    # Tentativa 1: Conexão Direta (LibPQ)
+    try:
+        return psycopg2.connect(uri, connect_timeout=10), None
+    except Exception as e:
+        errs.append(f"Erro URI: {str(e)}")
+
+    # Tentativa 2: Parsing Manual (Blindagem contra erros de DSN do LibPQ)
+    if "://" in uri:
         try:
-            return psycopg2.connect(uri, connect_timeout=10), None
+            import urllib.parse
+            res = urllib.parse.urlparse(uri)
+            # Extrai componentes manualmente para evitar o erro "missing =" do libpq
+            conn = psycopg2.connect(
+                host=res.hostname,
+                port=res.port or 5432,
+                database=res.path[1:],
+                user=res.username,
+                password=res.password,
+                connect_timeout=10,
+                sslmode="require"
+            )
+            return conn, None
         except Exception as e:
-            errs.append(f"Erro URI: {str(e)}")
+            errs.append(f"Erro Manual: {str(e)}")
 
-        # Tentativa 2: Parsing Manual (Blindagem contra erros de DSN do LibPQ)
-        if "://" in uri:
-            try:
-                import urllib.parse
-                res = urllib.parse.urlparse(uri)
-                # Extrai componentes manualmente para evitar o erro "missing =" do libpq
-                conn = psycopg2.connect(
-                    host=res.hostname,
-                    port=res.port or 5432,
-                    database=res.path[1:],
-                    user=res.username,
-                    password=res.password,
-                    connect_timeout=10,
-                    sslmode="require"
-                )
-                return conn, None
-            except Exception as e:
-                errs.append(f"Erro Manual: {str(e)}")
+    return None, " | ".join(errs)
 
-        return None, " | ".join(errs)
+# ── Endpoints REST ────────────────────────────────────────────
+@app.get("/crawler/status")
+def get_status():
+    # Verifica último heartbeat no banco
+    last_hb = None
+    conn_str = os.environ.get("WEBCRAWLER_DB_CONNECTION")
+    
+    if not conn_str:
+        last_hb = "Erro: Variável WEBCRAWLER_DB_CONNECTION não configurada no Render."
+        return {"status": state.status, "pid": state.process.pid if state.process else None, "last_heartbeat": last_hb, "config": state.config}
 
     conn, db_err = connect_to_db(conn_str)
     try:
