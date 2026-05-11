@@ -90,6 +90,22 @@ partial class Program
             var paginationDelayMaxMs = GetOptionalIntEnv("WEBCRAWLER_PAGINATION_DELAY_MAX_MS", testMode ? 1200 : 2800);
             var activeHoursStart = GetOptionalTimeOfDayEnv("WEBCRAWLER_ACTIVE_HOURS_START");
             var activeHoursEnd = GetOptionalTimeOfDayEnv("WEBCRAWLER_ACTIVE_HOURS_END");
+
+            if (!activeHoursStart.HasValue && !activeHoursEnd.HasValue)
+            {
+                Console.WriteLine("📅 [C#] MODO 24/7 ATIVADO (Padrão): O robô não irá dormir.");
+            }
+            else if (activeHoursStart.HasValue && activeHoursEnd.HasValue && activeHoursStart.Value == activeHoursEnd.Value)
+            {
+                Console.WriteLine($"📅 [C#] MODO 24/7 ATIVADO ({activeHoursStart.Value.Hours:D2}:00): O robô não irá dormir.");
+            }
+            else
+            {
+                Console.WriteLine($"📅 [C#] Janela ativa configurada: {(activeHoursStart?.Hours ?? 0):D2}:00 ate {(activeHoursEnd?.Hours ?? 0):D2}:00");
+            }
+            
+            ConfigureHumanization(interactionDelayMinMs, interactionDelayMaxMs, applyDelayMinMs, applyDelayMaxMs, paginationDelayMinMs, paginationDelayMaxMs, activeHoursStart, activeHoursEnd);
+
             var useJobsSearchEntry = GetOptionalBoolEnv("WEBCRAWLER_USE_JOBS_SEARCH_ENTRY", true);
             var jobsSearchTerms = GetOptionalCsvEnvList("WEBCRAWLER_JOB_SEARCH_TERMS", DefaultJobSearchTerms);
 
