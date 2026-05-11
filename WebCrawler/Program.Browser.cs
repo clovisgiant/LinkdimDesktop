@@ -70,7 +70,6 @@ partial class Program
             options.AddArgument("--disable-software-rasterizer");
             options.AddArgument("--disable-dev-shm-usage");
             options.AddArgument("--js-flags=\"--max-old-space-size=256\""); 
-            options.AddArgument("--single-process"); // Reduz drasticamente o overhead de processos
             options.AddArgument("--memory-pressure-thresholds=1,2");
             options.AddArgument("--disable-background-networking");
             options.AddArgument("--disable-sync");
