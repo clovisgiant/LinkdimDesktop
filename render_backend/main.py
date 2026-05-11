@@ -101,32 +101,37 @@ def get_status():
 
     def connect_to_db(uri):
         if not uri: return None, "URI vazia"
-        uri = uri.strip().strip('"').strip("'")
+        
+        # Limpeza ultra-agressiva (remove espaços, aspas e quebras de linha invisíveis)
+        uri = uri.strip().replace('"', '').replace("'", "")
         errs = []
         
-        # Tentativa 1: Direta
+        # Garante que use 'postgresql://' (psycopg2 prefere assim)
+        if uri.startswith("postgres://"):
+            uri = uri.replace("postgres://", "postgresql://", 1)
+        
+        # Tentativa 1: Conexão por URL (Padrão)
         try:
             return psycopg2.connect(uri), None
         except Exception as e:
-            errs.append(str(e))
+            errs.append(f"URL Error: {e}")
             
-        # Tentativa 2: Parse Manual e Conexão via Parâmetros (Mais robusto)
+        # Tentativa 2: Conexão por Parâmetros (Blindada)
         if "://" in uri:
             try:
                 import urllib.parse
-                clean_url = uri.replace("postgres://", "postgresql://")
-                res = urllib.parse.urlparse(clean_url)
-                # Passando parâmetros individuais (kwargs) - Evita erros de "missing ="
+                res = urllib.parse.urlparse(uri)
                 return psycopg2.connect(
                     host=res.hostname,
                     port=res.port or 5432,
                     database=res.path[1:],
                     user=res.username,
                     password=res.password,
+                    connect_timeout=10,
                     sslmode="require"
                 ), None
             except Exception as e:
-                errs.append(f"Param-Connect Error: {e}")
+                errs.append(f"Param Error: {e}")
                 
         return None, " | ".join(errs)
 
