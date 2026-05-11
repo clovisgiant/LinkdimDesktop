@@ -21,7 +21,7 @@ class CrawlerState:
     last_heartbeat: Optional[str] = None
     log_buffer: list = [] # Guarda os últimos 100 logs
     config: dict = {
-        "max_apply_per_cycle": 15,
+        "max_apply_per_cycle": 0,
         "cycle_wait_minutes":  45,
         "active_hours_start":  0,
         "active_hours_end":    0,
