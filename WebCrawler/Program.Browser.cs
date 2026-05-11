@@ -30,7 +30,7 @@ partial class Program
                 // Ignora erro de leitura de cookie.
             }
 
-            if (url.Contains("/feed", StringComparison.OrdinalIgnoreCase))
+            if (url.Contains("/feed", StringComparison.OrdinalIgnoreCase) || url.Contains("/jobs", StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
@@ -104,8 +104,8 @@ partial class Program
 
     private static bool EnsureAuthenticatedSession(IWebDriver driver, WebDriverWait wait, string linkedinUsername, string linkedinPassword)
     {
-        Console.WriteLine("Abrindo LinkedIn...");
-        driver.Navigate().GoToUrl(LinkedInFeedUrl);
+        Console.WriteLine("Abrindo LinkedIn (Página de Vagas para economizar RAM)...");
+        driver.Navigate().GoToUrl("https://www.linkedin.com/jobs/");
 
         var pageTitle = driver.Title;
         Console.WriteLine("Título da página: " + pageTitle);
@@ -119,7 +119,7 @@ partial class Program
             Thread.Sleep(1000);
             
             driver.Manage().Cookies.AddCookie(new OpenQA.Selenium.Cookie("li_at", sessionCookie, ".linkedin.com", "/", DateTime.Now.AddDays(30)));
-            driver.Navigate().GoToUrl(LinkedInFeedUrl);
+            driver.Navigate().GoToUrl("https://www.linkedin.com/jobs/");
             Thread.Sleep(2000);
 
             if (IsLoggedIn(driver))
