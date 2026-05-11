@@ -61,6 +61,8 @@ partial class Program
             options.AddArgument("--no-sandbox");
             options.AddArgument("--disable-dev-shm-usage");
             options.AddArgument("--disable-gpu");
+            // Disfarce: Dizemos ao LinkedIn que somos um Chrome de Windows comum
+            options.AddArgument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36");
             
             // Tenta localizar o binário do Chromium no Render
             var chromePath = Environment.GetEnvironmentVariable("CHROMIUM_PATH") ?? "/usr/bin/chromium";
@@ -106,7 +108,7 @@ partial class Program
             driver.Navigate().GoToUrl("https://www.linkedin.com/robots.txt"); // Precisa estar no domínio para setar cookie
             Thread.Sleep(1000);
             
-            driver.Manage().Cookies.AddCookie(new OpenQA.Selenium.Cookie("li_at", sessionCookie, ".www.linkedin.com", "/", DateTime.Now.AddDays(30)));
+            driver.Manage().Cookies.AddCookie(new OpenQA.Selenium.Cookie("li_at", sessionCookie, ".linkedin.com", "/", DateTime.Now.AddDays(30)));
             driver.Navigate().GoToUrl(LinkedInFeedUrl);
             Thread.Sleep(2000);
 
