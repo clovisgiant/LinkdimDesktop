@@ -152,28 +152,15 @@ partial class Program
         return $"{ActiveHoursStartLocal.Value:hh\\:mm}-{ActiveHoursEndLocal.Value:hh\\:mm}";
     }
 
+    private static bool IsWithinActiveHours()
+    {
+        // Configuração cortada: O robô agora trabalha 24/7 sem exceções.
+        return true;
+    }
+
     private static void WaitUntilWithinActiveHoursIfNeeded()
     {
-        if (!ActiveHoursStartLocal.HasValue || !ActiveHoursEndLocal.HasValue)
-        {
-            return;
-        }
-
-        var now = DateTime.Now;
-        if (IsWithinActiveHours(now.TimeOfDay, ActiveHoursStartLocal.Value, ActiveHoursEndLocal.Value))
-        {
-            return;
-        }
-
-        var nextStart = GetNextActiveWindowStart(now, ActiveHoursStartLocal.Value);
-        var waitTime = nextStart - now;
-        if (waitTime <= TimeSpan.Zero)
-        {
-            return;
-        }
-
-        Console.WriteLine($"Fora da janela ativa {DescribeActiveHoursWindow()}. Aguardando ate {nextStart:dd/MM/yyyy HH:mm} ({Math.Ceiling(waitTime.TotalMinutes)} min).");
-        SleepWithRuntimeHeartbeat(waitTime, "waiting", $"Fora da janela ativa {DescribeActiveHoursWindow()}. Aguardando proxima janela.");
+        // Configuração cortada: O robô não espera mais por janelas de horário.
     }
 
     private static bool IsWithinActiveHours(TimeSpan currentTime, TimeSpan startTime, TimeSpan endTime)
