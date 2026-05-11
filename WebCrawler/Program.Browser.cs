@@ -69,7 +69,13 @@ partial class Program
             options.AddArgument("--no-default-browser-check");
             options.AddArgument("--disable-software-rasterizer");
             options.AddArgument("--disable-dev-shm-usage");
-            options.AddArgument("--js-flags=\"--max-old-space-size=256\""); // Limita RAM do JavaScript do Chrome
+            options.AddArgument("--js-flags=\"--max-old-space-size=256\""); 
+            
+            // --- BLOQUEIO DE IMAGENS E PESO ---
+            options.AddUserProfilePreference("profile.managed_default_content_settings.images", 2); // Bloqueia imagens
+            options.AddArgument("--disable-webgl");
+            options.AddArgument("--disable-3d-apis");
+            options.AddArgument("--blink-settings=imagesEnabled=false");
             
             // Disfarce: Dizemos ao LinkedIn que somos um Chrome de Windows comum
             options.AddArgument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36");
