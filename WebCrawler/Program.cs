@@ -202,8 +202,7 @@ partial class Program
                 PrintSuccessfulJobsCycleSummary();
                 PrintVagasTabela(allJobsData);
 
-                Console.WriteLine("Encerrando driver...");
-                driver.Quit();
+                Console.WriteLine("Ciclo concluido. Limpando memória...");
                 StopRuntimeHeartbeatLoop();
                 SleepWithRuntimeHeartbeat(TimeSpan.FromMinutes(cycleWaitMinutes), "waiting", "Aguardando proximo ciclo.");
             }
