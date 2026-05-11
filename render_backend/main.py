@@ -251,28 +251,22 @@ async def start_crawler(req: StartRequest):
         dll_path = os.path.join(crawler_dir, "WebCrawler.dll")
         binary_path = os.path.join(crawler_dir, "WebCrawler")
         
-        # --- DIAGNÓSTICO DE BIBLIOTECAS ---
-        if os.path.exists(binary_path):
-            try:
-                await broadcast_log("🔍 [SISTEMA] Verificando dependências do robô (ldd)...")
-                ldd_out = subprocess.check_output(["ldd", binary_path], stderr=subprocess.STDOUT, text=True)
-                missing = [line for line in ldd_out.splitlines() if "not found" in line]
-                if missing:
-                    await broadcast_log(f"❌ BIBLIOTECAS FALTANDO: {', '.join(missing)}")
-                else:
-                    await broadcast_log("✅ Todas as bibliotecas do sistema parecem OK.")
-            except: pass
-
-        # Passa a conexão limpa para o C#
-        raw_conn = os.environ.get("WEBCRAWLER_DB_CONNECTION", "")
-        clean_conn = raw_conn.strip().replace('"', '').replace("'", "")
-        env["WEBCRAWLER_DB_CONNECTION"] = clean_conn
+        await broadcast_log("🔍 [SISTEMA] Iniciando verificação de lançamento...")
         
-        cmd = ["dotnet", dll_path]
+        # Teste de eco para verificar se o pipe de logs está funcionando
+        try:
+            echo_test = subprocess.check_output(["echo", "PIPE_OK"], text=True).strip()
+            await broadcast_log(f"✅ Teste de Pipe OS: {echo_test}")
+        except Exception as e:
+            await broadcast_log(f"⚠️ Alerta de Pipe OS: {e}")
+
+        # 3. Verifica se o executável nativo existe
         if os.path.exists(binary_path):
             await broadcast_log(f"✅ Usando execução direta: {binary_path}")
             os.chmod(binary_path, 0o755)
             cmd = [binary_path]
+        else:
+            cmd = ["dotnet", dll_path]
 
         await broadcast_log(f"🚀 Lançando processo: {' '.join(cmd)}")
         
@@ -339,6 +333,14 @@ async def update_config(req: ConfigRequest):
     state.config.update(req.dict())
     await broadcast_log("⚙️  Configuração atualizada pelo painel Qt.")
     return {"ok": True, "config": state.config}
+
+@app.get("/crawler/view_logs")
+async def view_logs():
+    """Endpoint de emergência para ver logs caso o WebSocket falhe"""
+    return {
+        "status": state.status,
+        "logs": state.log_buffer[-100:] if state.log_buffer else ["Nenhum log capturado ainda."]
+    }
 
 # ── WebSocket para streaming de logs ─────────────────────────
 @app.websocket("/ws/logs")
