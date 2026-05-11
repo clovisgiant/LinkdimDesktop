@@ -234,22 +234,43 @@ async def start_crawler(req: StartRequest):
         # O robô C# (Npgsql) pode precisar da URL convertida ou limpa
         env["WEBCRAWLER_DB_CONNECTION"] = clean_conn
         
+        # --- MODO DIAGNÓSTICO ---
+        await broadcast_log("🔍 [DIAGNÓSTICO] Verificando ambiente...")
+        
         dll_path = "/app/crawler/WebCrawler.dll"
+        
+        # 1. Verifica arquivos na pasta
+        crawler_dir = "/app/crawler"
+        if os.path.exists(crawler_dir):
+            files = os.listdir(crawler_dir)
+            await broadcast_log(f"📁 Arquivos em {crawler_dir}: {', '.join(files)}")
+        else:
+            await broadcast_log(f"❌ Pasta {crawler_dir} não existe!")
+
+        # 2. Testa comando dotnet
+        try:
+            dn_ver = subprocess.check_output(["dotnet", "--version"], stderr=subprocess.STDOUT, text=True)
+            await broadcast_log(f"✅ .NET SDK/Runtime: {dn_ver.strip()}")
+        except Exception as e:
+            await broadcast_log(f"❌ Erro ao testar 'dotnet': {e}")
+
+        # 3. Verifica se a DLL existe especificamente
         if not os.path.exists(dll_path):
-            await broadcast_log(f"❌ ERRO CRÍTICO: Arquivo {dll_path} não encontrado no container!")
+            await broadcast_log(f"❌ ERRO CRÍTICO: {dll_path} não encontrado!")
             state.status = "error"
             return {"ok": False, "msg": "Binário do robô não encontrado."}
 
-        await broadcast_log("🔍 Iniciando robô C# (.NET 8.0)...")
+        await broadcast_log("🚀 Lançando processo: dotnet " + dll_path)
         
         proc = subprocess.Popen(
             ["dotnet", dll_path], 
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             env=env,
-            cwd="/app/crawler", # Importante: Rodar na pasta do robô
+            cwd=crawler_dir,
             bufsize=1,
-            universal_newlines=True
+            universal_newlines=True,
+            shell=False
         )
         state.process = proc
         state.status  = "running"

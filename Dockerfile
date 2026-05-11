@@ -16,17 +16,19 @@ RUN dotnet publish -c Release -o /app/crawler --self-contained false
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 
 # ── Instala Python, Chrome e ChromeDriver ───────────────────
+# ── Instala Python, Chrome e dependências do sistema ────────
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 python3-pip python3-venv python3-dev \
     build-essential libpq-dev \
     wget gnupg curl unzip ca-certificates \
-    # Chrome headless
+    # Chrome e dependências para Headless (Super Conjunto)
     chromium chromium-driver \
-    # Fontes para não crashar na renderização
-    fonts-liberation libappindicator3-1 libasound2 \
-    libatk-bridge2.0-0 libatk1.0-0 libcups2 libdbus-1-3 \
-    libgdk-pixbuf2.0-0 libnspr4 libnss3 libx11-xcb1 \
-    libxcomposite1 libxdamage1 libxrandr2 xdg-utils \
+    fonts-liberation libnss3 libatk-bridge2.0-0 libatk1.0-0 \
+    libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 \
+    libxrandr2 libgbm1 libasound2 libpango-1.0-0 libpangocairo-1.0-0 \
+    libxshmfence1 libnss3-dev libxrender1 libfontconfig1 \
+    # Utilitários de diagnóstico
+    procps \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # ── Variáveis para Chrome headless ──────────────────────────
