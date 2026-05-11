@@ -13,9 +13,9 @@ partial class Program
         try
         {
             Console.WriteLine($"[HUMAN] Iniciando busca humana para: {selectedSearchTerm}");
-            driver.Navigate().GoToUrl("https://www.linkedin.com/jobs/");
+            // Removida navegação redundante para economizar RAM
             WaitForJobPageReady(driver);
-            Thread.Sleep(2000);
+            Thread.Sleep(1000);
 
             if (TrySubmitJobsSearchKeyword(driver, selectedSearchTerm))
             {
