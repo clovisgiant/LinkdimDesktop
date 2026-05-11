@@ -69,19 +69,23 @@ partial class Program
             options.AddArgument("--no-default-browser-check");
             options.AddArgument("--disable-software-rasterizer");
             options.AddArgument("--disable-dev-shm-usage");
-            options.AddArgument("--js-flags=\"--max-old-space-size=256\""); 
+            options.AddArgument("--js-flags=\"--max-old-space-size=128\""); 
             options.AddArgument("--memory-pressure-thresholds=1,2");
             options.AddArgument("--disable-background-networking");
             options.AddArgument("--disable-sync");
+            options.AddArgument("--disable-print-preview");
+            options.AddArgument("--disable-speech-api");
+            options.AddArgument("--disable-media-session-api");
+            options.AddArgument("--disable-features=TranslateUI,BlinkGenPropertyTrees,SpellCheck,AudioServiceOutOfProcess");
             
             // --- BLOQUEIO DE IMAGENS E PESO ---
-            options.AddUserProfilePreference("profile.managed_default_content_settings.images", 2); // Bloqueia imagens
+            options.AddUserProfilePreference("profile.managed_default_content_settings.images", 2); 
             options.AddArgument("--disable-webgl");
             options.AddArgument("--disable-3d-apis");
             options.AddArgument("--blink-settings=imagesEnabled=false");
             
-            // Disfarce: Dizemos ao LinkedIn que somos um Chrome de Windows comum
-            options.AddArgument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36");
+            // User-Agent estável (Chrome 119) em vez de versões experimentais
+            options.AddArgument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36");
             
             // Tenta localizar o binário do Chromium no Render
             var chromePath = Environment.GetEnvironmentVariable("CHROMIUM_PATH") ?? "/usr/bin/chromium";
