@@ -227,6 +227,9 @@ async def start_crawler(req: StartRequest):
         env["WEBCRAWLER_JOB_SEARCH_TERMS"] = req.search_terms
 
     try:
+        crawler_dir = "/app/crawler"
+        dll_path = os.path.join(crawler_dir, "WebCrawler.dll")
+        
         # Passa a conexão limpa para o C#
         raw_conn = os.environ.get("WEBCRAWLER_DB_CONNECTION", "")
         clean_conn = raw_conn.strip().replace('"', '').replace("'", "")
