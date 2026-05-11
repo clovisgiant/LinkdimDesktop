@@ -496,7 +496,17 @@ partial class Program
 
     private static IReadOnlyCollection<IWebElement> FindJobCards(IWebDriver driver)
     {
-        var cards = driver.FindElements(By.CssSelector("ul.jobs-search-results__list > li, ul.scaffold-layout__list-container > li, li.jobs-search-results__list-item, ul.jobs-search__results-list > li, ul.scaffold-layout__list-container li, div.job-card-container, a.job-card-container__link"));
+        try {
+            var js = (IJavaScriptExecutor)driver;
+            js.ExecuteScript(@"
+                var sidebar = document.querySelector('.jobs-search-results-list, .scaffold-layout__list-container, div.jobs-search-results-list__container');
+                if (sidebar) { sidebar.scrollTop = sidebar.scrollHeight; }
+                window.scrollBy(0, 500);
+            ");
+            Thread.Sleep(1000);
+        } catch {}
+
+        var cards = driver.FindElements(By.CssSelector("ul.jobs-search-results__list > li, ul.scaffold-layout__list-container > li, li.jobs-search-results__list-item, .job-card-container, .job-card-list__entity-lockup"));
         return cards;
     }
 
@@ -504,21 +514,17 @@ partial class Program
     {
         try
         {
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(60));
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(45));
             return wait.Until(d => HasAnyJobCard(d));
         }
-        catch (WebDriverTimeoutException)
+        catch
         {
-            try
-            {
+            try {
                 driver.Navigate().Refresh();
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(60));
+                Thread.Sleep(3000);
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(45));
                 return wait.Until(d => HasAnyJobCard(d));
-            }
-            catch
-            {
-                return false;
-            }
+            } catch { return false; }
         }
     }
 
@@ -526,29 +532,18 @@ partial class Program
     {
         try
         {
-            var cards = driver.FindElements(By.CssSelector("li.jobs-search-results__list-item, div.job-card-container, a.job-card-container__link, ul.jobs-search__results-list li"));
-            if (cards.Count > 0)
-            {
-                return true;
-            }
+            var cards = driver.FindElements(By.CssSelector("li.jobs-search-results__list-item, .job-card-container, .job-card-list__entity-lockup, ul.scaffold-layout__list-container li"));
+            if (cards.Count > 0) return true;
 
-            try
-            {
+            try {
                 var js = (IJavaScriptExecutor)driver;
-                js.ExecuteScript("window.scrollBy(0, 600);");
-            }
-            catch
-            {
-                // Ignora falha de script e continua tentativa.
-            }
+                js.ExecuteScript("window.scrollBy(0, 800);");
+                js.ExecuteScript("var s = document.querySelector('.jobs-search-results-list, .scaffold-layout__list-container'); if(s) s.scrollTop += 500;");
+            } catch {}
 
-            cards = driver.FindElements(By.CssSelector("li.jobs-search-results__list-item, div.job-card-container, a.job-card-container__link, ul.jobs-search__results-list li"));
-            return cards.Count > 0;
+            return driver.FindElements(By.CssSelector("li.jobs-search-results__list-item, .job-card-container, .job-card-list__entity-lockup")).Count > 0;
         }
-        catch
-        {
-            return false;
-        }
+        catch { return false; }
     }
 
     private static string GetTextBySelectors(IWebElement root, params string[] selectors)
