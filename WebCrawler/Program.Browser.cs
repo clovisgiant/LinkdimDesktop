@@ -61,6 +61,16 @@ partial class Program
             options.AddArgument("--no-sandbox");
             options.AddArgument("--disable-dev-shm-usage");
             options.AddArgument("--disable-gpu");
+            
+            // --- OTIMIZAÇÕES EXTREMAS DE MEMÓRIA PARA PLANO FREE ---
+            options.AddArgument("--disable-extensions");
+            options.AddArgument("--disable-setuid-sandbox");
+            options.AddArgument("--no-first-run");
+            options.AddArgument("--no-default-browser-check");
+            options.AddArgument("--disable-software-rasterizer");
+            options.AddArgument("--disable-dev-shm-usage");
+            options.AddArgument("--js-flags=\"--max-old-space-size=256\""); // Limita RAM do JavaScript do Chrome
+            
             // Disfarce: Dizemos ao LinkedIn que somos um Chrome de Windows comum
             options.AddArgument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36");
             
