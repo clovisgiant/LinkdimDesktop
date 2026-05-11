@@ -12,8 +12,8 @@ COPY WebCrawler ./WebCrawler/
 WORKDIR /src/WebCrawler
 RUN dotnet publish -c Release -o /app/crawler --self-contained false
 
-# ── Estágio 2: Runtime final ─────────────────────────────────
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+# ── Estágio 2: Runtime final (Usando SDK para garantir compatibilidade total) ──
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS runtime
 
 # ── Instala Python, Chrome e ChromeDriver ───────────────────
 # ── Instala Python, Chrome e dependências do sistema ────────
