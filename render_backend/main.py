@@ -260,6 +260,11 @@ async def start_crawler(req: StartRequest):
         except Exception as e:
             await broadcast_log(f"⚠️ Alerta de Pipe OS: {e}")
 
+        # Passa a conexão limpa para o C#
+        raw_conn = os.environ.get("WEBCRAWLER_DB_CONNECTION", "")
+        clean_conn = raw_conn.strip().replace('"', '').replace("'", "")
+        env["WEBCRAWLER_DB_CONNECTION"] = clean_conn
+
         # 3. Verifica se o executável nativo existe
         if os.path.exists(binary_path):
             await broadcast_log(f"✅ Usando execução direta: {binary_path}")
