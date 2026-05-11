@@ -127,20 +127,25 @@ private:
     // ── Membros de rede ──────────────────────────────────────
     QNetworkAccessManager* m_nam = nullptr;
     QWebSocket             m_ws;
-    QString m_apiBase = "https://linkdim-api.onrender.com"; // ← URL do Render
+    QString m_apiBase = "https://linkdimdesktop.onrender.com"; // ← Sua URL real agora é o padrão
 
     void buildUI() {
         auto* root = new QVBoxLayout(this);
-        root->setContentsMargins(40, 36, 40, 36);
-        root->setSpacing(24);
+        root->setContentsMargins(0, 0, 0, 0); // Remove margens do root (o scroll cuida do resto)
+        root->setSpacing(0);
 
-        // ── Cabeçalho ────────────────────────────────────────
-        auto* hdr = new QHBoxLayout();
+        // ── Cabeçalho (FORA DO SCROLL) ──────────────────────
+        auto* hdrContainer = new QWidget();
+        hdrContainer->setFixedHeight(100);
+        hdrContainer->setStyleSheet("background:#1A1D24; border-bottom:1px solid #252830;");
+        auto* hdr = new QHBoxLayout(hdrContainer);
+        hdr->setContentsMargins(32, 10, 32, 10);
+        
         auto* titleV = new QVBoxLayout();
         auto* title = new QLabel("Controle do Robô");
-        title->setStyleSheet("color:#F0F4F8;font-size:28px;font-weight:bold;");
-        auto* sub = new QLabel("Orquestra o WebCrawler rodando no Render.com via API.");
-        sub->setStyleSheet("color:#A39C93;font-size:13px;");
+        title->setStyleSheet("color:#F0F4F8;font-size:24px;font-weight:bold;");
+        auto* sub = new QLabel("Orquestrador Render.com via API.");
+        sub->setStyleSheet("color:#A39C93;font-size:12px;");
         titleV->addWidget(title); titleV->addWidget(sub);
         hdr->addLayout(titleV);
         hdr->addStretch();
@@ -149,20 +154,23 @@ private:
         m_apiUrlInput = new QLineEdit(m_apiBase);
         m_apiUrlInput->setFixedWidth(360);
         m_apiUrlInput->setStyleSheet(
-            "QLineEdit{background:#1A1D24;color:#F0F4F8;border:1px solid #252830;"
-            "border-radius:8px;padding:8px 14px;font-size:12px;}"
+            "QLineEdit{background:#111216;color:#F0F4F8;border:1px solid #252830;"
+            "border-radius:8px;padding:8px 14px;font-size:12px;font-family:Consolas;}"
             "QLineEdit:focus{border:1px solid #E39B35;}");
-        connect(m_apiUrlInput, &QLineEdit::editingFinished, this, [this]{
-            m_apiBase = m_apiUrlInput->text().trimmed();
-            connectWebSocket();
-            appendLog("🔗 API URL atualizada: " + m_apiBase);
+        
+        // MUDEI PARA textChanged para salvar na hora!
+        connect(m_apiUrlInput, &QLineEdit::textChanged, this, [this](const QString& text){
+            m_apiBase = text.trimmed();
+            // Debounce simples para não reconectar a cada letra
+            QTimer::singleShot(1000, this, &RobotControlPage::connectWebSocket);
         });
+        
         auto* apiLbl = new QLabel("API URL:");
-        apiLbl->setStyleSheet("color:#A39C93;font-size:12px;");
+        apiLbl->setStyleSheet("color:#A39C93;font-size:11px;font-weight:bold;");
         auto* apiRow = new QVBoxLayout();
         apiRow->addWidget(apiLbl); apiRow->addWidget(m_apiUrlInput);
         hdr->addLayout(apiRow);
-        root->addLayout(hdr);
+        root->addWidget(hdrContainer);
 
         // ── Status Card ──────────────────────────────────────
         auto* statusCard = makeCard();
@@ -357,19 +365,28 @@ private:
     // ── API Calls ─────────────────────────────────────────────
     void connectWebSocket() {
         if (m_ws.state() == QAbstractSocket::ConnectedState) m_ws.close();
-        QString wsUrl = m_apiBase;
+        
+        // Limpa a URL (remove barras extras no final)
+        QString base = m_apiBase.trimmed();
+        while(base.endsWith('/')) base.chop(1);
+        
+        QString wsUrl = base;
         wsUrl.replace("https://", "wss://").replace("http://", "ws://");
         wsUrl += "/ws/logs";
         m_ws.open(QUrl(wsUrl));
     }
 
-    QString buildAuthHeader() {
-        // Por hora sem auth — para MVP; adicionar JWT depois
-        return "";
-    }
-
     QNetworkRequest makeRequest(const QString& endpoint) {
-        QNetworkRequest req(QUrl(m_apiBase + endpoint));
+        // Limpa a URL base
+        QString base = m_apiBase.trimmed();
+        while(base.endsWith('/')) base.chop(1);
+        
+        // Garante que o endpoint comece com barra
+        QString path = endpoint;
+        if (!path.startsWith('/')) path = "/" + path;
+        
+        QUrl url(base + path);
+        QNetworkRequest req(url);
         req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
         return req;
     }

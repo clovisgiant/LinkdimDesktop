@@ -51,6 +51,7 @@
 #include <QUrl>
 #include "src/ui/LinkedInDashboard.h"
 #include "src/ui/RobotControlPage.h"
+#include "src/ui/LinkedInJobsPage.h"
 
 
 // ============================================================================
@@ -1271,14 +1272,14 @@ public:
         stacked->addWidget(dashPage);                                            // Pagina 0
         stacked->addWidget(netPage);                                             // Pagina 1
         
-        TransactionsPage* transPage = new TransactionsPage();
-        stacked->addWidget(transPage);                                           // Pagina 2
+        // --- ABA 2: Candidaturas Enviadas (Banco Real) ---
+        QString liConn = QString::fromUtf8(qgetenv("WEBCRAWLER_DB_CONNECTION")).trimmed().remove('"');
+        auto* jobsPage = new LinkedInJobsPage(liConn);
+        stacked->addWidget(jobsPage);                                            // Pagina 2
+        
         stacked->addWidget(new AccountEditPage());                               // Pagina 3
 
         // ── Página 4: LinkedIn Dashboard (dados reais do PostgreSQL) ──
-        // A connection string já foi carregada do .env no main() via qputenv
-        QString liConn = QString::fromUtf8(qgetenv("WEBCRAWLER_DB_CONNECTION")).trimmed().remove('"');
-        qDebug() << "[LINKDIM] DB conn length:" << liConn.length() << "| preview:" << liConn.left(30);
         auto* liPage = new LinkedInDashboardPage(liConn);
         stacked->addWidget(liPage);                                              // Pagina 4
 
@@ -1291,7 +1292,6 @@ public:
         // 3. Conexao de Evento: Quando clicar na Sidebar, muda a tela do Caderno (StackedWidget)
         connect(sidebar, &Sidebar::pageSelected, stacked, &QStackedWidget::setCurrentIndex);
         connect(netPage, &NetworkChatPage::telemetryReceived, dashPage, &DashboardPage::updateTelemetry);
-        connect(netPage, &NetworkChatPage::magicTransactionReceived, transPage, &TransactionsPage::addTransactionRow);
     }
 };
 

@@ -22,8 +22,8 @@ if [ -f "$CHROMEDRIVER_PATH" ]; then
     echo "✅ ChromeDriver: $($CHROMEDRIVER_PATH --version)"
 fi
 
-# Verifica .NET
-dotnet --version && echo "✅ .NET Runtime OK"
+# Verifica .NET (Runtime)
+dotnet --list-runtimes && echo "✅ .NET Runtime OK" || echo "⚠️  .NET: Runtime detectado, mas --version não suportado (OK)"
 
 echo "🚀 Iniciando FastAPI na porta 8000..."
 cd /api

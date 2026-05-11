@@ -30,6 +30,7 @@ add_executable(DashboardProject WIN32
     main.cpp
     src/ui/LinkedInDashboard.cpp
     src/ui/RobotControlPage.cpp
+    src/ui/LinkedInJobsPage.h
 )
 add_executable(cliente_teste cliente_teste.cpp)
 
