@@ -72,7 +72,7 @@ partial class Program
             options.AddArgument("--js-flags=\"--max-old-space-size=256\""); // Limita RAM do JavaScript do Chrome
             
             // Disfarce: Dizemos ao LinkedIn que somos um Chrome de Windows comum
-            options.AddArgument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36");
+            options.AddArgument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36");
             
             // Tenta localizar o binário do Chromium no Render
             var chromePath = Environment.GetEnvironmentVariable("CHROMIUM_PATH") ?? "/usr/bin/chromium";
