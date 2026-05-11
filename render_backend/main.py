@@ -65,13 +65,22 @@ async def broadcast_log(msg: str):
             state.log_subscribers.remove(ws)
 
 def sync_broadcast(msg: str):
-    """Chama broadcast de threads síncronas (ex: reader do subprocess)"""
+    """Chama broadcast de threads síncronas usando o loop global"""
     try:
-        loop = asyncio.get_event_loop()
-        if loop.is_running():
+        # Se não tiver loop salvo, tenta pegar o atual
+        loop = getattr(app, 'main_loop', None)
+        if not loop:
+            loop = asyncio.get_event_loop()
+        
+        if loop and loop.is_running():
             asyncio.run_coroutine_threadsafe(broadcast_log(msg), loop)
     except Exception:
         pass
+
+@app.on_event("startup")
+async def startup_event():
+    # Salva o loop principal para ser usado pelas threads de log
+    app.main_loop = asyncio.get_running_loop()
 
 # ── Lê stdout/stderr do subprocess e envia via WebSocket ─────
 def stream_process_output(proc: subprocess.Popen):
