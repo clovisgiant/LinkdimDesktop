@@ -111,31 +111,35 @@ partial class Program
         }
 
         Console.WriteLine("Preenchendo credenciais...");
+        
+        // Função auxiliar para preenchimento robusto
+        Action<IWebElement, string> safeType = (element, text) => {
+            try {
+                ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView(true);", element);
+                Thread.Sleep(500);
+                element.Click();
+                element.Clear();
+                element.SendKeys(text);
+            } catch {
+                // Fallback via JavaScript se a interação normal falhar
+                ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].value = arguments[1];", element, text);
+                ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].dispatchEvent(new Event('input', { bubbles: true }));", element);
+            }
+        };
+
         IWebElement emailField;
-        try
-        {
-            emailField = wait.Until(d => d.FindElement(By.Id("username")));
-        }
-        catch
-        {
-            emailField = wait.Until(d => d.FindElement(By.CssSelector("input[type='email']")));
-        }
-        emailField.Clear();
-        emailField.SendKeys(linkedinUsername);
+        try { emailField = wait.Until(d => d.FindElement(By.Id("username"))); }
+        catch { emailField = wait.Until(d => d.FindElement(By.CssSelector("input[type='email']"))); }
+        
+        safeType(emailField, linkedinUsername);
         Console.WriteLine("Email preenchido.");
         Thread.Sleep(500);
 
         IWebElement passwordField;
-        try
-        {
-            passwordField = driver.FindElement(By.Id("password"));
-        }
-        catch
-        {
-            passwordField = driver.FindElement(By.CssSelector("input[type='password']"));
-        }
-        passwordField.Clear();
-        passwordField.SendKeys(linkedinPassword);
+        try { passwordField = driver.FindElement(By.Id("password")); }
+        catch { passwordField = driver.FindElement(By.CssSelector("input[type='password']")); }
+        
+        safeType(passwordField, linkedinPassword);
         Console.WriteLine("Senha preenchida.");
         Thread.Sleep(500);
 
