@@ -143,39 +143,52 @@ partial class Program
         Console.WriteLine("Senha preenchida.");
         Thread.Sleep(500);
 
-        IWebElement loginButton = null;
-        string[] buttonSelectors = { 
-            "//button[@type='submit']", 
-            "#login-submit", 
-            ".login__form_action_container button",
-            "button[data-litms-control-urn]",
-            "//button[contains(text(), 'Entrar')]",
-            "//button[contains(text(), 'Sign in')]"
-        };
-
-        foreach (var selector in buttonSelectors)
+        // --- TENTATIVA 1: Tecla ENTER (Plano B Infalível) ---
+        try
         {
-            try
-            {
-                if (selector.StartsWith("//"))
-                    loginButton = wait.Until(d => d.FindElement(By.XPath(selector)));
-                else if (selector.StartsWith("#"))
-                    loginButton = wait.Until(d => d.FindElement(By.Id(selector.Substring(1))));
-                else
-                    loginButton = wait.Until(d => d.FindElement(By.CssSelector(selector)));
-                
-                if (loginButton != null && loginButton.Displayed && loginButton.Enabled)
-                    break;
-            }
-            catch { /* Tenta o próximo */ }
+            Console.WriteLine("Tentando enviar formulário via tecla ENTER...");
+            passwordField.SendKeys(OpenQA.Selenium.Keys.Enter);
+            Thread.Sleep(2000);
         }
+        catch { /* Segue para o botão se falhar */ }
 
-        if (loginButton == null)
-            throw new Exception("Não foi possível encontrar o botão de login do LinkedIn após várias tentativas.");
+        // Se ainda estiver na página de login, tenta o botão
+        if (driver.Url.Contains("login"))
+        {
+            IWebElement loginButton = null;
+            string[] buttonSelectors = { 
+                "//button[@type='submit']", 
+                "#login-submit", 
+                "button[type='submit']",
+                ".login__form_action_container button",
+                "//button[contains(., 'Entrar')]",
+                "//button[contains(., 'Sign in')]",
+                "//div[@role='button'][contains(., 'Entrar')]"
+            };
 
-        Console.WriteLine("Botão de login encontrado. Clicando...");
-        try { loginButton.Click(); }
-        catch { ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].click();", loginButton); }
+            foreach (var selector in buttonSelectors)
+            {
+                try
+                {
+                    if (selector.StartsWith("//"))
+                        loginButton = driver.FindElement(By.XPath(selector));
+                    else if (selector.StartsWith("#"))
+                        loginButton = driver.FindElement(By.Id(selector.Substring(1)));
+                    else
+                        loginButton = driver.FindElement(By.CssSelector(selector));
+                    
+                    if (loginButton != null && loginButton.Displayed) break;
+                }
+                catch { }
+            }
+
+            if (loginButton != null)
+            {
+                Console.WriteLine("Botão de login encontrado. Clicando...");
+                try { loginButton.Click(); }
+                catch { ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].click();", loginButton); }
+            }
+        }
         
         Console.WriteLine("Login enviado, aguardando redirecionamento...");
 
