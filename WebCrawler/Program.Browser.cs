@@ -98,6 +98,29 @@ partial class Program
         var pageTitle = driver.Title;
         Console.WriteLine("Título da página: " + pageTitle);
 
+        // --- TENTATIVA 0: BYPASS VIA COOKIE (O PULO DO GATO) ---
+        var sessionCookie = Environment.GetEnvironmentVariable("LINKEDIN_SESSION_COOKIE");
+        if (!string.IsNullOrEmpty(sessionCookie))
+        {
+            Console.WriteLine("🍪 [C#] Tentando login via Cookie de Sessão (Bypass 2FA)...");
+            driver.Navigate().GoToUrl("https://www.linkedin.com/robots.txt"); // Precisa estar no domínio para setar cookie
+            Thread.Sleep(1000);
+            
+            driver.Manage().Cookies.AddCookie(new OpenQA.Selenium.Cookie("li_at", sessionCookie, ".www.linkedin.com", "/", DateTime.Now.AddDays(30)));
+            driver.Navigate().GoToUrl(LinkedInFeedUrl);
+            Thread.Sleep(2000);
+
+            if (IsLoggedIn(driver))
+            {
+                Console.WriteLine("✅ [C#] Login via Cookie bem-sucedido! Bypass total de 2FA.");
+                return true;
+            }
+            else
+            {
+                Console.WriteLine("⚠️ [C#] Cookie de sessão inválido ou expirado. Tentando login normal...");
+            }
+        }
+
         if (!IsLoggedIn(driver))
         {
             Console.WriteLine("Abrindo tela de login...");
