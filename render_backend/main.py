@@ -253,6 +253,9 @@ async def start_crawler(req: StartRequest):
         
         await broadcast_log("🔍 [SISTEMA] Iniciando verificação de lançamento...")
         
+        # Log de variáveis (sem senhas)
+        await broadcast_log(f"📦 [SISTEMA] Termos: {req.search_terms} | Ciclo: {req.cycle_wait_minutes}min")
+
         # Teste de eco para verificar se o pipe de logs está funcionando
         try:
             echo_test = subprocess.check_output(["echo", "PIPE_OK"], text=True).strip()
