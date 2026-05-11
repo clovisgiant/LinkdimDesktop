@@ -120,22 +120,6 @@ partial class Program
 
                 StartSuccessfulJobsCycle();
 
-                Console.WriteLine("🔧 [C#] Inicializando Selenium ChromeDriver...");
-                using var driver = new ChromeDriver(BuildChromeOptions(usePersistentProfile));
-                Console.WriteLine("✅ [C#] Selenium ChromeDriver iniciado com sucesso!");
-                
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
-
-                if (!EnsureAuthenticatedSession(driver, wait, linkedinUsername, linkedinPassword))
-                {
-                    StopRuntimeHeartbeatLoop();
-                    SleepWithRuntimeHeartbeat(TimeSpan.FromMinutes(1), "waiting", "Sessao nao autenticada.");
-                    continue;
-                }
-
-                UpdateRuntimeHeartbeatLoopState("running", "Coletando e aplicando vagas.");
-                Console.WriteLine("Login bem-sucedido! Página atual: " + driver.Url);
-
                 var allJobsLines = new List<string>();
                 var allJobsData = new List<(string Titulo, string Empresa, string Localizacao, string Link)>();
                 var collectedFromJobsSearch = false;
@@ -145,14 +129,25 @@ partial class Program
                     var cycleSearchTerms = GetJobSearchTermsForCurrentCycle(jobsSearchTerms);
                     foreach (var searchTerm in cycleSearchTerms)
                     {
-                        UpdateRuntimeHeartbeatLoopState("running", $"Coletando vagas para '{searchTerm}'.");
-                        Console.WriteLine($"Preparando busca de vagas para o termo '{searchTerm}'...");
+                        UpdateRuntimeHeartbeatLoopState("running", $"Iniciando busca para '{searchTerm}'.");
+                        Console.WriteLine($"\n[C#] Iniciando novo navegador para o termo: '{searchTerm}'...");
 
-                        if (!TryPrepareJobsSearchEntry(driver, searchTerm)) continue;
+                        using (var driver = new ChromeDriver(BuildChromeOptions(usePersistentProfile)))
+                        {
+                            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
+                            if (!EnsureAuthenticatedSession(driver, wait, linkedinUsername, linkedinPassword)) continue;
 
-                        if (!TryCollectJobsFromCurrentResults(driver, wait, allJobsLines, allJobsData, maxPagesPerCycle, $"termo '{searchTerm}'")) continue;
-
-                        collectedFromJobsSearch = true;
+                            if (!TryPrepareJobsSearchEntry(driver, searchTerm)) continue;
+                            if (!TryCollectJobsFromCurrentResults(driver, wait, allJobsLines, allJobsData, maxPagesPerCycle, $"termo '{searchTerm}'")) continue;
+                            
+                            collectedFromJobsSearch = true;
+                            Console.WriteLine($"[C#] Busca para '{searchTerm}' concluida. Fechando navegador para limpar RAM...");
+                            driver.Quit();
+                        }
+                        
+                        // Pequena pausa entre termos para o SO limpar a RAM
+                        GC.Collect();
+                        Thread.Sleep(5000);
                     }
                 }
 
@@ -168,17 +163,28 @@ partial class Program
                 Console.WriteLine($"\nTotal de vagas coletadas: {allJobsLines.Count}");
                 File.WriteAllLines(JobsOutputFileName, allJobsLines);
 
-                if (maxJobsToApplyPerCycle > 0)
+                if (maxJobsToApplyPerCycle > 0 && allJobsData.Count > 0)
                 {
-                    if (!disableDatabase)
+                    UpdateRuntimeHeartbeatLoopState("running", $"Iniciando candidaturas ({allJobsData.Count} vagas).");
+                    Console.WriteLine($"\n[C#] Abrindo navegador para candidaturas...");
+                    
+                    using (var driver = new ChromeDriver(BuildChromeOptions(usePersistentProfile)))
                     {
-                        SaveCollectedJobsToDatabase(allJobsData);
-                        ApplySimplifiedJobsFromDatabase(driver, maxJobsToApplyPerCycle);
-                    }
-                    else
-                    {
-                        var links = allJobsData.Select(v => v.Link).Where(l => !string.IsNullOrWhiteSpace(l)).Distinct().ToList();
-                        ApplySimplifiedJobsFromLinks(driver, links, maxJobsToApplyPerCycle);
+                        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
+                        if (EnsureAuthenticatedSession(driver, wait, linkedinUsername, linkedinPassword))
+                        {
+                            if (!disableDatabase)
+                            {
+                                SaveCollectedJobsToDatabase(allJobsData);
+                                ApplySimplifiedJobsFromDatabase(driver, maxJobsToApplyPerCycle);
+                            }
+                            else
+                            {
+                                var links = allJobsData.Select(v => v.Link).Where(l => !string.IsNullOrWhiteSpace(l)).Distinct().ToList();
+                                ApplySimplifiedJobsFromLinks(driver, links, maxJobsToApplyPerCycle);
+                            }
+                        }
+                        driver.Quit();
                     }
                 }
 
