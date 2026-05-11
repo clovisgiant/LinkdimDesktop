@@ -153,29 +153,37 @@ partial class Program
             loginButton = driver.FindElement(By.CssSelector("button[data-litms-control-urn]"));
         }
         Console.WriteLine("Botão de login encontrado. Clicando...");
-        loginButton.Click();
+        try { loginButton.Click(); }
+        catch { ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].click();", loginButton); }
+        
         Console.WriteLine("Login enviado, aguardando redirecionamento...");
 
         try
         {
+            wait.Timeout = TimeSpan.FromSeconds(30); // Mais paciência para o Render
             wait.Until(d =>
             {
-                var url = d.Url ?? string.Empty;
-                if (url.Contains("feed") || url.Contains("linkedin.com/in"))
+                var url = d.Url?.ToLower() ?? string.Empty;
+                
+                // Sucesso
+                if (url.Contains("feed") || url.Contains("linkedin.com/in")) return "logged_in";
+                
+                // Desafios de Segurança (2FA, Captcha, Checkpoint)
+                if (url.Contains("checkpoint") || url.Contains("challenge") || url.Contains("captcha") || url.Contains("verify"))
                 {
-                    return "logged_in";
+                    Console.WriteLine("⚠️ [C#] ALERTA: LinkedIn solicitou Verificação de Segurança (Captcha/2FA).");
+                    return "security_challenge";
                 }
 
                 return null;
             });
 
-            return true;
+            return driver.Url.Contains("feed") || driver.Url.Contains("linkedin.com/in");
         }
         catch (WebDriverTimeoutException)
         {
-            Console.WriteLine("Timeout no redirecionamento de login. Pode haver lentidão.");
-            var diagnostics = SaveFailureDiagnostics(driver, LinkedInLoginUrl, "login_redirect_timeout");
-            LogApplicationStep(LinkedInLoginUrl, "login_redirect_timeout", false, "Timeout aguardando redirecionamento após submit de login.", diagnostics.HtmlPath, diagnostics.ScreenshotPath);
+            Console.WriteLine("Timeout no redirecionamento de login. Pode haver lentidão ou bloqueio.");
+            SaveFailureDiagnostics(driver, LinkedInLoginUrl, "login_redirect_timeout");
             return false;
         }
     }
