@@ -399,7 +399,7 @@ async def test_env():
 def health():
     return {"ok": True, "time": datetime.utcnow().isoformat()}
 
-@app.get("/crawler/diagnostics")
+@app.get("/diag")
 async def list_diagnostics():
     """Lista arquivos de diagnóstico (capturas de tela HTML)"""
     diag_dir = "/app/crawler/diagnostics"
@@ -407,10 +407,10 @@ async def list_diagnostics():
         return {"ok": False, "msg": "Diretório de diagnósticos não existe ainda."}
     
     files = [f for f in os.listdir(diag_dir) if f.endswith(".html")]
-    files.sort(reverse=True) # Mais recentes primeiro
+    files.sort(reverse=True)
     return {"ok": True, "files": files}
 
-@app.get("/crawler/diagnostics/{filename}")
+@app.get("/diag/{filename}")
 async def view_diagnostic(filename: str):
     """Exibe o conteúdo de um arquivo de diagnóstico"""
     diag_path = os.path.join("/app/crawler/diagnostics", filename)
