@@ -4,11 +4,13 @@
 # =============================================================
 import asyncio, os, subprocess, signal, time, threading
 from datetime import datetime
-from typing import Optional
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from typing import Optional, List
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import psycopg2
+import glob
 
 app = FastAPI(title="LinkDim Crawler API", version="1.0")
 app.add_middleware(CORSMiddleware, allow_origins=["*"],
@@ -225,6 +227,35 @@ def get_status():
         "last_heartbeat": last_hb,
         "config":         state.config
     }
+
+# --- DIAGNÓSTICOS ---
+
+@app.get("/diagnostics")
+async def list_diagnostics():
+    diag_dir = "/app/crawler/diagnostics"
+    if not os.path.exists(diag_dir):
+        return {"files": []}
+    
+    files = []
+    for f in glob.glob(f"{diag_dir}/*.*"):
+        files.append({
+            "name": os.path.basename(f),
+            "size": os.path.getsize(f),
+            "mtime": os.path.getmtime(f)
+        })
+    # Ordenar por mais recentes
+    files.sort(key=lambda x: x["mtime"], reverse=True)
+    return {"files": files}
+
+@app.get("/diagnostics/{filename}")
+async def get_diagnostic(filename: str):
+    diag_dir = "/app/crawler/diagnostics"
+    file_path = os.path.join(diag_dir, filename)
+    
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Arquivo não encontrado")
+    
+    return FileResponse(file_path)
 
 @app.post("/crawler/start")
 async def start_crawler(req: StartRequest):
