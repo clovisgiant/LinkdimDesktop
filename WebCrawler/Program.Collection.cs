@@ -6,7 +6,7 @@ using System.Threading;
 
 partial class Program
 {
-    private static (List<string> RawLines, List<(string Titulo, string Empresa, string Localizacao, string Link)> StructuredJobs) ExtractSimplifiedJobs(IReadOnlyCollection<IWebElement> jobCards)
+    private static (List<string> RawLines, List<(string Titulo, string Empresa, string Localizacao, string Link)> StructuredJobs) ExtractSimplifiedJobs(IWebDriver driver, IReadOnlyCollection<IWebElement> jobCards)
     {
         var rawLines = new List<string>();
         var structuredJobs = new List<(string Titulo, string Empresa, string Localizacao, string Link)>();
@@ -97,7 +97,7 @@ partial class Program
         Console.WriteLine($"Cards encontrados na pagina inicial para {sourceLabel}: {initialJobCards.Count}");
 
         Console.WriteLine($"Extraindo vagas da pagina inicial para {sourceLabel}...");
-        var initialExtraction = ExtractSimplifiedJobs(initialJobCards);
+        var initialExtraction = ExtractSimplifiedJobs(driver, initialJobCards);
 
         foreach (var job in initialExtraction.RawLines)
         {
@@ -161,7 +161,7 @@ partial class Program
             var pageCards = FindJobCards(driver);
             Console.WriteLine($"Cards encontrados na página: {pageCards.Count}");
 
-            var pageExtraction = ExtractSimplifiedJobs(pageCards);
+            var pageExtraction = ExtractSimplifiedJobs(driver, pageCards);
             allJobsLines.AddRange(pageExtraction.RawLines);
             allJobsData.AddRange(pageExtraction.StructuredJobs);
         }
