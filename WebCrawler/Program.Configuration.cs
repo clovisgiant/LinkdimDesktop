@@ -5,9 +5,50 @@ using System.Linq;
 
 partial class Program
 {
-    private static string ConnectionString =>
-        Environment.GetEnvironmentVariable("WEBCRAWLER_DB_CONNECTION")
-        ?? throw new InvalidOperationException("Defina a variável de ambiente WEBCRAWLER_DB_CONNECTION.");
+    private static string ConnectionString
+    {
+        get
+        {
+            var raw = Environment.GetEnvironmentVariable("WEBCRAWLER_DB_CONNECTION");
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                throw new InvalidOperationException("Defina a variável de ambiente WEBCRAWLER_DB_CONNECTION.");
+            }
+            return ParsePostgresUrlIfNeeded(raw.Trim().Trim('"'));
+        }
+    }
+
+    private static string ParsePostgresUrlIfNeeded(string input)
+    {
+        if (!input.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) && 
+            !input.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+        {
+            return input;
+        }
+
+        try
+        {
+            var uri = new Uri(input);
+            var userInfo = uri.UserInfo.Split(':');
+            var user = userInfo[0];
+            var pass = userInfo.Length > 1 ? userInfo[1] : "";
+            var host = uri.Host;
+            var port = uri.Port > 0 ? uri.Port : 5432;
+            var database = uri.AbsolutePath.TrimStart('/');
+
+            // Remove parâmetros de query se existirem
+            if (database.Contains('?'))
+            {
+                database = database.Split('?')[0];
+            }
+
+            return $"Host={host};Port={port};Username={user};Password={pass};Database={database};SSL Mode=Prefer;Trust Server Certificate=true";
+        }
+        catch
+        {
+            return input; // Fallback para o original se falhar ao parsear
+        }
+    }
 
     private static string GetRequiredEnv(string name)
     {
