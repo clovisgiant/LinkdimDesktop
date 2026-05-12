@@ -129,8 +129,12 @@ partial class Program
         {
             Console.WriteLine("🍪 [C#] Tentando login via Cookie de Sessão (Bypass 2FA)...");
             driver.Navigate().GoToUrl("https://www.linkedin.com/robots.txt"); // Precisa estar no domínio para setar cookie
-            Thread.Sleep(1000);
+            Thread.Sleep(1500);
             
+            Console.WriteLine("🧹 [C#] Limpando cookies antigos...");
+            driver.Manage().Cookies.DeleteAllCookies();
+            
+            Console.WriteLine("🍪 [C#] Injetando novo cookie de sessão...");
             driver.Manage().Cookies.AddCookie(new OpenQA.Selenium.Cookie("li_at", sessionCookie, ".linkedin.com", "/", DateTime.Now.AddDays(30)));
             driver.Navigate().GoToUrl("https://www.linkedin.com/jobs/");
             Thread.Sleep(2000);

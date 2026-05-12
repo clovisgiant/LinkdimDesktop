@@ -18,12 +18,15 @@
 #include <QNetworkReply>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QWebSocket>
 #include <QUrl>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPropertyAnimation>
 #include <QEasingCurve>
+#include <QListWidget>
+#include <QDesktopServices>
 
 // ─────────────────────────────────────────────────────────────
 // PulseIndicator — bolinha animada de status
@@ -89,6 +92,81 @@ static QHBoxLayout* makeConfigRow(const QString& label, QWidget* input) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// LinkedInButton — Botão estilo InfoJobs (como solicitado)
+// ─────────────────────────────────────────────────────────────
+class LinkedInButton : public QPushButton {
+public:
+    LinkedInButton(QWidget* parent = nullptr) : QPushButton(parent) {
+        setCursor(Qt::PointingHandCursor);
+        setFixedHeight(50);
+        setMinimumWidth(300);
+        
+        // Estilo Premium White (estilo InfoJobs)
+        setStyleSheet(
+            "QPushButton {"
+            "  background-color: white;"
+            "  color: #1F2937;"
+            "  border: 1px solid #D1D5DB;"
+            "  border-radius: 25px;"
+            "  font-size: 15px;"
+            "  font-weight: 600;"
+            "  padding: 0 20px;"
+            "}"
+            "QPushButton:hover {"
+            "  background-color: #F9FAFB;"
+            "  border: 1px solid #9CA3AF;"
+            "}"
+            "QPushButton:pressed {"
+            "  background-color: #F3F4F6;"
+            "}"
+        );
+
+        auto* lay = new QHBoxLayout(this);
+        lay->setContentsMargins(20, 0, 20, 0);
+        lay->setSpacing(12);
+
+        // Ícone LinkedIn (Desenhado via Painter)
+        m_iconPlaceholder = new QWidget();
+        m_iconPlaceholder->setFixedSize(24, 24);
+        
+        auto* textLabel = new QLabel("LinkedIn");
+        textLabel->setStyleSheet("color: #1F2937; font-weight: bold; font-size: 16px; background: transparent;");
+
+        lay->addStretch();
+        lay->addWidget(m_iconPlaceholder);
+        lay->addWidget(textLabel);
+        lay->addStretch();
+    }
+
+protected:
+    void paintEvent(QPaintEvent* e) override {
+        QPushButton::paintEvent(e);
+        QPainter p(this);
+        p.setRenderHint(QPainter::Antialiasing);
+        
+        // Geometria do ícone baseado no placeholder
+        QRect r = m_iconPlaceholder->geometry();
+        
+        // Desenha o fundo azul do LinkedIn
+        p.setBrush(QColor("#0A66C2"));
+        p.setPen(Qt::NoPen);
+        p.drawRoundedRect(r, 4, 4);
+        
+        // Desenha o "in" estilizado (simplificado com texto, mas fiel à marca)
+        p.setPen(Qt::white);
+        QFont f = p.font();
+        f.setFamily("Arial");
+        f.setBold(true);
+        f.setPixelSize(16);
+        p.setFont(f);
+        p.drawText(r.adjusted(0, -1, 0, 0), Qt::AlignCenter, "in");
+    }
+
+private:
+    QWidget* m_iconPlaceholder;
+};
+
+// ─────────────────────────────────────────────────────────────
 // RobotControlPage — tela de controle do WebCrawler
 // ─────────────────────────────────────────────────────────────
 class RobotControlPage : public QWidget {
@@ -106,6 +184,7 @@ public:
         connect(t, &QTimer::timeout, this, &RobotControlPage::fetchStatus);
         t->start(10000);
         QTimer::singleShot(500, this, &RobotControlPage::fetchStatus);
+        QTimer::singleShot(1000, this, &RobotControlPage::fetchDiagnostics);
     }
 
 private:
@@ -116,6 +195,7 @@ private:
     QLabel*         m_uptimeLabel = nullptr;
     QPushButton*    m_startBtn    = nullptr;
     QPushButton*    m_stopBtn     = nullptr;
+    QPushButton*    m_resetBtn    = nullptr;
     QTextEdit*      m_logArea     = nullptr;
     QLineEdit*      m_apiUrlInput = nullptr;
     QSpinBox*       m_maxApply    = nullptr;
@@ -124,6 +204,14 @@ private:
     QSpinBox*       m_activeEnd   = nullptr;
     QLineEdit*      m_termsInput  = nullptr;
     QPushButton*    m_testBtn     = nullptr;
+    QListWidget*    m_diagList    = nullptr;
+    QPushButton*    m_refreshDiag = nullptr;
+    QPushButton*    m_openDiag    = nullptr;
+    
+    // Autenticação
+    LinkedInButton* m_loginBtn     = nullptr;
+    QLineEdit*      m_cookieInput  = nullptr;
+    QPushButton*    m_saveCookieBtn = nullptr;
 
     // ── Membros de rede ──────────────────────────────────────
     QNetworkAccessManager* m_nam = nullptr;
@@ -210,10 +298,15 @@ private:
         m_startBtn = makeActionBtn("▶  INICIAR CRAWLER", "#22C55E");
         m_stopBtn  = makeActionBtn("■  PARAR CRAWLER",   "#EF4444");
         m_stopBtn->setEnabled(false);
+        m_resetBtn = makeActionBtn("🧹  LIMPAR SESSÃO", "#6B7280");
+        m_resetBtn->setFixedHeight(36); m_resetBtn->setStyleSheet(m_resetBtn->styleSheet().replace("14px", "11px"));
+        
         connect(m_startBtn, &QPushButton::clicked, this, &RobotControlPage::startCrawler);
         connect(m_stopBtn,  &QPushButton::clicked, this, &RobotControlPage::stopCrawler);
+        connect(m_resetBtn, &QPushButton::clicked, this, &RobotControlPage::resetSession);
+        
         auto* btnV = new QVBoxLayout();
-        btnV->addWidget(m_startBtn); btnV->addWidget(m_stopBtn);
+        btnV->addWidget(m_startBtn); btnV->addWidget(m_stopBtn); btnV->addWidget(m_resetBtn);
         sclay->addLayout(btnV);
         root->addWidget(statusCard);
 
@@ -255,7 +348,89 @@ private:
         connect(applyBtn, &QPushButton::clicked, this, &RobotControlPage::applyConfig);
         cfglay->addWidget(applyBtn);
         cfglay->addStretch();
-        midRow->addWidget(cfgCard);
+
+        // ── Painel de Autenticação & Sessão ──────────────────
+        auto* authCard = makeCard();
+        authCard->setFixedWidth(360);
+        auto* authlay = new QVBoxLayout(authCard);
+        authlay->setContentsMargins(24, 20, 24, 20); authlay->setSpacing(16);
+
+        auto* authTitle = new QLabel("🔐  Autenticação & Sessão");
+        authTitle->setStyleSheet("color:#3B82F6;font-size:14px;font-weight:bold;");
+        authlay->addWidget(authTitle);
+        addSeparator(authlay);
+
+        auto* authInfo = new QLabel("Se o LinkedIn estiver bloqueando o robô, faça login no seu navegador e cole o cookie 'li_at' abaixo:");
+        authInfo->setWordWrap(true);
+        authInfo->setStyleSheet("color:#A39C93;font-size:11px;line-height:1.4;");
+        authlay->addWidget(authInfo);
+
+        m_loginBtn = new LinkedInButton(this);
+        m_loginBtn->setToolTip("Abrir LinkedIn para login manual");
+        connect(m_loginBtn, &QPushButton::clicked, this, [this]{
+            QDesktopServices::openUrl(QUrl("https://www.linkedin.com/login"));
+        });
+        authlay->addWidget(m_loginBtn, 0, Qt::AlignCenter);
+
+        m_cookieInput = new QLineEdit();
+        m_cookieInput->setPlaceholderText("Cole o valor do cookie li_at...");
+        styleInput(m_cookieInput);
+        authlay->addLayout(makeConfigRow("Cookie li_at:", m_cookieInput));
+
+        m_saveCookieBtn = new QPushButton("Atualizar Sessão no Robô");
+        m_saveCookieBtn->setCursor(Qt::PointingHandCursor);
+        m_saveCookieBtn->setStyleSheet(
+            "QPushButton{background:#3B82F6;color:white;border:none;border-radius:8px;"
+            "padding:10px;font-weight:bold;font-size:13px;}"
+            "QPushButton:hover{background:#60A5FA;}");
+        connect(m_saveCookieBtn, &QPushButton::clicked, this, &RobotControlPage::saveSessionCookie);
+        authlay->addWidget(m_saveCookieBtn);
+
+        authlay->addStretch();
+
+        
+        // ── Painel de Diagnósticos (Raio-X) ──────────────────
+        auto* leftCol = new QVBoxLayout(); leftCol->setSpacing(20);
+        leftCol->addWidget(cfgCard);
+        leftCol->addWidget(authCard);
+
+        auto* diagCard = makeCard();
+        diagCard->setFixedWidth(360);
+        auto* diaglay = new QVBoxLayout(diagCard);
+        diaglay->setContentsMargins(24, 20, 24, 20); diaglay->setSpacing(12);
+
+        auto* diagHdr = new QHBoxLayout();
+        auto* diagTitle = new QLabel("📸 Galeria de Raio-X");
+        diagTitle->setStyleSheet("color:#3B82F6;font-size:14px;font-weight:bold;");
+        m_refreshDiag = new QPushButton("🔄");
+        m_refreshDiag->setFixedSize(30, 30);
+        m_refreshDiag->setCursor(Qt::PointingHandCursor);
+        m_refreshDiag->setStyleSheet("QPushButton{background:#252830;border-radius:15px;color:white;}QPushButton:hover{background:#3B82F6;}");
+        connect(m_refreshDiag, &QPushButton::clicked, this, &RobotControlPage::fetchDiagnostics);
+        diagHdr->addWidget(diagTitle); diagHdr->addStretch(); diagHdr->addWidget(m_refreshDiag);
+        diaglay->addLayout(diagHdr);
+        
+        addSeparator(diaglay);
+
+        m_diagList = new QListWidget();
+        m_diagList->setStyleSheet(
+            "QListWidget{background:#111216;color:#F0F4F8;border:1px solid #252830;border-radius:8px;padding:5px;font-size:11px;}"
+            "QListWidget::item{padding:8px;border-bottom:1px solid #1A1D24;}"
+            "QListWidget::item:selected{background:#3B82F6;color:white;border-radius:4px;}"
+        );
+        diaglay->addWidget(m_diagList, 1);
+
+        m_openDiag = new QPushButton("Abrir Snapshot no Navegador");
+        m_openDiag->setCursor(Qt::PointingHandCursor);
+        m_openDiag->setStyleSheet(
+            "QPushButton{background:#3B82F6;color:white;border:none;border-radius:8px;"
+            "padding:10px;font-weight:bold;font-size:12px;}"
+            "QPushButton:hover{background:#60A5FA;}");
+        connect(m_openDiag, &QPushButton::clicked, this, &RobotControlPage::openDiagnostic);
+        diaglay->addWidget(m_openDiag);
+        
+        leftCol->addWidget(diagCard, 1);
+        midRow->addLayout(leftCol);
 
         // ── Log em Tempo Real ────────────────────────────────
         auto* logCard = makeCard();
@@ -466,6 +641,23 @@ private slots:
         });
     }
 
+    void resetSession() {
+        if (m_statusLabel->text().contains("RODANDO")) {
+            appendLog("⚠️ Pare o robô antes de limpar a sessão.");
+            return;
+        }
+        appendLog("🧹 Solicitando limpeza de sessão no Render...");
+        auto* reply = m_nam->post(makeRequest("/crawler/reset_session"), QByteArray("{}"));
+        connect(reply, &QNetworkReply::finished, this, [this, reply]{
+            reply->deleteLater();
+            if (reply->error() != QNetworkReply::NoError) {
+                appendLog("❌ Erro ao resetar: " + reply->errorString());
+                return;
+            }
+            appendLog("✅ Sessão e cache limpos no servidor.");
+        });
+    }
+
     // POST /crawler/config
     void applyConfig() {
         appendLog("⚙️  Aplicando configuração...");
@@ -500,6 +692,76 @@ private slots:
                 return;
             }
             appendLog("✅ Diagnóstico concluído! Verifique as mensagens acima.");
+            fetchDiagnostics(); // Atualiza a lista após testar
+        });
+    }
+
+    // GET /diag
+    void fetchDiagnostics() {
+        m_diagList->clear();
+        m_diagList->addItem("Carregando...");
+        
+        auto* reply = m_nam->get(makeRequest("/diag"));
+        connect(reply, &QNetworkReply::finished, this, [this, reply]{
+            reply->deleteLater();
+            m_diagList->clear();
+            if (reply->error() != QNetworkReply::NoError) {
+                m_diagList->addItem("Erro ao buscar diagnósticos");
+                return;
+            }
+            auto doc = QJsonDocument::fromJson(reply->readAll());
+            auto obj = doc.object();
+            if (obj["ok"].toBool()) {
+                auto files = obj["files"].toArray();
+                if (files.isEmpty()) {
+                    m_diagList->addItem("Nenhum snapshot disponível.");
+                } else {
+                    for (const auto& f : files) {
+                        m_diagList->addItem(f.toString());
+                    }
+                }
+            }
+        });
+    }
+
+    void openDiagnostic() {
+        auto* item = m_diagList->currentItem();
+        if (!item) return;
+        QString filename = item->text();
+        if (filename.isEmpty() || filename.contains(" ")) return;
+
+        QString base = m_apiBase.trimmed();
+        while(base.endsWith('/')) base.chop(1);
+        QUrl url(base + "/diag/" + filename);
+        QDesktopServices::openUrl(url);
+    }
+
+    void saveSessionCookie() {
+        QString cookie = m_cookieInput->text().trimmed();
+        if (cookie.isEmpty()) {
+            appendLog("⚠️ Por favor, cole um cookie válido.");
+            return;
+        }
+
+        appendLog("🍪 Enviando cookie de sessão ao servidor...");
+        QJsonObject cfg;
+        cfg["session_cookie"] = cookie;
+        
+        // Também envia as configs atuais para não sobrescrever com padrão
+        cfg["max_apply_per_cycle"] = m_maxApply->value();
+        cfg["cycle_wait_minutes"]  = m_cycleWait->value();
+        cfg["search_terms"]        = m_termsInput->text().trimmed();
+
+        auto* reply = m_nam->post(makeRequest("/crawler/config"),
+                                  QJsonDocument(cfg).toJson());
+        connect(reply, &QNetworkReply::finished, this, [this, reply]{
+            reply->deleteLater();
+            if (reply->error() != QNetworkReply::NoError)
+                appendLog("❌ Erro ao salvar cookie: " + reply->errorString());
+            else {
+                appendLog("✅ Cookie de sessão atualizado! O robô usará sua conta no próximo ciclo.");
+                m_cookieInput->clear();
+            }
         });
     }
 };

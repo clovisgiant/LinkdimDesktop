@@ -21,11 +21,12 @@ class CrawlerState:
     last_heartbeat: Optional[str] = None
     log_buffer: list = [] # Guarda os últimos 100 logs
     config: dict = {
-        "max_apply_per_cycle": 0,
+        "max_apply_per_cycle": 15,
         "cycle_wait_minutes":  45,
         "active_hours_start":  0,
         "active_hours_end":    0,
-        "search_terms":        "C#, Python, Qt"
+        "search_terms":        "C#, Python, Qt",
+        "session_cookie":      ""
     }
     log_subscribers: list = []
 
@@ -38,6 +39,7 @@ class StartRequest(BaseModel):
     active_hours_start:  int = 0
     active_hours_end:    int = 0
     search_terms:        str = ""
+    session_cookie:      str = ""
 
 class ConfigRequest(BaseModel):
     max_apply_per_cycle: int = 15
@@ -45,6 +47,7 @@ class ConfigRequest(BaseModel):
     active_hours_start:  int = 8
     active_hours_end:    int = 22
     search_terms:        str = ""
+    session_cookie:      str = ""
 
 # ── Broadcast de logs para todos os WebSocket conectados ──────
 async def broadcast_log(msg: str):
@@ -234,7 +237,8 @@ async def start_crawler(req: StartRequest):
         "cycle_wait_minutes":  req.cycle_wait_minutes,
         "active_hours_start":  req.active_hours_start,
         "active_hours_end":    req.active_hours_end,
-        "search_terms":        req.search_terms or state.config["search_terms"]
+        "search_terms":        req.search_terms or state.config["search_terms"],
+        "session_cookie":      req.session_cookie or state.config["session_cookie"]
     })
 
     # Monta variáveis de ambiente para o processo C#
@@ -245,6 +249,8 @@ async def start_crawler(req: StartRequest):
     env["WEBCRAWLER_ACTIVE_HOURS_END"]    = str(req.active_hours_end)
     if req.search_terms:
         env["WEBCRAWLER_JOB_SEARCH_TERMS"] = req.search_terms
+    if req.session_cookie or state.config["session_cookie"]:
+        env["LINKEDIN_SESSION_COOKIE"] = req.session_cookie or state.config["session_cookie"]
 
     try:
         crawler_dir = "/app/crawler"
@@ -423,6 +429,26 @@ async def view_diagnostic(filename: str):
     from fastapi.responses import HTMLResponse
     with open(diag_path, "r", encoding="utf-8") as f:
         return HTMLResponse(content=f.read())
+
+@app.post("/crawler/reset_session")
+async def reset_session():
+    """Limpa o diretório de perfil do Chrome para forçar novo login"""
+    import shutil
+    crawler_dir = "/app/crawler"
+    profile_dir = os.path.join(crawler_dir, "ChromeProfile")
+    
+    if state.status == "running":
+        return {"ok": False, "msg": "Pare o robô antes de resetar a sessão."}
+        
+    try:
+        if os.path.exists(profile_dir):
+            shutil.rmtree(profile_dir)
+            await broadcast_log("🧹 [SISTEMA] Diretório de perfil limpo com sucesso.")
+            return {"ok": True, "msg": "Sessão resetada."}
+        else:
+            return {"ok": True, "msg": "Diretório de perfil não encontrado, já está limpo."}
+    except Exception as e:
+        return {"ok": False, "msg": str(e)}
 
 @app.get("/")
 def root():
