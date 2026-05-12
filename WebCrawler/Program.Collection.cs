@@ -15,7 +15,8 @@ partial class Program
         {
             try
             {
-                if (!HasSimplifiedApplication(card))
+                bool isEasyApplyUrl = driver.Url.Contains("f_AL=true", StringComparison.OrdinalIgnoreCase);
+                if (!HasSimplifiedApplication(card) && !isEasyApplyUrl)
                 {
                     continue;
                 }

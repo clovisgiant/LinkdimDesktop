@@ -132,36 +132,36 @@ partial class Program
 
     private static bool EnsureAuthenticatedSession(IWebDriver driver, WebDriverWait wait, string linkedinUsername, string linkedinPassword)
     {
-        Console.WriteLine("Abrindo LinkedIn (Página de Vagas para economizar RAM)...");
-        driver.Navigate().GoToUrl("https://www.linkedin.com/jobs/");
-
-        var pageTitle = driver.Title;
-        Console.WriteLine("Título da página: " + pageTitle);
-
-        // --- TENTATIVA 0: BYPASS VIA COOKIE (O PULO DO GATO) ---
+        Console.WriteLine("[C#] Iniciando validação de sessão (estratégia anti-loop)...");
+        
+        // 1. Vai para a home primeiro para estabelecer o domínio
+        driver.Navigate().GoToUrl("https://www.linkedin.com");
+        Thread.Sleep(3000);
+        
         var sessionCookie = Environment.GetEnvironmentVariable("LINKEDIN_SESSION_COOKIE");
         if (!string.IsNullOrEmpty(sessionCookie))
         {
-            Console.WriteLine("🍪 [C#] Tentando login via Cookie de Sessão (Bypass 2FA)...");
-            driver.Navigate().GoToUrl("https://www.linkedin.com/robots.txt"); // Precisa estar no domínio para setar cookie
-            Thread.Sleep(1500);
-            
-            Console.WriteLine("🧹 [C#] Limpando cookies antigos...");
+            Console.WriteLine("🍪 [C#] Injetando Cookie de Sessão...");
             driver.Manage().Cookies.DeleteAllCookies();
+            Thread.Sleep(1000);
             
-            Console.WriteLine("🍪 [C#] Injetando novo cookie de sessão...");
             driver.Manage().Cookies.AddCookie(new OpenQA.Selenium.Cookie("li_at", sessionCookie, ".linkedin.com", "/", DateTime.Now.AddDays(30)));
-            driver.Navigate().GoToUrl("https://www.linkedin.com/jobs/");
-            Thread.Sleep(2000);
+            
+            // 2. Tenta ir para o FEED primeiro (é mais leve que /jobs para validar login)
+            Console.WriteLine("🚀 [C#] Validando sessão via /feed...");
+            driver.Navigate().GoToUrl("https://www.linkedin.com/feed/");
+            Thread.Sleep(5000);
 
             if (IsLoggedIn(driver))
             {
-                Console.WriteLine("✅ [C#] Login via Cookie bem-sucedido! Bypass total de 2FA.");
+                Console.WriteLine("✅ [C#] Login confirmado via /feed! Indo para vagas...");
+                driver.Navigate().GoToUrl("https://www.linkedin.com/jobs/");
+                Thread.Sleep(4000);
                 return true;
             }
             else
             {
-                Console.WriteLine("⚠️ [C#] Cookie de sessão inválido ou expirado. Tentando login normal...");
+                Console.WriteLine("⚠️ [C#] Cookie injetado, mas o LinkedIn não reconheceu a sessão (ou pediu CAPTCHA). Tentando login normal...");
             }
         }
 
