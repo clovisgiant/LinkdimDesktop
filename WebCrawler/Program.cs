@@ -137,69 +137,64 @@ partial class Program
                 StartSuccessfulJobsCycle();
 
                 var allJobsLines = new List<string>();
+                StartSuccessfulJobsCycle();
                 var allJobsData = new List<(string Titulo, string Empresa, string Localizacao, string Link)>();
-                var collectedFromJobsSearch = false;
+                var isLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
 
-                if (useJobsSearchEntry)
+                Console.WriteLine("\n[C#] Abrindo navegador único para o ciclo completo (Economia de RAM)...");
+                using (var driver = new ChromeDriver(BuildChromeOptions(usePersistentProfile)))
                 {
-                    var cycleSearchTerms = GetJobSearchTermsForCurrentCycle(jobsSearchTerms);
-                    foreach (var searchTerm in cycleSearchTerms)
-                    {
-                        UpdateRuntimeHeartbeatLoopState("running", $"Iniciando busca para '{searchTerm}'.");
-                        Console.WriteLine($"\n[C#] Iniciando novo navegador para o termo: '{searchTerm}'...");
-
-                        using (var driver = new ChromeDriver(BuildChromeOptions(usePersistentProfile)))
-                        {
-                            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
-                            if (!EnsureAuthenticatedSession(driver, wait, linkedinUsername, linkedinPassword)) continue;
-
-                            if (!TryPrepareJobsSearchEntry(driver, searchTerm)) continue;
-                            if (!TryCollectJobsFromCurrentResults(driver, wait, allJobsLines, allJobsData, maxPagesPerCycle, $"termo '{searchTerm}'")) continue;
-                            
-                            collectedFromJobsSearch = true;
-                            Console.WriteLine($"[C#] Busca para '{searchTerm}' concluida. Fechando navegador para limpar RAM...");
-                            driver.Quit();
-                        }
-                        
-                        // Pequena pausa entre termos para o SO limpar a RAM
-                        GC.Collect();
-                        Thread.Sleep(5000);
-                    }
-                }
-
-                if (!collectedFromJobsSearch)
-                {
-                    UpdateRuntimeHeartbeatLoopState("running", "Coletando da colecao Easy Apply.");
-                    Console.WriteLine("\n[C#] Abrindo navegador para colecao Easy Apply...");
+                    var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
                     
-                    using (var driver = new ChromeDriver(BuildChromeOptions(usePersistentProfile)))
+                    // 1. AUTENTICAÇÃO
+                    UpdateRuntimeHeartbeatLoopState("running", "Autenticando...");
+                    if (!EnsureAuthenticatedSession(driver, wait, linkedinUsername, linkedinPassword)) 
                     {
-                        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-                        if (EnsureAuthenticatedSession(driver, wait, linkedinUsername, linkedinPassword))
+                        Console.WriteLine("⚠️ Falha na autenticação. Pulando ciclo.");
+                    }
+                    else 
+                    {
+                        // 2. BUSCA POR TERMOS
+                        if (useJobsSearchEntry)
                         {
+                            var cycleSearchTerms = GetJobSearchTermsForCurrentCycle(jobsSearchTerms);
+                            foreach (var searchTerm in cycleSearchTerms)
+                            {
+                                UpdateRuntimeHeartbeatLoopState("running", $"Buscando '{searchTerm}'...");
+                                Console.WriteLine($"\n[C#] Buscando: '{searchTerm}'...");
+
+                                if (TryPrepareJobsSearchEntry(driver, searchTerm))
+                                {
+                                    var currentTermJobs = new List<(string Titulo, string Empresa, string Localizacao, string Link)>();
+                                    var dummyLines = new List<string>();
+                                    if (TryCollectJobsFromCurrentResults(driver, wait, dummyLines, currentTermJobs, maxPagesPerCycle, $"termo '{searchTerm}'"))
+                                    {
+                                        allJobsData.AddRange(currentTermJobs);
+                                    }
+                                }
+                                // Pausa leve entre buscas na mesma aba
+                                Thread.Sleep(3000);
+                            }
+                        }
+
+                        // 3. COLEÇÃO EASY APPLY (Se nada foi coletado antes)
+                        if (allJobsData.Count == 0)
+                        {
+                            UpdateRuntimeHeartbeatLoopState("running", "Coletando Coleção Easy Apply.");
+                            Console.WriteLine("\n[C#] Nada encontrado na busca. Tentando Coleção Easy Apply...");
                             driver.Navigate().GoToUrl(GetEasyApplyCollectionEntryUrlForCycle());
-                            TryCollectJobsFromCurrentResults(driver, wait, allJobsLines, allJobsData, maxPagesPerCycle, "colecao Easy Apply");
+                            var dummyLines = new List<string>();
+                            TryCollectJobsFromCurrentResults(driver, wait, dummyLines, allJobsData, maxPagesPerCycle, "coleção Easy Apply");
                         }
-                        driver.Quit();
-                    }
-                }
 
-                allJobsData = NormalizeAndDeduplicateJobs(allJobsData);
-                allJobsLines = allJobsData.Select(BuildJobLine).ToList();
+                        // DEDUPLICAÇÃO
+                        allJobsData = NormalizeAndDeduplicateJobs(allJobsData);
+                        Console.WriteLine($"\nTotal de vagas únicas coletadas: {allJobsData.Count}");
 
-                Console.WriteLine($"\nTotal de vagas coletadas: {allJobsLines.Count}");
-                File.WriteAllLines(JobsOutputFileName, allJobsLines);
-
-                if (maxJobsToApplyPerCycle > 0 && allJobsData.Count > 0)
-                {
-                    UpdateRuntimeHeartbeatLoopState("running", $"Iniciando candidaturas ({allJobsData.Count} vagas).");
-                    Console.WriteLine($"\n[C#] Abrindo navegador para candidaturas...");
-                    
-                    using (var driver = new ChromeDriver(BuildChromeOptions(usePersistentProfile)))
-                    {
-                        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
-                        if (EnsureAuthenticatedSession(driver, wait, linkedinUsername, linkedinPassword))
+                        // 4. CANDIDATURAS
+                        if (maxJobsToApplyPerCycle > 0 && allJobsData.Count > 0)
                         {
+                            UpdateRuntimeHeartbeatLoopState("running", $"Candidatando ({allJobsData.Count} vagas)...");
                             if (!disableDatabase)
                             {
                                 SaveCollectedJobsToDatabase(allJobsData);
@@ -211,8 +206,10 @@ partial class Program
                                 ApplySimplifiedJobsFromLinks(driver, links, maxJobsToApplyPerCycle);
                             }
                         }
-                        driver.Quit();
                     }
+
+                    Console.WriteLine("[C#] Ciclo finalizado. Fechando navegador...");
+                    driver.Quit();
                 }
 
                 PrintSuccessfulJobsCycleSummary();
