@@ -127,6 +127,12 @@ partial class Program
 
         options.AddArgument("--disable-blink-features=AutomationControlled");
         options.AddArgument("--window-size=1920,1080");
+        options.AddArgument("--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
+        options.AddArgument("--disable-infobars");
+        options.AddArgument("--disable-notifications");
+        options.AddExcludedArgument("enable-automation");
+        options.AddAdditionalChromeOption("useAutomationExtension", false);
+        
         return options;
     }
 
