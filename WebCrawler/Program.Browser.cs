@@ -20,9 +20,21 @@ partial class Program
                 var hasSessionCookie = liAt != null && !string.IsNullOrWhiteSpace(liAt.Value);
                 var lowerUrl = url.ToLowerInvariant();
                 var isAuthRoute = lowerUrl.Contains("/login") || lowerUrl.Contains("/checkpoint") || lowerUrl.Contains("/challenge");
-                if (hasSessionCookie && !isAuthRoute)
+                
+                // Check explícito para telas de bloqueio/bot detection
+                var pageSource = (driver.PageSource ?? "").ToLowerInvariant();
+                bool isBlocked = pageSource.Contains("security check") || 
+                                 pageSource.Contains("verificação de segurança") || 
+                                 pageSource.Contains("unusual activity");
+
+                if (hasSessionCookie && !isAuthRoute && !isBlocked)
                 {
                     return true;
+                }
+                
+                if (isBlocked) {
+                    Console.WriteLine("⚠️ [ALERTA] LinkedIn detectou atividade incomum (Bot Detection/CAPTCHA).");
+                    return false;
                 }
             }
             catch

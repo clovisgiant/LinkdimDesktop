@@ -142,9 +142,10 @@ partial class Program
                 var isLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
 
                 Console.WriteLine("\n[C#] Abrindo navegador único para o ciclo completo (Economia de RAM)...");
-                using (var driver = new ChromeDriver(BuildChromeOptions(usePersistentProfile)))
+                var service = ChromeDriverService.CreateDefaultService();
+                using (var driver = new ChromeDriver(service, BuildChromeOptions(usePersistentProfile), TimeSpan.FromMinutes(3)))
                 {
-                    var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+                    var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
                     
                     // 1. AUTENTICAÇÃO
                     UpdateRuntimeHeartbeatLoopState("running", "Autenticando...");
