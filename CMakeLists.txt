@@ -23,7 +23,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(websocketpp)
 
 # ── Qt6 — inclui Sql para PostgreSQL (QPSQL driver) ─────────
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets Network Gui WebSockets Sql)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets Network Gui WebSockets Sql WebEngineWidgets)
 
 # ── Dashboard existente ──────────────────────────────────────
 add_executable(DashboardProject WIN32
@@ -45,7 +45,7 @@ target_compile_definitions(DashboardProject PRIVATE ASIO_STANDALONE _WEBSOCKETPP
 target_include_directories(cliente_teste PRIVATE ${asio_SOURCE_DIR}/asio/include ${websocketpp_SOURCE_DIR})
 target_compile_definitions(cliente_teste PRIVATE ASIO_STANDALONE _WEBSOCKETPP_CPP11_STL_ _WEBSOCKETPP_CPP11_THREAD_ _WEBSOCKETPP_CPP11_FUNCTION_ _WEBSOCKETPP_CPP11_SYSTEM_ERROR_ _WEBSOCKETPP_CPP11_RANDOM_ _WEBSOCKETPP_CPP11_MEMORY_ _WIN32_WINNT=0x0601)
 
-target_link_libraries(DashboardProject PRIVATE Qt6::Widgets Qt6::Network Qt6::Gui Qt6::WebSockets Qt6::Sql)
+target_link_libraries(DashboardProject PRIVATE Qt6::Widgets Qt6::Network Qt6::Gui Qt6::WebSockets Qt6::Sql Qt6::WebEngineWidgets)
 
 if(WIN32)
     target_link_libraries(DashboardProject PRIVATE ws2_32 wsock32)
@@ -68,7 +68,9 @@ target_include_directories(LinkdimCrawler PRIVATE
 target_link_libraries(LinkdimCrawler PRIVATE
     Qt6::Core
     Qt6::Network
+    Qt6::WebSockets
     Qt6::Sql
+    Qt6::WebEngineWidgets
 )
 
 # Habilita suporte a threads Qt

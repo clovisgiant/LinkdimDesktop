@@ -252,6 +252,9 @@ async def start_crawler(req: StartRequest):
     if req.session_cookie or state.config["session_cookie"]:
         env["LINKEDIN_SESSION_COOKIE"] = req.session_cookie or state.config["session_cookie"]
 
+    # Força ativação do banco de dados para salvar as vagas
+    env["WEBCRAWLER_DISABLE_DATABASE"] = "false"
+
     try:
         crawler_dir = "/app/crawler"
         dll_path = os.path.join(crawler_dir, "WebCrawler.dll")

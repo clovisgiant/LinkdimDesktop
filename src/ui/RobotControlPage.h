@@ -28,6 +28,52 @@
 #include <QListWidget>
 #include <QDesktopServices>
 #include <QScrollArea>
+#include <QWebEngineView>
+#include <QWebEngineProfile>
+#include <QWebEngineCookieStore>
+#include <QNetworkCookie>
+#include <QDialog>
+
+// ─────────────────────────────────────────────────────────────
+// LinkedInLoginDialog — Navegador embutido para capturar o cookie
+// ─────────────────────────────────────────────────────────────
+class LinkedInLoginDialog : public QDialog {
+    Q_OBJECT
+public:
+    LinkedInLoginDialog(QWidget* parent = nullptr) : QDialog(parent) {
+        setWindowTitle("Login LinkedIn — Captura Automática");
+        setMinimumSize(800, 700);
+        auto* lay = new QVBoxLayout(this);
+        lay->setContentsMargins(0,0,0,0);
+
+        m_view = new QWebEngineView(this);
+        lay->addWidget(m_view);
+
+        // Monitorar cookies
+        auto* store = m_view->page()->profile()->cookieStore();
+        connect(store, &QWebEngineCookieStore::cookieAdded, this, &LinkedInLoginDialog::onCookieAdded);
+
+        m_view->setUrl(QUrl("https://www.linkedin.com/login"));
+    }
+
+    QString capturedCookie() const { return m_cookie; }
+
+signals:
+    void cookieCaptured(const QString& li_at);
+
+private slots:
+    void onCookieAdded(const QNetworkCookie& cookie) {
+        if (cookie.name() == "li_at") {
+            m_cookie = QString::fromUtf8(cookie.value());
+            emit cookieCaptured(m_cookie);
+            accept(); // Fecha ao capturar
+        }
+    }
+
+private:
+    QWebEngineView* m_view;
+    QString m_cookie;
+};
 
 // ─────────────────────────────────────────────────────────────
 // PulseIndicator — bolinha animada de status
@@ -284,6 +330,11 @@ private:
         m_resetBtn->setFixedHeight(32); m_resetBtn->setStyleSheet(m_resetBtn->styleSheet().replace("14px", "11px"));
         btnV->addWidget(m_startBtn); btnV->addWidget(m_stopBtn); btnV->addWidget(m_resetBtn);
         sclay->addLayout(btnV);
+
+        connect(m_startBtn, &QPushButton::clicked, this, &RobotControlPage::startCrawler);
+        connect(m_stopBtn,  &QPushButton::clicked, this, &RobotControlPage::stopCrawler);
+        connect(m_resetBtn, &QPushButton::clicked, this, &RobotControlPage::resetSession);
+
         scrollLayout->addWidget(statusCard);
 
         // --- GRID: CONFIG + AUTH | LOGS ---
@@ -323,7 +374,14 @@ private:
         addSeparator(authlay);
         m_loginBtn = new LinkedInButton(this);
         m_loginBtn->setFixedWidth(200);
-        connect(m_loginBtn, &QPushButton::clicked, this, [this]{ QDesktopServices::openUrl(QUrl("https://www.linkedin.com/login")); });
+        connect(m_loginBtn, &QPushButton::clicked, this, [this]{
+            auto* dlg = new LinkedInLoginDialog(this);
+            connect(dlg, &LinkedInLoginDialog::cookieCaptured, this, [this](const QString& li_at){
+                m_cookieInput->setText(li_at);
+                appendLog("🎯 Cookie 'li_at' capturado automaticamente!");
+            });
+            dlg->exec();
+        });
         authlay->addWidget(m_loginBtn, 0, Qt::AlignCenter);
         m_cookieInput = new QLineEdit(); m_cookieInput->setPlaceholderText("Cole o cookie li_at..."); styleInput(m_cookieInput);
         authlay->addLayout(makeConfigRow("Cookie:", m_cookieInput));
