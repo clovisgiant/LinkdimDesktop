@@ -391,13 +391,10 @@ public:
         };
         
         // Adiciona as opcoes de pagina
-        MenuButton* btnDash = addMenuBtn("\xE2\x8A\x9E", "Dashboard", 0);
-        btnDash->setChecked(true); // O Dashboard é a pagina inicial
-        addMenuBtn("\xF0\x9F\x93\x88", "Analytics", 1);
-        addMenuBtn("\xF0\x9F\x93\x84", "Transactions", 2);
-        addMenuBtn("\xE2\x9A\x99", "Account Profile", 3);
-        addMenuBtn("\xF0\x9F\x94\x97", "LinkedIn Vagas", 4);
-        addMenuBtn("\xF0\x9F\xA4\x96", "Controle do Rob\xC3\xB4", 5);
+        MenuButton* btnDash = addMenuBtn("\xE2\x8A\x9E", "Monitoramento", 0);
+        btnDash->setChecked(true);
+        addMenuBtn("\xF0\x9F\x94\x97", "LinkedIn Vagas", 1);
+        addMenuBtn("\xF0\x9F\xA4\x96", "Controle do Rob\xC3\xB4", 2);
         
         layout->addStretch(); // Empurra tudo pra cima
         
@@ -1266,32 +1263,20 @@ public:
         
         // 2. QStackedWidget funciona como um "Caderno", onde cada QWidget adicionado é uma pagina
         QStackedWidget* stacked = new QStackedWidget();
-        DashboardPage* dashPage = new DashboardPage();
-        NetworkChatPage* netPage = new NetworkChatPage();
         
-        stacked->addWidget(dashPage);                                            // Pagina 0
-        stacked->addWidget(netPage);                                             // Pagina 1
-        
-        // --- ABA 2: Candidaturas Enviadas (Banco Real) ---
         QString liConn = QString::fromUtf8(qgetenv("WEBCRAWLER_DB_CONNECTION")).trimmed().remove('"');
-        auto* jobsPage = new LinkedInJobsPage(liConn);
-        stacked->addWidget(jobsPage);                                            // Pagina 2
-        
-        stacked->addWidget(new AccountEditPage());                               // Pagina 3
-
-        // ── Página 4: LinkedIn Dashboard (dados reais do PostgreSQL) ──
         auto* liPage = new LinkedInDashboardPage(liConn);
-        stacked->addWidget(liPage);                                              // Pagina 4
-
-        // ── Página 5: Controle do Robô (API Render) ──
+        auto* jobsPage = new LinkedInJobsPage(liConn);
         auto* robotPage = new RobotControlPage();
-        stacked->addWidget(robotPage);                                           // Pagina 5
+        
+        stacked->addWidget(liPage);                                              // Pagina 0: Monitoramento (Postgres)
+        stacked->addWidget(jobsPage);                                            // Pagina 1: LinkedIn Vagas (Tabela)
+        stacked->addWidget(robotPage);                                           // Pagina 2: Controle do Robô (API Render)
 
         mainLayout->addWidget(stacked, 1);
         
         // 3. Conexao de Evento: Quando clicar na Sidebar, muda a tela do Caderno (StackedWidget)
         connect(sidebar, &Sidebar::pageSelected, stacked, &QStackedWidget::setCurrentIndex);
-        connect(netPage, &NetworkChatPage::telemetryReceived, dashPage, &DashboardPage::updateTelemetry);
     }
 };
 

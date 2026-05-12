@@ -27,6 +27,7 @@
 #include <QEasingCurve>
 #include <QListWidget>
 #include <QDesktopServices>
+#include <QScrollArea>
 
 // ─────────────────────────────────────────────────────────────
 // PulseIndicator — bolinha animada de status
@@ -107,23 +108,20 @@ public:
             "  background-color: white;"
             "  color: #1F2937;"
             "  border: 1px solid #D1D5DB;"
-            "  border-radius: 25px;"
-            "  font-size: 15px;"
+            "  border-radius: 20px;"
+            "  font-size: 14px;"
             "  font-weight: 600;"
-            "  padding: 0 20px;"
+            "  padding: 0 15px;"
             "}"
             "QPushButton:hover {"
             "  background-color: #F9FAFB;"
-            "  border: 1px solid #9CA3AF;"
-            "}"
-            "QPushButton:pressed {"
-            "  background-color: #F3F4F6;"
+            "  border: 1px solid #0A66C2;"
             "}"
         );
 
         auto* lay = new QHBoxLayout(this);
-        lay->setContentsMargins(20, 0, 20, 0);
-        lay->setSpacing(12);
+        lay->setContentsMargins(10, 0, 10, 0);
+        lay->setSpacing(8);
 
         // Ícone LinkedIn (Desenhado via Painter)
         m_iconPlaceholder = new QWidget();
@@ -184,7 +182,6 @@ public:
         connect(t, &QTimer::timeout, this, &RobotControlPage::fetchStatus);
         t->start(10000);
         QTimer::singleShot(500, this, &RobotControlPage::fetchStatus);
-        QTimer::singleShot(1000, this, &RobotControlPage::fetchDiagnostics);
     }
 
 private:
@@ -200,13 +197,7 @@ private:
     QLineEdit*      m_apiUrlInput = nullptr;
     QSpinBox*       m_maxApply    = nullptr;
     QSpinBox*       m_cycleWait   = nullptr;
-    QSpinBox*       m_activeStart = nullptr;
-    QSpinBox*       m_activeEnd   = nullptr;
     QLineEdit*      m_termsInput  = nullptr;
-    QPushButton*    m_testBtn     = nullptr;
-    QListWidget*    m_diagList    = nullptr;
-    QPushButton*    m_refreshDiag = nullptr;
-    QPushButton*    m_openDiag    = nullptr;
     
     // Autenticação
     LinkedInButton* m_loginBtn     = nullptr;
@@ -220,65 +211,58 @@ private:
 
     void buildUI() {
         auto* root = new QVBoxLayout(this);
-        root->setContentsMargins(0, 0, 0, 0); // Remove margens do root (o scroll cuida do resto)
+        root->setContentsMargins(0, 0, 0, 0);
         root->setSpacing(0);
 
-        // ── Cabeçalho (FORA DO SCROLL) ──────────────────────
+        // ── 1. CABEÇALHO FIXO ────────────────────────────────
         auto* hdrContainer = new QWidget();
-        hdrContainer->setFixedHeight(100);
+        hdrContainer->setFixedHeight(80);
         hdrContainer->setStyleSheet("background:#1A1D24; border-bottom:1px solid #252830;");
         auto* hdr = new QHBoxLayout(hdrContainer);
         hdr->setContentsMargins(32, 10, 32, 10);
         
         auto* titleV = new QVBoxLayout();
         auto* title = new QLabel("Controle do Robô");
-        title->setStyleSheet("color:#F0F4F8;font-size:24px;font-weight:bold;");
-        auto* sub = new QLabel("Orquestrador Render.com via API.");
-        sub->setStyleSheet("color:#A39C93;font-size:12px;");
+        title->setStyleSheet("color:#F0F4F8;font-size:22px;font-weight:bold;");
+        auto* sub = new QLabel("Orquestrador Render.com via API");
+        sub->setStyleSheet("color:#A39C93;font-size:11px;");
         titleV->addWidget(title); titleV->addWidget(sub);
         hdr->addLayout(titleV);
         hdr->addStretch();
 
-        // Campo URL da API
         m_apiUrlInput = new QLineEdit(m_apiBase);
-        m_apiUrlInput->setFixedWidth(360);
-        m_apiUrlInput->setStyleSheet(
-            "QLineEdit{background:#111216;color:#F0F4F8;border:1px solid #252830;"
-            "border-radius:8px;padding:8px 14px;font-size:12px;font-family:Consolas;}"
-            "QLineEdit:focus{border:1px solid #E39B35;}");
-        
-        // MUDEI PARA textChanged para salvar na hora!
+        m_apiUrlInput->setFixedWidth(300);
+        styleInput(m_apiUrlInput);
         connect(m_apiUrlInput, &QLineEdit::textChanged, this, [this](const QString& text){
             m_apiBase = text.trimmed();
-            // Debounce simples para não reconectar a cada letra
             QTimer::singleShot(1000, this, &RobotControlPage::connectWebSocket);
         });
         
-        auto* apiLbl = new QLabel("API URL:");
-        apiLbl->setStyleSheet("color:#A39C93;font-size:11px;font-weight:bold;");
         auto* apiRow = new QVBoxLayout();
+        auto* apiLbl = new QLabel("API URL:");
+        apiLbl->setStyleSheet("color:#A39C93;font-size:10px;font-weight:bold;");
         apiRow->addWidget(apiLbl); apiRow->addWidget(m_apiUrlInput);
         hdr->addLayout(apiRow);
-
-        // BOTÃO DE AUTODIAGNÓSTICO (O "RAIO-X")
-        m_testBtn = new QPushButton("🔍 TESTAR INFRA");
-        m_testBtn->setCursor(Qt::PointingHandCursor);
-        m_testBtn->setFixedSize(140, 40);
-        m_testBtn->setStyleSheet(
-            "QPushButton{background:#3B82F6;color:white;border:none;border-radius:8px;"
-            "font-weight:bold;font-size:11px;}"
-            "QPushButton:hover{background:#60A5FA;}"
-        );
-        connect(m_testBtn, &QPushButton::clicked, this, &RobotControlPage::testInfra);
-        hdr->addWidget(m_testBtn);
         root->addWidget(hdrContainer);
 
-        // ── Status Card ──────────────────────────────────────
+        // ── 2. ÁREA SCROLLABLE ───────────────────────────────
+        auto* scroll = new QScrollArea(this);
+        scroll->setWidgetResizable(true);
+        scroll->setFrameShape(QFrame::NoFrame);
+        scroll->setStyleSheet("background:transparent; QScrollBar:vertical { width: 8px; background: #111216; } "
+                            "QScrollBar::handle:vertical { background: #252830; border-radius: 4px; }");
+        
+        auto* scrollContent = new QWidget();
+        scrollContent->setStyleSheet("background:transparent;");
+        auto* scrollLayout = new QVBoxLayout(scrollContent);
+        scrollLayout->setContentsMargins(32, 24, 32, 24);
+        scrollLayout->setSpacing(24);
+
+        // --- CARD DE STATUS ---
         auto* statusCard = makeCard();
         auto* sclay = new QHBoxLayout(statusCard);
         sclay->setContentsMargins(24, 20, 24, 20); sclay->setSpacing(32);
 
-        // Indicador + status
         m_pulse = new PulseIndicator(this);
         m_statusLabel = new QLabel("Verificando...");
         m_statusLabel->setStyleSheet("color:#F0F4F8;font-size:20px;font-weight:bold;");
@@ -289,173 +273,89 @@ private:
         m_cycleLabel->setStyleSheet("color:#A39C93;font-size:12px;");
         m_uptimeLabel = new QLabel("Último heartbeat: —");
         m_uptimeLabel->setStyleSheet("color:#A39C93;font-size:12px;");
-        stV->addLayout(stRow);
-        stV->addWidget(m_cycleLabel);
-        stV->addWidget(m_uptimeLabel);
+        stV->addLayout(stRow); stV->addWidget(m_cycleLabel); stV->addWidget(m_uptimeLabel);
         sclay->addLayout(stV, 1);
 
-        // Botões START / STOP
+        auto* btnV = new QVBoxLayout();
         m_startBtn = makeActionBtn("▶  INICIAR CRAWLER", "#22C55E");
         m_stopBtn  = makeActionBtn("■  PARAR CRAWLER",   "#EF4444");
         m_stopBtn->setEnabled(false);
         m_resetBtn = makeActionBtn("🧹  LIMPAR SESSÃO", "#6B7280");
-        m_resetBtn->setFixedHeight(36); m_resetBtn->setStyleSheet(m_resetBtn->styleSheet().replace("14px", "11px"));
-        
-        connect(m_startBtn, &QPushButton::clicked, this, &RobotControlPage::startCrawler);
-        connect(m_stopBtn,  &QPushButton::clicked, this, &RobotControlPage::stopCrawler);
-        connect(m_resetBtn, &QPushButton::clicked, this, &RobotControlPage::resetSession);
-        
-        auto* btnV = new QVBoxLayout();
+        m_resetBtn->setFixedHeight(32); m_resetBtn->setStyleSheet(m_resetBtn->styleSheet().replace("14px", "11px"));
         btnV->addWidget(m_startBtn); btnV->addWidget(m_stopBtn); btnV->addWidget(m_resetBtn);
         sclay->addLayout(btnV);
-        root->addWidget(statusCard);
+        scrollLayout->addWidget(statusCard);
 
-        // ── Layout horizontal: Config + Log ─────────────────
-        auto* midRow = new QHBoxLayout(); midRow->setSpacing(20);
-
-        // ── Painel de Configuração ───────────────────────────
+        // --- GRID: CONFIG + AUTH | LOGS ---
+        auto* gridRow = new QHBoxLayout(); gridRow->setSpacing(20);
+        
+        auto* leftCol = new QVBoxLayout(); leftCol->setSpacing(20);
+        
+        // CARD DE CONFIGURAÇÃO
         auto* cfgCard = makeCard();
-        cfgCard->setFixedWidth(360);
         auto* cfglay = new QVBoxLayout(cfgCard);
-        cfglay->setContentsMargins(24, 20, 24, 20); cfglay->setSpacing(16);
-
+        cfglay->setContentsMargins(24, 20, 24, 20); cfglay->setSpacing(12);
         auto* cfgTitle = new QLabel("⚙️  Configuração do Ciclo");
         cfgTitle->setStyleSheet("color:#E39B35;font-size:14px;font-weight:bold;");
         cfglay->addWidget(cfgTitle);
         addSeparator(cfglay);
-
         m_maxApply = makeSpinBox(1, 100, 15);
         m_cycleWait = makeSpinBox(1, 480, 45);
-        m_activeStart = makeSpinBox(0, 23, 8);
-        m_activeEnd   = makeSpinBox(0, 23, 22);
-        m_termsInput  = new QLineEdit("C#, Python, Qt, PostgreSQL");
-        styleInput(m_termsInput);
-
-        cfglay->addLayout(makeConfigRow("Candidaturas / ciclo:", m_maxApply));
-        cfglay->addLayout(makeConfigRow("Espera entre ciclos (min):", m_cycleWait));
-        cfglay->addLayout(makeConfigRow("Horário início (h):", m_activeStart));
-        cfglay->addLayout(makeConfigRow("Horário fim (h):", m_activeEnd));
-        cfglay->addLayout(makeConfigRow("Termos de busca:", m_termsInput));
-
-        addSeparator(cfglay);
-
-        auto* applyBtn = new QPushButton("Salvar e Aplicar Configuração");
+        m_termsInput  = new QLineEdit("C#, Python, Qt"); styleInput(m_termsInput);
+        cfglay->addLayout(makeConfigRow("Vagas / ciclo:", m_maxApply));
+        cfglay->addLayout(makeConfigRow("Espera (min):", m_cycleWait));
+        cfglay->addLayout(makeConfigRow("Termos:", m_termsInput));
+        auto* applyBtn = new QPushButton("Aplicar Configuração");
+        applyBtn->setFixedHeight(36);
         applyBtn->setCursor(Qt::PointingHandCursor);
-        applyBtn->setStyleSheet(
-            "QPushButton{background:#E39B35;color:#111216;border:none;border-radius:8px;"
-            "padding:10px;font-weight:bold;font-size:13px;}"
-            "QPushButton:hover{background:#f0ab45;}");
+        applyBtn->setStyleSheet("QPushButton{background:#E39B35;color:#111216;border-radius:6px;font-weight:bold; font-size:12px;}");
         connect(applyBtn, &QPushButton::clicked, this, &RobotControlPage::applyConfig);
         cfglay->addWidget(applyBtn);
-        cfglay->addStretch();
+        leftCol->addWidget(cfgCard);
 
-        // ── Painel de Autenticação & Sessão ──────────────────
+        // CARD DE AUTENTICAÇÃO
         auto* authCard = makeCard();
-        authCard->setFixedWidth(360);
         auto* authlay = new QVBoxLayout(authCard);
-        authlay->setContentsMargins(24, 20, 24, 20); authlay->setSpacing(16);
-
-        auto* authTitle = new QLabel("🔐  Autenticação & Sessão");
+        authlay->setContentsMargins(24, 20, 24, 20); authlay->setSpacing(12);
+        auto* authTitle = new QLabel("🔐  LinkedIn & Sessão");
         authTitle->setStyleSheet("color:#3B82F6;font-size:14px;font-weight:bold;");
         authlay->addWidget(authTitle);
         addSeparator(authlay);
-
-        auto* authInfo = new QLabel("Se o LinkedIn estiver bloqueando o robô, faça login no seu navegador e cole o cookie 'li_at' abaixo:");
-        authInfo->setWordWrap(true);
-        authInfo->setStyleSheet("color:#A39C93;font-size:11px;line-height:1.4;");
-        authlay->addWidget(authInfo);
-
         m_loginBtn = new LinkedInButton(this);
-        m_loginBtn->setToolTip("Abrir LinkedIn para login manual");
-        connect(m_loginBtn, &QPushButton::clicked, this, [this]{
-            QDesktopServices::openUrl(QUrl("https://www.linkedin.com/login"));
-        });
+        m_loginBtn->setFixedWidth(200);
+        connect(m_loginBtn, &QPushButton::clicked, this, [this]{ QDesktopServices::openUrl(QUrl("https://www.linkedin.com/login")); });
         authlay->addWidget(m_loginBtn, 0, Qt::AlignCenter);
-
-        m_cookieInput = new QLineEdit();
-        m_cookieInput->setPlaceholderText("Cole o valor do cookie li_at...");
-        styleInput(m_cookieInput);
-        authlay->addLayout(makeConfigRow("Cookie li_at:", m_cookieInput));
-
-        m_saveCookieBtn = new QPushButton("Atualizar Sessão no Robô");
+        m_cookieInput = new QLineEdit(); m_cookieInput->setPlaceholderText("Cole o cookie li_at..."); styleInput(m_cookieInput);
+        authlay->addLayout(makeConfigRow("Cookie:", m_cookieInput));
+        m_saveCookieBtn = new QPushButton("Atualizar Cookie");
+        m_saveCookieBtn->setFixedHeight(36);
         m_saveCookieBtn->setCursor(Qt::PointingHandCursor);
-        m_saveCookieBtn->setStyleSheet(
-            "QPushButton{background:#3B82F6;color:white;border:none;border-radius:8px;"
-            "padding:10px;font-weight:bold;font-size:13px;}"
-            "QPushButton:hover{background:#60A5FA;}");
+        m_saveCookieBtn->setStyleSheet("QPushButton{background:#3B82F6;color:white;border-radius:6px;font-weight:bold; font-size:12px;}");
         connect(m_saveCookieBtn, &QPushButton::clicked, this, &RobotControlPage::saveSessionCookie);
         authlay->addWidget(m_saveCookieBtn);
-
-        authlay->addStretch();
-
-        
-        // ── Painel de Diagnósticos (Raio-X) ──────────────────
-        auto* leftCol = new QVBoxLayout(); leftCol->setSpacing(20);
-        leftCol->addWidget(cfgCard);
         leftCol->addWidget(authCard);
-
-        auto* diagCard = makeCard();
-        diagCard->setFixedWidth(360);
-        auto* diaglay = new QVBoxLayout(diagCard);
-        diaglay->setContentsMargins(24, 20, 24, 20); diaglay->setSpacing(12);
-
-        auto* diagHdr = new QHBoxLayout();
-        auto* diagTitle = new QLabel("📸 Galeria de Raio-X");
-        diagTitle->setStyleSheet("color:#3B82F6;font-size:14px;font-weight:bold;");
-        m_refreshDiag = new QPushButton("🔄");
-        m_refreshDiag->setFixedSize(30, 30);
-        m_refreshDiag->setCursor(Qt::PointingHandCursor);
-        m_refreshDiag->setStyleSheet("QPushButton{background:#252830;border-radius:15px;color:white;}QPushButton:hover{background:#3B82F6;}");
-        connect(m_refreshDiag, &QPushButton::clicked, this, &RobotControlPage::fetchDiagnostics);
-        diagHdr->addWidget(diagTitle); diagHdr->addStretch(); diagHdr->addWidget(m_refreshDiag);
-        diaglay->addLayout(diagHdr);
         
-        addSeparator(diaglay);
+        gridRow->addLayout(leftCol, 0);
 
-        m_diagList = new QListWidget();
-        m_diagList->setStyleSheet(
-            "QListWidget{background:#111216;color:#F0F4F8;border:1px solid #252830;border-radius:8px;padding:5px;font-size:11px;}"
-            "QListWidget::item{padding:8px;border-bottom:1px solid #1A1D24;}"
-            "QListWidget::item:selected{background:#3B82F6;color:white;border-radius:4px;}"
-        );
-        diaglay->addWidget(m_diagList, 1);
-
-        m_openDiag = new QPushButton("Abrir Snapshot no Navegador");
-        m_openDiag->setCursor(Qt::PointingHandCursor);
-        m_openDiag->setStyleSheet(
-            "QPushButton{background:#3B82F6;color:white;border:none;border-radius:8px;"
-            "padding:10px;font-weight:bold;font-size:12px;}"
-            "QPushButton:hover{background:#60A5FA;}");
-        connect(m_openDiag, &QPushButton::clicked, this, &RobotControlPage::openDiagnostic);
-        diaglay->addWidget(m_openDiag);
-        
-        leftCol->addWidget(diagCard, 1);
-        midRow->addLayout(leftCol);
-
-        // ── Log em Tempo Real ────────────────────────────────
+        // CARD DE LOGS
         auto* logCard = makeCard();
         auto* loglay = new QVBoxLayout(logCard);
         loglay->setContentsMargins(20, 16, 20, 16); loglay->setSpacing(10);
-
         auto* logHdr = new QHBoxLayout();
-        auto* logTitle = new QLabel("📋  Log em Tempo Real (WebSocket)");
+        auto* logTitle = new QLabel("📋 Log em Tempo Real");
         logTitle->setStyleSheet("color:#F0F4F8;font-size:14px;font-weight:bold;");
-        auto* wsStatus = new QLabel("● Conectando...");
-        wsStatus->setObjectName("wsStatus");
+        auto* wsStatus = new QLabel("● ..."); wsStatus->setObjectName("wsStatus");
         wsStatus->setStyleSheet("color:#E39B35;font-size:11px;");
         logHdr->addWidget(logTitle); logHdr->addStretch(); logHdr->addWidget(wsStatus);
-
+        
         auto* clearBtn = new QPushButton("Limpar");
         clearBtn->setCursor(Qt::PointingHandCursor);
         clearBtn->setFixedHeight(28);
-        clearBtn->setStyleSheet(
-            "QPushButton{background:transparent;color:#A39C93;border:1px solid #252830;"
-            "border-radius:5px;padding:0 10px;font-size:11px;}"
-            "QPushButton:hover{color:#F0F4F8;}");
+        clearBtn->setStyleSheet("QPushButton{background:transparent;color:#A39C93;border:1px solid #252830;border-radius:5px;padding:0 10px;font-size:11px;}QPushButton:hover{color:#F0F4F8;}");
         connect(clearBtn, &QPushButton::clicked, this, [this]{ m_logArea->clear(); });
         logHdr->addWidget(clearBtn);
         loglay->addLayout(logHdr);
-
+        
         m_logArea = new QTextEdit();
         m_logArea->setReadOnly(true);
         m_logArea->setStyleSheet(
@@ -481,8 +381,11 @@ private:
             appendLog(msg);
         });
 
-        midRow->addWidget(logCard, 1);
-        root->addLayout(midRow, 1);
+        gridRow->addWidget(logCard, 1);
+        scrollLayout->addLayout(gridRow, 1);
+
+        scroll->setWidget(scrollContent);
+        root->addWidget(scroll);
     }
 
     // ── Helpers de UI ────────────────────────────────────────
@@ -608,8 +511,6 @@ private slots:
         QJsonObject body;
         body["max_apply_per_cycle"] = m_maxApply->value();
         body["cycle_wait_minutes"]  = m_cycleWait->value();
-        body["active_hours_start"]  = m_activeStart->value();
-        body["active_hours_end"]    = m_activeEnd->value();
         body["search_terms"] = m_termsInput->text().trimmed();
 
         auto* reply = m_nam->post(makeRequest("/crawler/start"),
@@ -664,8 +565,6 @@ private slots:
         QJsonObject cfg;
         cfg["max_apply_per_cycle"] = m_maxApply->value();
         cfg["cycle_wait_minutes"]  = m_cycleWait->value();
-        cfg["active_hours_start"]  = m_activeStart->value();
-        cfg["active_hours_end"]    = m_activeEnd->value();
         cfg["search_terms"]        = m_termsInput->text().trimmed();
 
         auto* reply = m_nam->post(makeRequest("/crawler/config"),
@@ -679,62 +578,7 @@ private slots:
         });
     }
 
-    // GET /crawler/test (O MODO RAIO-X)
-    void testInfra() {
-        appendLog("🔍 [DIAGNÓSTICO] Verificando integridade da infraestrutura...");
-        m_testBtn->setEnabled(false);
-        auto* reply = m_nam->get(makeRequest("/crawler/test"));
-        connect(reply, &QNetworkReply::finished, this, [this, reply]{
-            reply->deleteLater();
-            m_testBtn->setEnabled(true);
-            if (reply->error() != QNetworkReply::NoError) {
-                appendLog("❌ Erro ao conectar na API de Diagnóstico.");
-                return;
-            }
-            appendLog("✅ Diagnóstico concluído! Verifique as mensagens acima.");
-            fetchDiagnostics(); // Atualiza a lista após testar
-        });
-    }
-
-    // GET /diag
-    void fetchDiagnostics() {
-        m_diagList->clear();
-        m_diagList->addItem("Carregando...");
-        
-        auto* reply = m_nam->get(makeRequest("/diag"));
-        connect(reply, &QNetworkReply::finished, this, [this, reply]{
-            reply->deleteLater();
-            m_diagList->clear();
-            if (reply->error() != QNetworkReply::NoError) {
-                m_diagList->addItem("Erro ao buscar diagnósticos");
-                return;
-            }
-            auto doc = QJsonDocument::fromJson(reply->readAll());
-            auto obj = doc.object();
-            if (obj["ok"].toBool()) {
-                auto files = obj["files"].toArray();
-                if (files.isEmpty()) {
-                    m_diagList->addItem("Nenhum snapshot disponível.");
-                } else {
-                    for (const auto& f : files) {
-                        m_diagList->addItem(f.toString());
-                    }
-                }
-            }
-        });
-    }
-
-    void openDiagnostic() {
-        auto* item = m_diagList->currentItem();
-        if (!item) return;
-        QString filename = item->text();
-        if (filename.isEmpty() || filename.contains(" ")) return;
-
-        QString base = m_apiBase.trimmed();
-        while(base.endsWith('/')) base.chop(1);
-        QUrl url(base + "/diag/" + filename);
-        QDesktopServices::openUrl(url);
-    }
+    // Métodos de diagnóstico removidos para limpeza
 
     void saveSessionCookie() {
         QString cookie = m_cookieInput->text().trimmed();
