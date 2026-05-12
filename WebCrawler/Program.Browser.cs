@@ -68,15 +68,18 @@ partial class Program
             options.AddArgument("--no-first-run");
             options.AddArgument("--no-default-browser-check");
             options.AddArgument("--disable-software-rasterizer");
-            options.AddArgument("--disable-dev-shm-usage");
-            options.AddArgument("--js-flags=\"--max-old-space-size=128\""); 
+            options.AddArgument("--no-zygote"); // Mata o processo zygote para economizar RAM
+            options.AddArgument("--disable-breakpad"); // Desativa crash reporter
+            options.AddArgument("--disable-dev-tools"); // Desativa ferramentas de dev
+            options.AddArgument("--log-level=3"); // Silencia logs do Chrome
+            options.AddArgument("--js-flags=\"--max-old-space-size=96\""); // Limita JS a 96MB
             options.AddArgument("--memory-pressure-thresholds=1,2");
             options.AddArgument("--disable-background-networking");
             options.AddArgument("--disable-sync");
             options.AddArgument("--disable-print-preview");
             options.AddArgument("--disable-speech-api");
             options.AddArgument("--disable-media-session-api");
-            options.AddArgument("--disable-features=TranslateUI,BlinkGenPropertyTrees,SpellCheck,AudioServiceOutOfProcess");
+            options.AddArgument("--disable-features=TranslateUI,BlinkGenPropertyTrees,SpellCheck,AudioServiceOutOfProcess,VisualSearchResults");
             
             // --- BLOQUEIO DE IMAGENS E PESO ---
             options.AddUserProfilePreference("profile.managed_default_content_settings.images", 2); 

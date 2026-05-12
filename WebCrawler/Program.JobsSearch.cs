@@ -12,6 +12,14 @@ partial class Program
 
         try
         {
+            var isLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
+            
+            if (isLinux)
+            {
+                Console.WriteLine($"[C#] Ambiente Render detectado. Usando navegação direta via URL para economizar RAM (Busca: {selectedSearchTerm}).");
+                return TryOpenJobsSearchViaUrl(driver, selectedSearchTerm);
+            }
+
             Console.WriteLine($"[HUMAN] Iniciando busca humana para: {selectedSearchTerm}");
             // Removida navegação redundante para economizar RAM
             WaitForJobPageReady(driver);
