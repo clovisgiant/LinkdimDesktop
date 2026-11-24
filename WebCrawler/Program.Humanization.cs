@@ -66,9 +66,31 @@ partial class Program
         }
     }
 
+    private static int _consecutiveFailures = 0;
+    private const int MaxBackoffMinutes = 120; 
+
+    private static void ResetFailures() => _consecutiveFailures = 0;
+
+    private static void ApplyExponentialBackoff(string reason)
+    {
+        _consecutiveFailures++;
+        int minutesToWait = (int)Math.Min(Math.Pow(2, _consecutiveFailures), MaxBackoffMinutes);
+        
+        Console.WriteLine($"[!!] DETECÇÃO/ERRO: {reason}");
+        Console.WriteLine($"[!!] Aplicando Backoff Exponencial: Aguardando {minutesToWait} minutos...");
+        
+        for(int i = 0; i < minutesToWait; i++)
+        {
+            if (i > 0 && i % 5 == 0) Console.WriteLine($"... ainda aguardando ({minutesToWait - i} min restantes)");
+            Thread.Sleep(60000); 
+        }
+    }
+
     private static void SleepRandomDelay(int minMs, int maxMs, string? label = null, bool log = false)
     {
-        var delayMs = NextRandomInt(minMs, maxMs);
+        double jitter = 1.0 + (HumanizationRandom.NextDouble() * 0.3 - 0.15); 
+        var delayMs = (int)(NextRandomInt(minMs, maxMs) * jitter);
+
         if (log && !string.IsNullOrWhiteSpace(label))
         {
             Console.WriteLine($"[HUMAN] {label}: aguardando {delayMs} ms.");
@@ -77,9 +99,15 @@ partial class Program
         Thread.Sleep(delayMs);
     }
 
+    private static void SimulateReadingPause()
+    {
+        Console.WriteLine($"[HUMAN] Analisando detalhes da vaga...");
+        SleepRandomDelay(1500, 3200);
+    }
+
     private static void PauseBeforeClick()
     {
-        SleepRandomDelay(160, 360);
+        SleepRandomDelay(250, 750);
     }
 
     private static void PauseBetweenFlowSteps(string? label = null, bool log = false)
@@ -96,10 +124,13 @@ partial class Program
     {
         var normalizedLink = NormalizeLinkedInJobLink(link) ?? link;
         var description = flowCompleted
-            ? $"intervalo apos candidatura para {normalizedLink}"
-            : $"intervalo apos tentativa nao concluida para {normalizedLink}";
+            ? $"intervalo apos candidatura concluída para {normalizedLink}"
+            : $"intervalo apos tentativa falha para {normalizedLink}";
 
-        SleepRandomDelay(BetweenApplicationsDelayMinMs, BetweenApplicationsDelayMaxMs, description, log: true);
+        int min = flowCompleted ? BetweenApplicationsDelayMinMs : (BetweenApplicationsDelayMinMs / 2);
+        int max = flowCompleted ? BetweenApplicationsDelayMaxMs : (BetweenApplicationsDelayMaxMs / 2);
+
+        SleepRandomDelay(min, max, description, log: true);
     }
 
     private static string GetEasyApplyCollectionEntryUrlForCycle()
@@ -112,14 +143,14 @@ partial class Program
     {
         try
         {
-            var scrollTarget = NextRandomInt(CollectionEntryScrollMinPx, CollectionEntryScrollMaxPx);
-            ((IJavaScriptExecutor)driver).ExecuteScript("window.scrollTo({ top: arguments[0], behavior: 'smooth' });", scrollTarget);
-            SleepRandomDelay(250, Math.Min(900, InteractionDelayMaxMs));
+            for (int i = 0; i < NextRandomInt(2, 4); i++)
+            {
+                var scrollStep = NextRandomInt(150, 400);
+                ((IJavaScriptExecutor)driver).ExecuteScript($"window.scrollBy({{ top: {scrollStep}, behavior: 'smooth' }});");
+                SleepRandomDelay(400, 1200);
+            }
         }
-        catch
-        {
-            // Segue sem scroll auxiliar.
-        }
+        catch { }
     }
 
     private static void TryScrollElementIntoViewHumanized(IWebDriver driver, IWebElement element)

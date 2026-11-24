@@ -18,7 +18,9 @@ partial class Program
                     "input[type='radio'][name*='resume']:checked, " +
                     "input[type='radio'][id*='resume']:checked, " +
                     "input[id*='jobsDocumentCardToggle']:checked, " +
-                    "input[name*='jobsDocumentCardToggle']:checked"));
+                    "input[name*='jobsDocumentCardToggle']:checked, " +
+                    "input[type='radio'][aria-label*='.pdf']:checked, " +
+                    "input[type='radio'][checked][aria-label*='.pdf']"));
 
                 if (selectedInputs.Count > 0)
                 {
@@ -43,6 +45,51 @@ partial class Program
 
         try
         {
+            // Suporte tanto para layout clássico quanto para SDUI (onde input[type='radio'] tem opacity:0)
+            if (driver is IJavaScriptExecutor jsResume)
+            {
+                var firstNameResumeToken = (AutoFillDefaultFirstName ?? string.Empty).Trim().ToLowerInvariant();
+                var sduiResumeResult = jsResume.ExecuteScript(@"
+                    const firstNameToken = arguments[0] || '';
+                    const modals = Array.from(document.querySelectorAll('dialog[data-testid=""dialog""][open], dialog[open], [data-testid=""dialog""], div.jobs-easy-apply-modal[role=""dialog""], div.jobs-easy-apply-modal, div[data-sdui-screen*=""easyapply""], div[role=""dialog""]'));
+                    const modal = modals.find(m => {
+                        const s = window.getComputedStyle(m);
+                        const r = m.getBoundingClientRect();
+                        return s.display !== 'none' && s.visibility !== 'hidden' && r.width > 0 && r.height > 0 && m.getAttribute('aria-hidden') !== 'true';
+                    });
+                    if (!modal) return 'no_modal';
+
+                    const radios = Array.from(modal.querySelectorAll('input[type=""radio""]')).filter(r => {
+                        const a = (r.getAttribute('aria-label') || '').toLowerCase();
+                        const id = (r.id || '').toLowerCase();
+                        const nm = (r.name || '').toLowerCase();
+                        return a.includes('.pdf') || a.includes('.doc') || id.includes('resume') || nm.includes('resume') || id.includes('jobsdocumentcard');
+                    });
+
+                    if (radios.length === 0) return 'no_resume_radios';
+                    if (radios.some(r => r.checked)) return 'already_selected';
+
+                    const preferred = (firstNameToken ? radios.find(r => (r.getAttribute('aria-label') || '').toLowerCase().includes(firstNameToken)) : null) || radios[0];
+                    const lbl = preferred.id ? modal.querySelector('label[for=""' + CSS.escape(preferred.id) + '""]') : null;
+                    (lbl || preferred).scrollIntoView({ block: 'center' });
+                    if (lbl) { try { lbl.click(); } catch {} }
+                    if (!preferred.checked) { try { preferred.click(); } catch {} }
+                    return preferred.checked ? 'selected_via_js' : 'click_attempted';
+                ", firstNameResumeToken)?.ToString() ?? string.Empty;
+
+                if (sduiResumeResult == "already_selected")
+                {
+                    Console.WriteLine("Currículo já selecionado no popup.");
+                    return;
+                }
+                if (sduiResumeResult == "selected_via_js")
+                {
+                    Console.WriteLine("Currículo selecionado no popup (SDUI/JS).");
+                    Thread.Sleep(300);
+                    return;
+                }
+            }
+
             // Se já existir um currículo selecionado, mantém como está.
             if (IsResumeSelected())
             {
@@ -117,7 +164,7 @@ partial class Program
 
             // Tenta localizar opções de currículo por seletores comuns da tela Easy Apply.
             var resumeCandidates = driver.FindElements(By.CssSelector(
-                "label[for*='resume'], label.jobs-document-upload-redesign-card__toggle-label, input[type='radio'][name*='resume'], input[id*='jobsDocumentCardToggle'], [data-test-document-upload-item], div.jobs-document-upload-redesign-card__container"));
+                "label[for*='resume'], label.jobs-document-upload-redesign-card__toggle-label, input[type='radio'][name*='resume'], input[id*='jobsDocumentCardToggle'], [data-test-document-upload-item], div.jobs-document-upload-redesign-card__container, input[type='radio'][aria-label*='.pdf']"));
 
             if (resumeCandidates.Count == 0)
             {
@@ -188,7 +235,7 @@ partial class Program
         {
             var js = (IJavaScriptExecutor)driver;
             var result = js.ExecuteScript(@"
-                const modals = Array.from(document.querySelectorAll('div.jobs-easy-apply-modal[role=""dialog""], div.jobs-easy-apply-modal, div[role=""dialog""]'));
+                const modals = Array.from(document.querySelectorAll('dialog[data-testid=""dialog""][open], dialog[open], [data-testid=""dialog""], div.jobs-easy-apply-modal[role=""dialog""], div.jobs-easy-apply-modal, div[data-sdui-screen*=""easyapply""], div[data-testid=""dialog-content""], div[role=""dialog""], dialog'));
                 const modal = modals.find(m => {
                     if (!m) return false;
                     const style = window.getComputedStyle(m);
@@ -201,10 +248,10 @@ partial class Program
                     return 'modal:closed';
                 }
 
-                const titleEl = modal.querySelector('h2, h3, [id*=""easy-apply""], .jobs-easy-apply-content__title');
+                const titleEl = modal.querySelector('h1, h2, h3, [id*=""easy-apply""], .jobs-easy-apply-content__title');
                 const progressEl = modal.querySelector('[aria-valuenow], [aria-valuemin], [aria-valuemax], .artdeco-completeness-meter-linear__progress-element, .jobs-easy-apply-content__step');
 
-                const footerButtons = Array.from(modal.querySelectorAll('footer button, button.artdeco-button--primary'));
+                const footerButtons = Array.from(modal.querySelectorAll('footer button, button.artdeco-button--primary, button'));
                 const visibleEnabledButtons = footerButtons.filter(btn => {
                     const s = window.getComputedStyle(btn);
                     const r = btn.getBoundingClientRect();
@@ -218,8 +265,6 @@ partial class Program
                     .map(btn => ((btn.getAttribute('aria-label') || '') + '|' + (btn.innerText || '').trim()))
                     .join('||');
 
-                // Inclui uma assinatura do conteúdo do modal (sem footer/botões) para detectar
-                // transições reais entre etapas que mantêm o mesmo progresso e os mesmos CTAs.
                 const contentRoot = modal.querySelector('.jobs-easy-apply-content, form, .jobs-easy-apply-content__content') || modal;
                 const contentClone = contentRoot.cloneNode(true);
                 contentClone.querySelectorAll('footer, button, script, style').forEach(node => node.remove());
@@ -254,22 +299,16 @@ partial class Program
             {
                 try
                 {
-                    var submitVisible = d.FindElements(By.CssSelector("button[data-live-test-easy-apply-submit-button], button[data-easy-apply-submit-button], button[aria-label*='Enviar'], button[aria-label*='Submit']"))
+                    var modal = TryFindActiveEasyApplyModal(d);
+                    ISearchContext scope = modal != null ? (ISearchContext)modal : d;
+
+                    var submitVisible = scope.FindElements(By.CssSelector("button[data-live-test-easy-apply-submit-button], button[data-easy-apply-submit-button], button[aria-label*='Enviar'], button[aria-label*='Submit']"))
+                        .Concat(scope.FindElements(By.XPath(".//button[contains(normalize-space(.),'Enviar candidatura') or contains(normalize-space(.),'Submit application') or normalize-space(.)='Enviar' or normalize-space(.)='Submit']")))
                         .Any(btn =>
                         {
                             try { return btn.Displayed; } catch { return false; }
                         });
                     if (submitVisible)
-                    {
-                        return true;
-                    }
-
-                    var reviewVisible = d.FindElements(By.CssSelector("button[data-live-test-easy-apply-review-button], button[aria-label*='Review'], button[aria-label*='Revis']"))
-                        .Any(btn =>
-                        {
-                            try { return btn.Displayed; } catch { return false; }
-                        });
-                    if (reviewVisible)
                     {
                         return true;
                     }
@@ -310,78 +349,77 @@ partial class Program
         return false;
     }
 
-    // Localiza e clica no botão "Avançar" da etapa atual do popup.
+    // Localiza e clica no botão "Avançar" (ou "Avaliar"/"Revisar" quando for a transição final) ESTRITAMENTE dentro do modal ativo.
     private static bool TryClickNextButtonInPopup(IWebDriver driver, WebDriverWait wait, string stepName, string link, int autoFillRetryCount = 0)
     {
         IWebElement? nextButton = null;
-        IWebElement? activeModal = null;
+        IWebElement? activeModal = TryFindActiveEasyApplyModal(driver);
         var beforeStepSignature = CaptureApplyStepSignature(driver);
         const string userProvidedNextXPath = "/html/body/div[1]/div[4]//div/div[1]/div/div/div[2]/div/div[2]/form/footer/div[2]/button";
 
-        // Primeiro tenta o botão exato informado pelo usuário no DOM inteiro.
-        try
+        if (activeModal == null)
         {
-            var exactXPathCandidates = driver.FindElements(By.XPath(userProvidedNextXPath));
-            foreach (var candidate in exactXPathCandidates)
+            try
             {
-                try
-                {
-                    if (!candidate.Displayed || !candidate.Enabled)
-                    {
-                        continue;
-                    }
-
-                    ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView({block: 'center'});", candidate);
-                    Thread.Sleep(200);
-                    ClickElementRobust(driver, candidate);
-
-                    if (!ConfirmNextStepProgress(driver, link, stepName, beforeStepSignature))
-                    {
-                        continue;
-                    }
-
-                    var xpathButtonDescription = DescribeElementForLog(candidate);
-                    Console.WriteLine($"Botão 'Avançar' clicado com XPath absoluto informado na etapa: {stepName}.");
-                    Console.WriteLine($"[DEBUG NEXT] xpath='{userProvidedNextXPath}', {xpathButtonDescription}");
-                    LogApplicationStep(link, $"next_clicked_xpath_{stepName}", true, $"Botão Avançar clicado com XPath absoluto informado. xpath='{userProvidedNextXPath}', {xpathButtonDescription}");
-                    return true;
-                }
-                catch
-                {
-                    // Tenta próximo candidato desse XPath.
-                }
+                var quickModalWait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+                activeModal = quickModalWait.Until(d => TryFindActiveEasyApplyModal(d));
             }
-
-            var js = (IJavaScriptExecutor)driver;
-            for (int attempt = 0; attempt < 12; attempt++)
+            catch (WebDriverTimeoutException)
             {
-                var clickedResult = js.ExecuteScript(@"
-                    const selectors = [
-                        'div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]',
-                        'div.display-flex.justify-flex-end.ph5.pv4 > button[data-easy-apply-next-button]',
-                        'div.display-flex.justify-flex-end.ph5.pv4 > button[aria-label=""Avançar para próxima etapa""]',
-                        'button[data-easy-apply-next-button][data-live-test-easy-apply-next-button]',
-                        'button[data-live-test-easy-apply-next-button]',
-                        'button[data-easy-apply-next-button]',
-                        'button[aria-label=""Avançar para próxima etapa""]',
-                        'button[aria-label*=""Avançar""]',
-                        'button[aria-label*=""Próximo""]',
-                        'button[aria-label*=""Next""]',
-                        'button[aria-label*=""Continue""]',
-                        'button[aria-label*=""Continuar""]',
-                        'footer button.artdeco-button--primary',
-                        'button.artdeco-button--primary'
-                    ];
+                Console.WriteLine($"Modal de candidatura não encontrado na etapa: {stepName}.");
+            }
+        }
 
-                    for (const selector of selectors) {
-                        const candidates = Array.from(document.querySelectorAll(selector));
-                        for (const candidate of candidates) {
-                            const style = window.getComputedStyle(candidate);
-                            const rect = candidate.getBoundingClientRect();
+        // Prioridade máxima: busca ESTRITAMENTE dentro do modal ativo (evita clicar em botões 'Avançar' de carrosséis do feed ao fundo!)
+        if (activeModal != null)
+        {
+            try
+            {
+                var js = (IJavaScriptExecutor)driver;
+                for (int attempt = 0; attempt < 10; attempt++)
+                {
+                    var clickedResult = js.ExecuteScript(@"
+                        const modal = arguments[0];
+                        if (!modal) return { clicked: false };
+
+                        const isVisibleEnabled = (btn) => {
+                            if (!btn) return false;
+                            const style = window.getComputedStyle(btn);
+                            const rect = btn.getBoundingClientRect();
                             const visible = style && style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
-                            const enabled = !candidate.disabled && candidate.getAttribute('aria-disabled') !== 'true';
+                            const enabled = !btn.disabled && btn.getAttribute('aria-disabled') !== 'true';
+                            return visible && enabled;
+                        };
 
-                            if (visible && enabled) {
+                        const isExcludedButton = (combined) => {
+                            return combined.includes('voltar') ||
+                                   combined.includes('back') ||
+                                   combined.includes('fechar') ||
+                                   combined.includes('close') ||
+                                   combined.includes('descartar') ||
+                                   combined.includes('discard') ||
+                                   combined.includes('salvar') ||
+                                   combined.includes('save') ||
+                                   combined.includes('cancel');
+                        };
+
+                        // 1. Seletores explícitos de Next dentro do modal
+                        const explicitNextSelectors = [
+                            'footer button[data-easy-apply-next-button]',
+                            'footer button[data-live-test-easy-apply-next-button]',
+                            'button[data-easy-apply-next-button]',
+                            'button[data-live-test-easy-apply-next-button]',
+                            'footer button[aria-label*=""Avançar""]',
+                            'footer button[aria-label*=""Próximo""]',
+                            'footer button[aria-label*=""Next""]',
+                            'footer button[aria-label*=""Continuar""]',
+                            'footer button[aria-label*=""Continue""]'
+                        ];
+
+                        for (const selector of explicitNextSelectors) {
+                            const candidates = Array.from(modal.querySelectorAll(selector));
+                            for (const candidate of candidates) {
+                                if (!isVisibleEnabled(candidate)) continue;
                                 candidate.scrollIntoView({ block: 'center' });
                                 candidate.click();
                                 return {
@@ -394,76 +432,79 @@ partial class Program
                                 };
                             }
                         }
-                    }
 
-                    return { clicked: false };
-                ");
+                        // 2. Botões do modal (priorizando footer) cujo texto/aria seja Avançar / Next / Continuar / Revisar / Avaliar
+                        const footerBtns = Array.from(modal.querySelectorAll('footer button'));
+                        const otherBtns = Array.from(modal.querySelectorAll('button')).filter(b => !footerBtns.includes(b));
+                        const orderedButtons = [...footerBtns, ...otherBtns];
 
-                if (clickedResult is IReadOnlyDictionary<string, object> clickedMap &&
-                    clickedMap.TryGetValue("clicked", out var clickedValue) &&
-                    clickedValue is bool ok && ok)
-                {
-                    if (!ConfirmNextStepProgress(driver, link, stepName, beforeStepSignature))
+                        const nextWords = ['avançar', 'avancar', 'próximo', 'proximo', 'continuar', 'prosseguir', 'next', 'continue'];
+                        const reviewWords = ['revisar', 'avaliar', 'evaluar', 'review'];
+
+                        for (const wordSet of [nextWords, reviewWords]) {
+                            for (const candidate of orderedButtons) {
+                                if (!isVisibleEnabled(candidate)) continue;
+                                const btnText = (candidate.innerText || candidate.textContent || '').trim().toLowerCase();
+                                const btnAria = (candidate.getAttribute('aria-label') || '').trim().toLowerCase();
+                                const combined = (btnText + ' ' + btnAria).trim();
+                                if (isExcludedButton(combined)) continue;
+                                if (!wordSet.some(w => btnText === w || btnText.includes(w) || btnAria.includes(w))) continue;
+
+                                candidate.scrollIntoView({ block: 'center' });
+                                candidate.click();
+                                return {
+                                    clicked: true,
+                                    selector: 'modal-scoped-button:' + btnText,
+                                    ariaLabel: candidate.getAttribute('aria-label') || '',
+                                    text: (candidate.innerText || '').trim(),
+                                    id: candidate.id || '',
+                                    className: candidate.className || ''
+                                };
+                            }
+                        }
+
+                        return { clicked: false };
+                    ", activeModal);
+
+                    if (clickedResult is IReadOnlyDictionary<string, object> clickedMap &&
+                        clickedMap.TryGetValue("clicked", out var clickedValue) &&
+                        clickedValue is bool ok && ok)
                     {
-                        // Evita loop de cliques infinitos quando a etapa não progride por campos obrigatórios.
-                        return false;
+                        if (!ConfirmNextStepProgress(driver, link, stepName, beforeStepSignature))
+                        {
+                            if (autoFillRetryCount < 2)
+                            {
+                                TrySelectResumeInPopup(driver);
+                                TryAutoFillMandatoryFieldsInModal(driver, link, $"next_not_progressed_{stepName}_{autoFillRetryCount}");
+                                Thread.Sleep(450);
+                                return TryClickNextButtonInPopup(driver, wait, stepName, link, autoFillRetryCount + 1);
+                            }
+                            return false;
+                        }
+
+                        var selectorUsed = clickedMap.TryGetValue("selector", out var selectorObj) ? selectorObj?.ToString() ?? string.Empty : string.Empty;
+                        var ariaUsed = clickedMap.TryGetValue("ariaLabel", out var ariaObj) ? ariaObj?.ToString() ?? string.Empty : string.Empty;
+                        var textUsed = clickedMap.TryGetValue("text", out var textObj) ? textObj?.ToString() ?? string.Empty : string.Empty;
+                        var idUsed = clickedMap.TryGetValue("id", out var idObj) ? idObj?.ToString() ?? string.Empty : string.Empty;
+                        var classUsed = clickedMap.TryGetValue("className", out var classObj) ? classObj?.ToString() ?? string.Empty : string.Empty;
+
+                        Console.WriteLine($"Botão '{textUsed}' clicado com sucesso dentro do modal na etapa: {stepName}.");
+                        Console.WriteLine($"[DEBUG NEXT] selector='{selectorUsed}', id='{idUsed}', class='{classUsed}', aria-label='{ariaUsed}', text='{textUsed}'");
+                        LogApplicationStep(link, $"next_clicked_exact_{stepName}", true, $"Botão de avanço clicado dentro do modal ativo. selector='{selectorUsed}', text='{textUsed}'.");
+                        return true;
                     }
 
-                    var selectorUsed = clickedMap.TryGetValue("selector", out var selectorObj) ? selectorObj?.ToString() ?? string.Empty : string.Empty;
-                    var ariaUsed = clickedMap.TryGetValue("ariaLabel", out var ariaObj) ? ariaObj?.ToString() ?? string.Empty : string.Empty;
-                    var textUsed = clickedMap.TryGetValue("text", out var textObj) ? textObj?.ToString() ?? string.Empty : string.Empty;
-                    var idUsed = clickedMap.TryGetValue("id", out var idObj) ? idObj?.ToString() ?? string.Empty : string.Empty;
-                    var classUsed = clickedMap.TryGetValue("className", out var classObj) ? classObj?.ToString() ?? string.Empty : string.Empty;
-
-                    Console.WriteLine($"Botão 'Avançar' (seletor exato global) clicado com sucesso na etapa: {stepName}.");
-                    Console.WriteLine($"[DEBUG NEXT] selector='{selectorUsed}', id='{idUsed}', class='{classUsed}', aria-label='{ariaUsed}', text='{textUsed}'");
-                    LogApplicationStep(link, $"next_clicked_exact_global_{stepName}", true, $"Botão exato de Avançar clicado no DOM global. selector='{selectorUsed}', id='{idUsed}', aria-label='{ariaUsed}', text='{textUsed}'.");
-                    return true;
+                    Thread.Sleep(250);
                 }
 
-                Thread.Sleep(250);
+                // Se activeModal existe, NÃO cai em busca global para jamais clicar em elementos fora do modal!
+                Console.WriteLine($"Nenhum botão de avanço habilitado encontrado dentro do modal na etapa: {stepName}.");
+                return false;
             }
-        }
-        catch
-        {
-            // Segue para estratégia por modal e fallback.
-        }
-
-        try
-        {
-            activeModal = wait.Until(d =>
+            catch
             {
-                var modals = d.FindElements(By.CssSelector("div.jobs-easy-apply-modal[role='dialog'], div.jobs-easy-apply-modal, div[role='dialog']"));
-                foreach (var modal in modals)
-                {
-                    try
-                    {
-                        if (!modal.Displayed)
-                        {
-                            continue;
-                        }
-
-                        var ariaHidden = modal.GetAttribute("aria-hidden")?.Trim().ToLowerInvariant();
-                        if (ariaHidden == "true")
-                        {
-                            continue;
-                        }
-
-                        return modal;
-                    }
-                    catch
-                    {
-                        // Tenta próximo modal.
-                    }
-                }
-
-                return null;
-            });
-        }
-        catch (WebDriverTimeoutException)
-        {
-            Console.WriteLine($"Modal de candidatura não encontrado na etapa: {stepName}. Tentando captura global do botão.");
-            LogApplicationStep(link, $"modal_not_found_{stepName}", false, "Modal de candidatura não encontrado; seguindo com fallback global.");
+                // Se falhar JS pontual, segue para fallback Selenium restrito ao activeModal abaixo.
+            }
         }
 
         // Prioriza o botão exato informado, procurando somente dentro do modal ativo.
@@ -521,6 +562,30 @@ partial class Program
                         }
                     }
 
+                    // Fallback SDUI dentro do modal por texto do botão (Avançar, Revisar, Avaliar, Next, Review, etc.)
+                    const targetTexts = ['avançar', 'revisar', 'avaliar', 'evaluar', 'próximo', 'proximo', 'continuar', 'next', 'review', 'continue'];
+                    const modalButtons = Array.from(modal.querySelectorAll('button'));
+                    for (const candidate of modalButtons) {
+                        const btnText = (candidate.innerText || '').trim().toLowerCase();
+                        if (!targetTexts.some(t => btnText.includes(t))) continue;
+                        const style = window.getComputedStyle(candidate);
+                        const rect = candidate.getBoundingClientRect();
+                        const visible = style && style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+                        const enabled = !candidate.disabled && candidate.getAttribute('aria-disabled') !== 'true';
+                        if (visible && enabled) {
+                            candidate.scrollIntoView({ block: 'center' });
+                            candidate.click();
+                            return {
+                                clicked: true,
+                                selector: 'sdui-modal-button-text:' + btnText,
+                                ariaLabel: candidate.getAttribute('aria-label') || '',
+                                text: (candidate.innerText || '').trim(),
+                                id: candidate.id || '',
+                                className: candidate.className || ''
+                            };
+                        }
+                    }
+
                     return {
                         clicked: false
                     };
@@ -532,6 +597,11 @@ partial class Program
                 {
                     if (!ConfirmNextStepProgress(driver, link, stepName, beforeStepSignature))
                     {
+                        if (autoFillRetryCount < 1 && TryAutoFillMandatoryFieldsInModal(driver, link, $"next_not_progressed_{stepName}"))
+                        {
+                            Thread.Sleep(500);
+                            return TryClickNextButtonInPopup(driver, wait, stepName, link, autoFillRetryCount + 1);
+                        }
                         // Evita loop de cliques infinitos quando a etapa não progride por campos obrigatórios.
                         return false;
                     }
@@ -805,17 +875,19 @@ partial class Program
         IWebElement? reviewButton = null;
         try
         {
-            reviewButton = wait.Until(d => d.FindElement(By.CssSelector("button[data-live-test-easy-apply-review-button]")));
-        }
-        catch (WebDriverTimeoutException)
-        {
-            // Fallback por aria-label/texto em PT/EN.
-            var reviewCandidates = driver.FindElements(By.XPath("//button[contains(@aria-label,'Revise sua candidatura') or contains(@aria-label,'Review your application') or .//span[contains(normalize-space(.),'Revisar')] or .//span[contains(normalize-space(.),'Review')]]"));
-            if (reviewCandidates.Count > 0)
+            var modal = TryFindActiveEasyApplyModal(driver);
+            ISearchContext root = modal != null ? (ISearchContext)modal : driver;
+
+            var candidates = root.FindElements(By.CssSelector("button[data-live-test-easy-apply-review-button], button[aria-label*='Revis'], button[aria-label*='Review'], button[aria-label*='Avaliar'], button[aria-label*='Evaluar']"))
+                .Concat(root.FindElements(By.XPath(".//button[contains(@aria-label,'Revise sua candidatura') or contains(@aria-label,'Review your application') or contains(@aria-label,'Avaliar') or contains(@aria-label,'Evaluar') or contains(normalize-space(.),'Revisar') or contains(normalize-space(.),'Review') or contains(normalize-space(.),'Avaliar') or contains(normalize-space(.),'Evaluar')]")))
+                .ToList();
+
+            reviewButton = candidates.FirstOrDefault(c =>
             {
-                reviewButton = reviewCandidates[0];
-            }
+                try { return c.Displayed && c.Enabled; } catch { return false; }
+            });
         }
+        catch { }
 
         if (reviewButton == null)
         {
@@ -829,6 +901,19 @@ partial class Program
         ClickElementRobust(driver, reviewButton);
         Console.WriteLine("Botão 'Revisar' clicado com sucesso.");
         LogApplicationStep(link, "review_clicked", true, "Botão Revisar clicado com sucesso.");
+
+        // Após revisar, o modal pode precisar rolar até o rodapé para expor o botão final de Enviar
+        Thread.Sleep(800);
+        try
+        {
+            var modal = TryFindActiveEasyApplyModal(driver);
+            if (modal != null)
+            {
+                ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollTop = arguments[0].scrollHeight;", modal);
+            }
+        }
+        catch { }
+
         return true;
     }
 
@@ -1045,8 +1130,31 @@ partial class Program
 
             Thread.Sleep(450);
 
+            // Garante que o diálogo "Salvar esta candidatura? Descartar / Salvar" seja descartado
+            if (driver is IJavaScriptExecutor js)
+            {
+                try
+                {
+                    js.ExecuteScript(@"
+                        const buttons = Array.from(document.querySelectorAll('button, [role=""button""]'));
+                        const discardBtn = buttons.find(b => {
+                            const t = (b.innerText || b.textContent || '').trim().toLowerCase();
+                            const a = (b.getAttribute('aria-label') || '').toLowerCase();
+                            const c = (b.getAttribute('data-control-name') || '').toLowerCase();
+                            return t === 'descartar' || t === 'discard' || a.includes('descartar') || a.includes('discard') || c.includes('discard');
+                        });
+                        if (discardBtn && discardBtn.offsetParent !== null) {
+                            discardBtn.scrollIntoView({block: 'center'});
+                            discardBtn.click();
+                        }
+                    ");
+                }
+                catch { }
+            }
+
             var discardConfirmCandidates = driver.FindElements(By.XPath(
                 "//button[contains(@aria-label,'Descartar') or contains(@aria-label,'Discard') or " +
+                "contains(normalize-space(.),'Descartar') or contains(normalize-space(.),'Discard') or " +
                 ".//span[contains(normalize-space(.),'Descartar')] or .//span[contains(normalize-space(.),'Discard')]]"
             ));
 
@@ -1091,6 +1199,76 @@ partial class Program
         }
     }
 
+    private static IWebElement? TryFindSubmitButtonRobust(IWebDriver driver)
+    {
+        try
+        {
+            var modal = TryFindActiveEasyApplyModal(driver);
+            if (modal != null)
+            {
+                try { ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollTop = arguments[0].scrollHeight;", modal); } catch { }
+            }
+
+            ISearchContext searchRoot = modal != null ? (ISearchContext)modal : driver;
+
+            var submitCandidates = searchRoot.FindElements(By.CssSelector(
+                "button[data-live-test-easy-apply-submit-button], " +
+                "button[data-easy-apply-submit-button], " +
+                "button[aria-label*='Enviar'], " +
+                "button[aria-label*='Submit']"
+            ));
+
+            if (submitCandidates.Count == 0)
+            {
+                submitCandidates = searchRoot.FindElements(By.XPath(
+                    ".//button[" +
+                    "contains(@aria-label,'Enviar candidatura') or contains(@aria-label,'Enviar') or contains(@aria-label,'Submit application') or contains(@aria-label,'Submit') or " +
+                    "contains(normalize-space(.),'Enviar candidatura') or contains(normalize-space(.),'Enviar') or " +
+                    "contains(normalize-space(.),'Submit application') or contains(normalize-space(.),'Submit') or " +
+                    ".//span[contains(normalize-space(.),'Enviar candidatura')] or .//span[contains(normalize-space(.),'Enviar')] or " +
+                    ".//span[contains(normalize-space(.),'Submit application')] or .//span[contains(normalize-space(.),'Submit')]" +
+                    "]"));
+            }
+
+            if (submitCandidates.Count == 0)
+            {
+                return null;
+            }
+
+            var candidate = submitCandidates.FirstOrDefault(btn =>
+            {
+                try
+                {
+                    if (!btn.Displayed)
+                    {
+                        return false;
+                    }
+
+                    var text = (btn.Text ?? string.Empty).Trim();
+                    var aria = (btn.GetAttribute("aria-label") ?? string.Empty).Trim();
+                    var combined = (text + " " + aria).ToLowerInvariant();
+
+                    return combined.Contains("enviar") || combined.Contains("submit");
+                }
+                catch
+                {
+                    return false;
+                }
+            }) ?? submitCandidates[0];
+
+            if (candidate != null)
+            {
+                try { ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView({block: 'center'});", candidate); } catch { }
+            }
+
+            return candidate;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
     // Em alguns fluxos SDUI não há botão "Avançar"; tenta finalizar por Revisar/Enviar diretamente.
     private static bool TryFinalizeWithoutNextIfPossible(IWebDriver driver, WebDriverWait wait, string link)
     {
@@ -1100,22 +1278,7 @@ partial class Program
         TryClickReviewButtonInPopup(driver, new WebDriverWait(driver, TimeSpan.FromSeconds(4)), link);
         Thread.Sleep(600);
 
-        IWebElement? submitButton = null;
-        try
-        {
-            submitButton = wait.Until(d => d.FindElement(By.CssSelector("button[data-live-test-easy-apply-submit-button]")));
-        }
-        catch (WebDriverTimeoutException)
-        {
-            var submitCandidates = driver.FindElements(By.XPath(
-                "//button[contains(@aria-label,'Enviar candidatura') or contains(@aria-label,'Submit application') or " +
-                ".//span[contains(normalize-space(.),'Enviar candidatura')] or .//span[contains(normalize-space(.),'Submit application')]]"));
-
-            if (submitCandidates.Count > 0)
-            {
-                submitButton = submitCandidates[0];
-            }
-        }
+        var submitButton = TryFindSubmitButtonRobust(driver);
 
         if (submitButton == null)
         {
@@ -1128,6 +1291,7 @@ partial class Program
         ClickElementRobust(driver, submitButton);
         Console.WriteLine("[FALLBACK] Botão 'Enviar candidatura' clicado sem etapa 'Avançar'.");
         LogApplicationStep(link, "fallback_submit_clicked", true, "Envio direto realizado sem etapa Avançar.");
+        WaitForAndDismissPostSubmitSuccessModal(driver, link);
         return true;
     }
 
@@ -1237,7 +1401,10 @@ partial class Program
                         }
                     }
 
-                    var modals = d.FindElements(By.CssSelector("div.jobs-easy-apply-modal[role='dialog'], div.jobs-easy-apply-modal"));
+                    var modals = d.FindElements(By.CssSelector(
+                        "dialog[data-testid='dialog'][open], dialog[open], [data-testid='dialog'], " +
+                        "div.jobs-easy-apply-modal[role='dialog'], div.jobs-easy-apply-modal, " +
+                        "div[data-sdui-screen*='easyapply'], div[data-testid='dialog-content'], dialog"));
                     foreach (var modal in modals)
                     {
                         try
@@ -1251,6 +1418,12 @@ partial class Program
                         {
                             // Ignora e tenta próximos modais.
                         }
+                    }
+
+                    var activeModalNow = TryFindActiveEasyApplyModal(d);
+                    if (activeModalNow != null)
+                    {
+                        return "active_modal_found";
                     }
 
                     // Em fluxos SDUI, o URL pode mudar antes do UI estar realmente interativa.
@@ -1309,18 +1482,7 @@ partial class Program
             {
                 try
                 {
-                    var modal = d.FindElements(By.CssSelector("div.jobs-easy-apply-modal[role='dialog'], div.jobs-easy-apply-modal"))
-                        .FirstOrDefault(m =>
-                        {
-                            try
-                            {
-                                return m.Displayed;
-                            }
-                            catch
-                            {
-                                return false;
-                            }
-                        });
+                    var modal = TryFindActiveEasyApplyModal(d);
 
                     if (modal == null)
                     {
@@ -1328,7 +1490,7 @@ partial class Program
                     }
 
                     var contactTitles = modal.FindElements(By.XPath(
-                        ".//*[self::h3 or self::h2 or self::span or self::div][contains(normalize-space(.),'Informações de contato') or contains(normalize-space(.),'Contact information') or contains(normalize-space(.),'Contact info')]"));
+                        ".//*[self::h3 or self::h2 or self::h1 or self::span or self::div or self::p][contains(normalize-space(.),'Informações de contato') or contains(normalize-space(.),'Contact information') or contains(normalize-space(.),'Contact info') or contains(normalize-space(.),'Candidate-se') or contains(normalize-space(.),'Apply')]"));
 
                     var hasContactInfoTitle = contactTitles.Any(e =>
                     {
@@ -1342,31 +1504,22 @@ partial class Program
                         }
                     });
 
-                    if (!hasContactInfoTitle)
-                    {
-                        return false;
-                    }
-
                     // Evita validação hard-coded de dados do perfil (nome/local/cargo) para funcionar em qualquer conta.
                     // Em vez disso, confirma a presença de campos comuns de contato (email/telefone) quando existirem.
                     var contactFieldCandidates = modal.FindElements(By.CssSelector(
-                        "input[type='email'], input[type='tel'], input[name*='email' i], input[id*='email' i], input[name*='phone' i], input[id*='phone' i], input[name*='telefone' i], input[id*='telefone' i]"));
+                        "input, select, textarea"));
 
-                    // Alguns layouts exibem apenas texto de contato (sem inputs editáveis). Aceita como válido nesse caso.
                     var hasAnyContactField = contactFieldCandidates.Any(e =>
                     {
                         try { return e.Displayed; } catch { return false; }
                     });
 
                     var footerNextButtons = modal.FindElements(By.CssSelector(
-                        "form footer button[data-easy-apply-next-button][data-live-test-easy-apply-next-button], " +
-                        "form footer button[data-live-test-easy-apply-next-button], " +
-                        "form footer button[data-easy-apply-next-button], " +
-                        "form footer button[aria-label*='Avançar'], " +
-                        "form footer button[aria-label*='Next'], " +
-                        "form footer button[aria-label*='Continuar'], " +
-                        "form footer button[aria-label*='Continue'], " +
-                        "form footer button.artdeco-button--primary"
+                        "form footer button, footer button, " +
+                        "button[data-easy-apply-next-button], " +
+                        "button[aria-label*='Avançar'], button[aria-label*='Next'], " +
+                        "button[aria-label*='Continuar'], button[aria-label*='Continue'], " +
+                        "button.artdeco-button--primary"
                     ));
 
                     var hasAnyFooterNextButton = footerNextButtons.Any(btn =>
@@ -1374,9 +1527,29 @@ partial class Program
                         try { return btn.Displayed; } catch { return false; }
                     });
 
-                    // Considera válido quando o modal de contato está presente e há um botão primário no rodapé.
-                    // Se o botão estiver desabilitado, a etapa seguinte vai registrar isso (para depuração).
-                    return hasAnyFooterNextButton && (hasAnyContactField || contactTitles.Count > 0);
+                    if (!hasAnyFooterNextButton)
+                    {
+                        hasAnyFooterNextButton = modal.FindElements(By.TagName("button")).Any(btn =>
+                        {
+                            try
+                            {
+                                if (!btn.Displayed) return false;
+                                var t = (btn.Text ?? string.Empty).Trim();
+                                return t.Equals("Avançar", StringComparison.OrdinalIgnoreCase)
+                                    || t.Equals("Revisar", StringComparison.OrdinalIgnoreCase)
+                                    || t.Equals("Avaliar", StringComparison.OrdinalIgnoreCase)
+                                    || t.Equals("Evaluar", StringComparison.OrdinalIgnoreCase)
+                                    || t.Equals("Next", StringComparison.OrdinalIgnoreCase)
+                                    || t.Equals("Review", StringComparison.OrdinalIgnoreCase)
+                                    || t.Equals("Enviar candidatura", StringComparison.OrdinalIgnoreCase)
+                                    || t.Equals("Submit application", StringComparison.OrdinalIgnoreCase);
+                            }
+                            catch { return false; }
+                        });
+                    }
+
+                    // Considera válido quando o modal de candidatura está presente e tem campos ou botão de avanço
+                    return hasAnyFooterNextButton || (hasAnyContactField && hasContactInfoTitle);
                 }
                 catch
                 {
@@ -1407,35 +1580,27 @@ partial class Program
     {
         try
         {
-            var quickWait = new WebDriverWait(driver, TimeSpan.FromSeconds(8));
+            var quickWait = new WebDriverWait(driver, TimeSpan.FromSeconds(12));
             var readyState = quickWait.Until(d =>
             {
                 try
                 {
-                    var submitVisible = d.FindElements(By.CssSelector(
-                        "button[data-live-test-easy-apply-submit-button], button[data-easy-apply-submit-button], button[aria-label*='Enviar'], button[aria-label*='Submit']"))
-                        .Any(btn =>
-                        {
-                            try { return btn.Displayed; } catch { return false; }
-                        });
-                    if (submitVisible)
+                    var submitBtn = TryFindSubmitButtonRobust(d);
+                    if (submitBtn != null)
                     {
-                        return "submit_visible";
+                        try { if (submitBtn.Displayed) return "submit_visible"; } catch { }
                     }
 
-                    var reviewVisible = d.FindElements(By.CssSelector(
-                        "button[data-live-test-easy-apply-review-button], button[aria-label*='Review'], button[aria-label*='Revis']"))
-                        .Any(btn =>
-                        {
-                            try { return btn.Displayed; } catch { return false; }
-                        });
-                    if (reviewVisible)
+                    var reviewCandidates = d.FindElements(By.CssSelector("button[data-live-test-easy-apply-review-button], button[aria-label*='Review'], button[aria-label*='Revis'], button[aria-label*='Avaliar'], button[aria-label*='Evaluar']"))
+                        .Concat(d.FindElements(By.XPath(".//button[contains(@aria-label,'Revise sua candidatura') or contains(@aria-label,'Review your application') or contains(@aria-label,'Avaliar') or contains(@aria-label,'Evaluar') or contains(normalize-space(.),'Revisar') or contains(normalize-space(.),'Review') or contains(normalize-space(.),'Avaliar') or contains(normalize-space(.),'Evaluar')]")));
+                    if (reviewCandidates.Any(btn => { try { return btn.Displayed; } catch { return false; } }))
                     {
                         return "review_visible";
                     }
 
                     var resumeVisible = d.FindElements(By.CssSelector(
-                        "input[type='radio'][name*='resume'], input[type='radio'][id*='resume'], label[for*='resume'], [data-test-document-upload-item], div.jobs-document-upload-redesign-card__container"))
+                        "input[type='radio'][name*='resume'], input[type='radio'][id*='resume'], label[for*='resume'], [data-test-document-upload-item], div.jobs-document-upload-redesign-card__container, input[type='radio'][aria-label*='.pdf'], input[type='radio'][name*='radio-group'], input[type='file']"))
+                        .Concat(d.FindElements(By.XPath(".//button[contains(normalize-space(.),'Carregar currículo') or contains(normalize-space(.),'Upload resume')]")))
                         .Any(el =>
                         {
                             try { return el.Displayed; } catch { return false; }
@@ -1447,6 +1612,7 @@ partial class Program
 
                     var nextVisible = d.FindElements(By.CssSelector(
                         "button[data-easy-apply-next-button], button[data-live-test-easy-apply-next-button], button[aria-label*='Avançar'], button[aria-label*='Next'], button[aria-label*='Continuar'], button[aria-label*='Continue']"))
+                        .Concat(d.FindElements(By.XPath(".//button[contains(normalize-space(.),'Avançar') or contains(normalize-space(.),'Next') or contains(normalize-space(.),'Continuar') or contains(normalize-space(.),'Voltar') or contains(normalize-space(.),'Back')]")))
                         .Any(btn =>
                         {
                             try { return btn.Displayed; } catch { return false; }
@@ -1454,6 +1620,12 @@ partial class Program
                     if (nextVisible)
                     {
                         return "next_visible";
+                    }
+
+                    var activeModal = TryFindActiveEasyApplyModal(d);
+                    if (activeModal != null && activeModal.FindElements(By.CssSelector("input, select, textarea")).Any(el => { try { return el.Displayed; } catch { return false; } }))
+                    {
+                        return "modal_fields_visible";
                     }
                 }
                 catch

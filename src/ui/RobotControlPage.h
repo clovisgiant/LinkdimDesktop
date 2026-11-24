@@ -207,7 +207,7 @@ private:
     // ── Membros de rede ──────────────────────────────────────
     QNetworkAccessManager* m_nam = nullptr;
     QWebSocket             m_ws;
-    QString m_apiBase = "https://linkdimdesktop.onrender.com"; // ← Sua URL real agora é o padrão
+    QString m_apiBase = "http://localhost:8000"; // ← Servidor local por padrão
 
     void buildUI() {
         auto* root = new QVBoxLayout(this);
@@ -224,7 +224,7 @@ private:
         auto* titleV = new QVBoxLayout();
         auto* title = new QLabel("Controle do Robô");
         title->setStyleSheet("color:#F0F4F8;font-size:22px;font-weight:bold;");
-        auto* sub = new QLabel("Orquestrador Render.com via API");
+        auto* sub = new QLabel("Orquestrador LinkDim via API");
         sub->setStyleSheet("color:#A39C93;font-size:11px;");
         titleV->addWidget(title); titleV->addWidget(sub);
         hdr->addLayout(titleV);
@@ -374,7 +374,7 @@ private:
         connect(&m_ws, &QWebSocket::connected, this, [wsStatus, this]{
             wsStatus->setText("● WebSocket conectado");
             wsStatus->setStyleSheet("color:#22C55E;font-size:11px;");
-            appendLog("✅ WebSocket conectado ao servidor Render.");
+            appendLog("✅ WebSocket conectado ao Servidor.");
         });
         connect(&m_ws, &QWebSocket::disconnected, this, [wsStatus, this]{
             wsStatus->setText("● Desconectado");
@@ -512,7 +512,7 @@ private slots:
 
     // POST /crawler/start
     void startCrawler() {
-        appendLog("▶ Enviando comando START ao Render...");
+        appendLog("▶ Enviando comando START ao Servidor...");
         QJsonObject body;
         body["max_apply_per_cycle"] = m_maxApply->value();
         body["cycle_wait_minutes"]  = m_cycleWait->value();
@@ -527,14 +527,14 @@ private slots:
                 m_pulse->setState(PulseIndicator::Error);
                 return;
             }
-            appendLog("✅ Crawler iniciado no Render!");
+            appendLog("✅ Crawler iniciado no Servidor!");
             setRunningState(true);
         });
     }
 
     // POST /crawler/stop
     void stopCrawler() {
-        appendLog("■ Enviando comando STOP ao Render...");
+        appendLog("■ Enviando comando STOP ao Servidor...");
         auto* reply = m_nam->post(makeRequest("/crawler/stop"), QByteArray("{}"));
         connect(reply, &QNetworkReply::finished, this, [this, reply]{
             reply->deleteLater();
@@ -552,7 +552,7 @@ private slots:
             appendLog("⚠️ Pare o robô antes de limpar a sessão.");
             return;
         }
-        appendLog("🧹 Solicitando limpeza de sessão no Render...");
+        appendLog("🧹 Solicitando limpeza de sessão no Servidor...");
         auto* reply = m_nam->post(makeRequest("/crawler/reset_session"), QByteArray("{}"));
         connect(reply, &QNetworkReply::finished, this, [this, reply]{
             reply->deleteLater();

@@ -1,10 +1,11 @@
 # =============================================================
-# render_backend/main.py — Orquestrador FastAPI
-# Deploy no Render.com como "Web Service"
+# render_backend/main.py — Orquestrador FastAPI para Linkdim
+# Suporta execução local e em servidor remoto
 # =============================================================
-import asyncio, os, subprocess, signal, time, threading
+import asyncio, os, sys, subprocess, signal, time, threading
 from datetime import datetime
 from typing import Optional, List
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -12,7 +13,20 @@ from pydantic import BaseModel
 import psycopg2
 import glob
 
-app = FastAPI(title="LinkDim Crawler API", version="1.0")
+# ── Lifespan events (novo padrão FastAPI) ────────────────────
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Salva o loop principal para ser usado pelas threads de log
+    app.main_loop = asyncio.get_running_loop()
+    yield
+    # Shutdown: Cleanup se necessário
+    pass
+
+app = FastAPI(
+    title="LinkDim Crawler API",
+    version="1.0",
+    lifespan=lifespan
+)
 app.add_middleware(CORSMiddleware, allow_origins=["*"],
                    allow_methods=["*"], allow_headers=["*"])
 
@@ -31,6 +45,28 @@ class CrawlerState:
         "session_cookie":      ""
     }
     log_subscribers: list = []
+    
+    # Detecção de ambiente para execução local
+    is_windows = os.name == 'nt'
+    
+    # Se estiver rodando compilado pelo PyInstaller (frozen), o executável fica na raiz
+    if getattr(sys, 'frozen', False):
+        root_dir = os.path.dirname(sys.executable)
+    else:
+        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        
+    # Prioridade: Env Var > Pasta 'WebCrawler_Bin' ou 'WebCrawler' no root > /app/crawler (Render)
+    if is_windows:
+        default_crawler_dir = os.path.join(root_dir, "WebCrawler_Bin")
+        if not os.path.exists(default_crawler_dir):
+            default_crawler_dir = os.path.join(root_dir, "WebCrawler")
+    else:
+        # Para Linux/Mac: usar /app/crawler apenas se não for Windows
+        default_crawler_dir = os.path.join(root_dir, "WebCrawler_Bin")
+        if not os.path.exists(default_crawler_dir):
+            default_crawler_dir = os.path.join(root_dir, "WebCrawler")
+        
+    crawler_dir = os.environ.get("WEBCRAWLER_DIR", default_crawler_dir)
 
 state = CrawlerState()
 
@@ -82,11 +118,6 @@ def sync_broadcast(msg: str):
     except Exception:
         pass
 
-@app.on_event("startup")
-async def startup_event():
-    # Salva o loop principal para ser usado pelas threads de log
-    app.main_loop = asyncio.get_running_loop()
-
 # ── Lê stdout/stderr do subprocess e envia via WebSocket ─────
 def stream_process_output(proc: subprocess.Popen):
     sync_broadcast("🚀 [SISTEMA] Conectado ao fluxo de saída do robô. Aguardando mensagens...")
@@ -114,16 +145,7 @@ def stream_process_output(proc: subprocess.Popen):
     thread.start()
 
 # ── Endpoints REST ────────────────────────────────────────────
-@app.get("/crawler/status")
-def get_status():
-    # Verifica último heartbeat no banco
-    last_hb = None
-    conn_str = os.environ.get("WEBCRAWLER_DB_CONNECTION")
-    
-    if not conn_str:
-        last_hb = "Erro: Variável WEBCRAWLER_DB_CONNECTION não configurada no Render."
-        return {"status": state.status, "pid": state.process.pid if state.process else None, "last_heartbeat": last_hb, "config": state.config}
-
+# Status endpoint moved to line 207 below
 def connect_to_db(uri):
     if not uri: return None, "URI vazia"
     
@@ -139,7 +161,7 @@ def connect_to_db(uri):
             masked_uri = f"{prefix[0]}://***:***@{parts[1]}"
     
     errs = []
-    sync_broadcast(f"🔍 [DB] Tentando conectar ao banco: {masked_uri[:60]}...")
+    # sync_broadcast(f"🔍 [DB] Tentando conectar ao banco: {masked_uri[:60]}...")
 
     # Garantir prefixo correto para psycopg2
     if uri.startswith("postgres://"):
@@ -180,7 +202,7 @@ def get_status():
     conn_str = os.environ.get("WEBCRAWLER_DB_CONNECTION")
     
     if not conn_str:
-        last_hb = "Erro: Variável WEBCRAWLER_DB_CONNECTION não configurada no Render."
+        last_hb = "Erro: Variável WEBCRAWLER_DB_CONNECTION não configurada. Configure a variável de ambiente."
         return {"status": state.status, "pid": state.process.pid if state.process else None, "last_heartbeat": last_hb, "config": state.config}
 
     conn, db_err = connect_to_db(conn_str)
@@ -287,34 +309,55 @@ async def start_crawler(req: StartRequest):
     env["WEBCRAWLER_DISABLE_DATABASE"] = "false"
 
     try:
-        crawler_dir = "/app/crawler"
-        dll_path = os.path.join(crawler_dir, "WebCrawler.dll")
-        binary_path = os.path.join(crawler_dir, "WebCrawler")
+        crawler_dir = state.crawler_dir
+        
+        # Define caminhos baseados no SO
+        if state.is_windows:
+            binary_name = os.environ.get("WEBCRAWLER_BINARY", "WebCrawler.exe")
+            # Tenta encontrar no diretório configurado
+            binary_path = os.path.join(crawler_dir, binary_name)
+            # Se não achar, tenta fallback para WebCrawler.exe se for o caso
+            if not os.path.exists(binary_path) and binary_name == "LinkdimCrawler.exe":
+                fallback = os.path.join(crawler_dir, "WebCrawler.exe")
+                if os.path.exists(fallback):
+                    binary_path = fallback
+                    binary_name = "WebCrawler.exe"
+            
+            # Se ainda não achar, tenta na pasta de build se estiver rodando do root
+            if not os.path.exists(binary_path):
+                if getattr(sys, 'frozen', False):
+                    root_dir = os.path.dirname(sys.executable)
+                else:
+                    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                build_path = os.path.join(root_dir, "build_crawler", binary_name)
+                if os.path.exists(build_path):
+                    binary_path = build_path
+                    crawler_dir = os.path.dirname(build_path)
+        else:
+            binary_path = os.path.join(crawler_dir, "WebCrawler")
+            dll_path = os.path.join(crawler_dir, "WebCrawler.dll")
         
         await broadcast_log("🔍 [SISTEMA] Iniciando verificação de lançamento...")
         
         # Log de variáveis (sem senhas)
         await broadcast_log(f"📦 [SISTEMA] Termos: {req.search_terms} | Ciclo: {req.cycle_wait_minutes}min")
 
-        # Teste de eco para verificar se o pipe de logs está funcionando
-        try:
-            echo_test = subprocess.check_output(["echo", "PIPE_OK"], text=True).strip()
-            await broadcast_log(f"✅ Teste de Pipe OS: {echo_test}")
-        except Exception as e:
-            await broadcast_log(f"⚠️ Alerta de Pipe OS: {e}")
-
         # Passa a conexão limpa para o C#
         raw_conn = os.environ.get("WEBCRAWLER_DB_CONNECTION", "")
         clean_conn = raw_conn.strip().replace('"', '').replace("'", "")
         env["WEBCRAWLER_DB_CONNECTION"] = clean_conn
 
-        # 3. Verifica se o executável nativo existe
+        # 3. Verifica se o executável existe
         if os.path.exists(binary_path):
             await broadcast_log(f"✅ Usando execução direta: {binary_path}")
-            os.chmod(binary_path, 0o755)
+            if not state.is_windows:
+                os.chmod(binary_path, 0o755)
             cmd = [binary_path]
-        else:
+        elif not state.is_windows:
             cmd = ["dotnet", dll_path]
+        else:
+            await broadcast_log(f"❌ [ERRO] Binário não encontrado em: {binary_path}")
+            return {"ok": False, "msg": "Executável do crawler não encontrado."}
 
         await broadcast_log(f"🚀 Lançando processo: {' '.join(cmd)}")
         
@@ -342,7 +385,9 @@ async def start_crawler(req: StartRequest):
                     if not line and proc.poll() is not None:
                         break
                     if line:
-                        sync_broadcast(line.strip())
+                        msg = line.strip()
+                        print(f"🤖 [C#] {msg}") # Espelhamento no console do servidor
+                        sync_broadcast(msg)
                 
                 rc = proc.wait()
                 sync_broadcast(f"🏁 Processo encerrado (Código: {rc})")
@@ -445,9 +490,9 @@ def health():
 @app.get("/diag")
 async def list_diagnostics():
     """Lista arquivos de diagnóstico (capturas de tela HTML)"""
-    diag_dir = "/app/crawler/diagnostics"
+    diag_dir = os.path.join(state.crawler_dir, "diagnostics")
     if not os.path.exists(diag_dir):
-        return {"ok": False, "msg": "Diretório de diagnósticos não existe ainda."}
+        return {"ok": False, "msg": f"Diretório de diagnósticos não existe: {diag_dir}"}
     
     files = [f for f in os.listdir(diag_dir) if f.endswith(".html")]
     files.sort(reverse=True)
@@ -456,7 +501,7 @@ async def list_diagnostics():
 @app.get("/diag/{filename}")
 async def view_diagnostic(filename: str):
     """Exibe o conteúdo de um arquivo de diagnóstico"""
-    diag_path = os.path.join("/app/crawler/diagnostics", filename)
+    diag_path = os.path.join(state.crawler_dir, "diagnostics", filename)
     if not os.path.exists(diag_path):
         return {"error": "Arquivo não encontrado."}
     
@@ -468,7 +513,7 @@ async def view_diagnostic(filename: str):
 async def reset_session():
     """Limpa o diretório de perfil do Chrome para forçar novo login"""
     import shutil
-    crawler_dir = "/app/crawler"
+    crawler_dir = state.crawler_dir
     profile_dir = os.path.join(crawler_dir, "ChromeProfile")
     
     if state.status == "running":
@@ -487,3 +532,13 @@ async def reset_session():
 @app.get("/")
 def root():
     return {"service": "LinkDim Crawler API", "status": state.status}
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=port,
+        log_level="info"
+    )

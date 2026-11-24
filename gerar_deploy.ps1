@@ -28,10 +28,27 @@ Copy-Item "build_release\DashboardProject.exe" "Deploy\"
 if (Test-Path "fundo.jpg") {
     Copy-Item "fundo.jpg" "Deploy\"
 }
+if (Test-Path ".env") {
+    Copy-Item ".env" "Deploy\"
+}
 
 # 4. Injetar dependencias automaticas (DLLs do Qt e Runtime C++)
 Write-Host ">>> Coletando e copiando DLLs do Qt..." -ForegroundColor Yellow
 windeployqt --compiler-runtime "Deploy\DashboardProject.exe"
+
+# 4.1 Injetar DLLs do PostgreSQL (libpq e dependencias)
+Write-Host ">>> Coletando DLLs do PostgreSQL (libpq)..." -ForegroundColor Yellow
+$PG_BIN = "C:\Program Files\PostgreSQL\18\bin"
+if (Test-Path $PG_BIN) {
+    Copy-Item "$PG_BIN\libpq.dll" "Deploy\" -ErrorAction SilentlyContinue
+    Copy-Item "$PG_BIN\libcrypto-*.dll" "Deploy\" -ErrorAction SilentlyContinue
+    Copy-Item "$PG_BIN\libssl-*.dll" "Deploy\" -ErrorAction SilentlyContinue
+    Copy-Item "$PG_BIN\libintl-*.dll" "Deploy\" -ErrorAction SilentlyContinue
+    Copy-Item "$PG_BIN\libiconv-*.dll" "Deploy\" -ErrorAction SilentlyContinue
+    Write-Host "DLLs do PostgreSQL copiadas com sucesso." -ForegroundColor Green
+} else {
+    Write-Host "AVISO: Pasta do PostgreSQL nao encontrada em $PG_BIN. O driver SQL pode falhar no outro PC." -ForegroundColor Red
+}
 
 # 5. Compactar tudo num ZIP portatil
 Write-Host ">>> Gerando Arquivo ZIP Final..." -ForegroundColor Yellow

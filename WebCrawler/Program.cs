@@ -13,17 +13,25 @@ partial class Program
     private static bool PersistIgnoredLinksToFile = true;
     private static bool PersistSuccessfulLinksToFile = true;
     private static bool AutoFillMandatoryFieldsEnabled = true;
-    private static string AutoFillDefaultFirstName = "Clovis";
-    private static string AutoFillDefaultLastName = "Silva";
-    private static string AutoFillDefaultPhone = "11999999999";
-    private static string AutoFillDefaultLocation = "Sao Paulo";
-    private static string AutoFillDefaultEmail = "clovis.eduardosilva23@gmail.com";
-    private static string AutoFillDefaultWebsite = "";
-    private static string AutoFillDefaultLinkedIn = "";
-    private static string AutoFillDefaultGithub = "";
-    private static string AutoFillDefaultSalary = "7000";
+    private static string AutoFillDefaultFirstName = string.Empty;
+    private static string AutoFillDefaultLastName = string.Empty;
+    private static string AutoFillDefaultPhone = string.Empty;
+    private static string AutoFillDefaultLocation = "São Paulo";
+    private static string AutoFillDefaultCity = "São Paulo";
+    private static string AutoFillDefaultState = "São Paulo";
+    private static string AutoFillDefaultAddress = string.Empty;
+    private static string AutoFillDefaultZip = string.Empty;
+    private static string AutoFillDefaultEmail = string.Empty;
+    private static string AutoFillDefaultWebsite = string.Empty;
+    private static string AutoFillDefaultLinkedIn = string.Empty;
+    private static string AutoFillDefaultGithub = string.Empty;
+    private static string AutoFillDefaultEducation = string.Empty;
+    private static string AutoFillDefaultDegree = "Superior completo";
+    private static string AutoFillDefaultJobTitle = "Desenvolvedor Full Stack";
+    private static string AutoFillDefaultCurrentCompany = string.Empty;
+    private static string AutoFillDefaultSalary = "8000";
     private static string AutoFillDefaultGenericText = "Tenho experiencia compativel com a vaga e disponibilidade para atuar no escopo solicitado.";
-    private static int AutoFillDefaultYearsExperience = 10;
+    private static int AutoFillDefaultYearsExperience = 5;
     private static bool AutoFillDefaultCheckboxTrue = true;
     private static bool AutoFillDefaultWorkAuthorization = true;
     private static bool AutoFillDefaultNeedVisaSponsorship = false;
@@ -79,6 +87,7 @@ partial class Program
             var maxJobsToApplyPerCycle = GetOptionalIntEnv("WEBCRAWLER_MAX_APPLY_PER_CYCLE", testMode ? 2 : 15);
             var cycleWaitMinutes = GetOptionalIntEnv("WEBCRAWLER_CYCLE_WAIT_MINUTES", testMode ? 1 : 45);
             var usePersistentProfile = GetOptionalBoolEnv("WEBCRAWLER_USE_PERSISTENT_PROFILE", true);
+            var headless = GetOptionalBoolEnv("WEBCRAWLER_HEADLESS", false);
             var persistIgnoredLinks = GetOptionalBoolEnv("WEBCRAWLER_PERSIST_IGNORED_LINKS", true);
             var persistSuccessfulLinks = GetOptionalBoolEnv("WEBCRAWLER_PERSIST_SUCCESSFUL_LINKS", true);
             var autoFillMandatoryFields = GetOptionalBoolEnv("WEBCRAWLER_AUTO_FILL_MANDATORY_FIELDS", true);
@@ -113,6 +122,25 @@ partial class Program
             PersistIgnoredLinksToFile = persistIgnoredLinks;
             PersistSuccessfulLinksToFile = persistSuccessfulLinks;
             AutoFillMandatoryFieldsEnabled = autoFillMandatoryFields;
+            AutoFillDefaultEmail = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_EMAIL", Environment.GetEnvironmentVariable("LINKEDIN_USERNAME") ?? string.Empty);
+            AutoFillDefaultFirstName = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_FIRST_NAME", string.Empty);
+            AutoFillDefaultLastName = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_LAST_NAME", string.Empty);
+            AutoFillDefaultPhone = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_PHONE", string.Empty);
+            AutoFillDefaultLocation = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_LOCATION", "São Paulo");
+            AutoFillDefaultCity = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_CITY", "São Paulo");
+            AutoFillDefaultState = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_STATE", "São Paulo");
+            AutoFillDefaultAddress = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_ADDRESS", string.Empty);
+            AutoFillDefaultZip = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_ZIP", string.Empty);
+            AutoFillDefaultSalary = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_SALARY", "8000");
+            AutoFillDefaultYearsExperience = GetOptionalIntEnv("WEBCRAWLER_DEFAULT_YEARS_EXPERIENCE", 5);
+            AutoFillDefaultWebsite = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_WEBSITE", string.Empty);
+            AutoFillDefaultLinkedIn = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_LINKEDIN_URL", string.Empty);
+            AutoFillDefaultGithub = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_GITHUB_URL", string.Empty);
+            AutoFillDefaultEducation = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_EDUCATION", string.Empty);
+            AutoFillDefaultDegree = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_DEGREE", "Superior completo");
+            AutoFillDefaultJobTitle = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_JOB_TITLE", "Desenvolvedor Full Stack");
+            AutoFillDefaultCurrentCompany = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_CURRENT_COMPANY", string.Empty);
+            AutoFillDefaultGenericText = GetOptionalStringEnv("WEBCRAWLER_DEFAULT_GENERIC_TEXT", "Tenho experiencia compativel com a vaga e disponibilidade para atuar no escopo solicitado.");
             ConfigureHumanization(interactionDelayMinMs, interactionDelayMaxMs, applyDelayMinMs, applyDelayMaxMs, paginationDelayMinMs, paginationDelayMaxMs, activeHoursStart, activeHoursEnd);
 
             LoadIgnoredJobLinksFromDisk();
@@ -122,39 +150,49 @@ partial class Program
 
             while (true)
             {
-                WaitUntilWithinActiveHoursIfNeeded();
-                StartRuntimeHeartbeatLoop("running", "Iniciando novo ciclo do crawler.");
-                Console.WriteLine("Iniciando nova execução...");
-
-                if (DatabaseEnabled && !ValidateDatabaseConnection())
+                try 
                 {
-                    Console.WriteLine("Conexão com o banco indisponível. Aguardando 2 minuto(s)...");
-                    StopRuntimeHeartbeatLoop();
-                    SleepWithRuntimeHeartbeat(TimeSpan.FromMinutes(2), "waiting", "Banco indisponivel.");
-                    continue;
-                }
+                    WaitUntilWithinActiveHoursIfNeeded();
+                    StartRuntimeHeartbeatLoop("running", "Iniciando novo ciclo do crawler.");
+                    Console.WriteLine("\n[MOTOR] Iniciando nova execução...");
 
-                StartSuccessfulJobsCycle();
-
-                var allJobsLines = new List<string>();
-                StartSuccessfulJobsCycle();
-                var allJobsData = new List<(string Titulo, string Empresa, string Localizacao, string Link)>();
-                var isLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
-
-                Console.WriteLine("\n[C#] Abrindo navegador único para o ciclo completo (Economia de RAM)...");
-                var service = ChromeDriverService.CreateDefaultService();
-                using (var driver = new ChromeDriver(service, BuildChromeOptions(usePersistentProfile), TimeSpan.FromMinutes(3)))
-                {
-                    var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
-                    
-                    // 1. AUTENTICAÇÃO
-                    UpdateRuntimeHeartbeatLoopState("running", "Autenticando...");
-                    if (!EnsureAuthenticatedSession(driver, wait, linkedinUsername, linkedinPassword)) 
+                    if (DatabaseEnabled && !ValidateDatabaseConnection())
                     {
-                        Console.WriteLine("⚠️ Falha na autenticação. Pulando ciclo.");
+                        Console.WriteLine("Conexão com o banco indisponível. Aguardando 2 minuto(s)...");
+                        StopRuntimeHeartbeatLoop();
+                        SleepWithRuntimeHeartbeat(TimeSpan.FromMinutes(2), "waiting", "Banco indisponivel.");
+                        continue;
                     }
-                    else 
+
+                    StartSuccessfulJobsCycle();
+                    var allJobsData = new List<(string Titulo, string Empresa, string Localizacao, string Link)>();
+
+                    Console.WriteLine("[MOTOR] Abrindo navegador único para o ciclo completo...");
+                    var service = ChromeDriverService.CreateDefaultService();
+                    service.SuppressInitialDiagnosticInformation = true;
+                    service.HideCommandPromptWindow = true;
+                    
+                    using (var driver = CreateRobustChromeDriver(service, BuildChromeOptions(headless, usePersistentProfile), TimeSpan.FromMinutes(3)))
                     {
+                        var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
+                        
+                        // 1. AUTENTICAÇÃO
+                        UpdateRuntimeHeartbeatLoopState("running", "Autenticando...");
+                        if (!EnsureAuthenticatedSession(driver, wait, linkedinUsername, linkedinPassword)) 
+                        {
+                            ApplyExponentialBackoff("Falha na autenticação ou desafio de segurança (CAPTCHA) não resolvido.");
+                            driver.Quit();
+                            continue;
+                        }
+
+                        // Verificação de segurança pós-login
+                        if (DetectBotInterruption(driver))
+                        {
+                            ApplyExponentialBackoff("LinkedIn detectou atividade suspeita logo após o login.");
+                            driver.Quit();
+                            continue;
+                        }
+
                         // 2. BUSCA POR TERMOS
                         if (useJobsSearchEntry)
                         {
@@ -166,6 +204,8 @@ partial class Program
 
                                 if (TryPrepareJobsSearchEntry(driver, searchTerm))
                                 {
+                                    if (DetectBotInterruption(driver)) break;
+
                                     var currentTermJobs = new List<(string Titulo, string Empresa, string Localizacao, string Link)>();
                                     var dummyLines = new List<string>();
                                     if (TryCollectJobsFromCurrentResults(driver, wait, dummyLines, currentTermJobs, maxPagesPerCycle, $"termo '{searchTerm}'"))
@@ -173,16 +213,17 @@ partial class Program
                                         allJobsData.AddRange(currentTermJobs);
                                     }
                                 }
-                                // Pausa leve entre buscas na mesma aba
-                                Thread.Sleep(3000);
+                                
+                                // Pausa humana entre termos de busca
+                                PauseBetweenFlowSteps("Intervalo entre termos de busca", log: true);
                             }
                         }
 
-                        // 3. COLEÇÃO EASY APPLY (Se nada foi coletado antes)
-                        if (allJobsData.Count == 0)
+                        // 3. COLEÇÃO EASY APPLY (Fallback)
+                        if (allJobsData.Count == 0 && !DetectBotInterruption(driver))
                         {
                             UpdateRuntimeHeartbeatLoopState("running", "Coletando Coleção Easy Apply.");
-                            Console.WriteLine("\n[C#] Nada encontrado na busca. Tentando Coleção Easy Apply...");
+                            Console.WriteLine("\n[MOTOR] Nada encontrado na busca. Tentando Coleção Easy Apply...");
                             driver.Navigate().GoToUrl(GetEasyApplyCollectionEntryUrlForCycle());
                             var dummyLines = new List<string>();
                             TryCollectJobsFromCurrentResults(driver, wait, dummyLines, allJobsData, maxPagesPerCycle, "coleção Easy Apply");
@@ -190,10 +231,10 @@ partial class Program
 
                         // DEDUPLICAÇÃO
                         allJobsData = NormalizeAndDeduplicateJobs(allJobsData);
-                        Console.WriteLine($"\nTotal de vagas únicas coletadas: {allJobsData.Count}");
+                        Console.WriteLine($"\n[SUCESSO] Total de vagas únicas coletadas: {allJobsData.Count}");
 
                         // 4. CANDIDATURAS
-                        if (maxJobsToApplyPerCycle > 0 && allJobsData.Count > 0)
+                        if (maxJobsToApplyPerCycle > 0 && allJobsData.Count > 0 && !DetectBotInterruption(driver))
                         {
                             UpdateRuntimeHeartbeatLoopState("running", $"Candidatando ({allJobsData.Count} vagas)...");
                             if (!disableDatabase)
@@ -207,25 +248,111 @@ partial class Program
                                 ApplySimplifiedJobsFromLinks(driver, links, maxJobsToApplyPerCycle);
                             }
                         }
+
+                        Console.WriteLine("[C#] Ciclo finalizado com sucesso. Fechando navegador...");
+                        ResetFailures(); // Sucesso limpa o histórico de erros para o Backoff
+                        driver.Quit();
                     }
 
-                    Console.WriteLine("[C#] Ciclo finalizado. Fechando navegador...");
-                    driver.Quit();
+                    PrintSuccessfulJobsCycleSummary();
+                    PrintVagasTabela(allJobsData);
+
+                    Console.WriteLine("[MOTOR] Ciclo concluido. Limpando memória...");
+                    StopRuntimeHeartbeatLoop();
+                    SleepWithRuntimeHeartbeat(TimeSpan.FromMinutes(cycleWaitMinutes), "waiting", "Aguardando proximo ciclo.");
                 }
-
-                PrintSuccessfulJobsCycleSummary();
-                PrintVagasTabela(allJobsData);
-
-                Console.WriteLine("Ciclo concluido. Limpando memória...");
-                StopRuntimeHeartbeatLoop();
-                SleepWithRuntimeHeartbeat(TimeSpan.FromMinutes(cycleWaitMinutes), "waiting", "Aguardando proximo ciclo.");
+                catch (Exception ex)
+                {
+                    Console.WriteLine("\n❌ [C#] ERRO NO CICLO DE EXECUÇÃO:");
+                    Console.WriteLine("Mensagem: " + ex.Message);
+                    if (ex.Message.Contains("429") || ex.Message.Contains("security")) 
+                    {
+                        ApplyExponentialBackoff("Erro HTTP 429 ou bloqueio de rede detectado.");
+                    }
+                    else 
+                    {
+                        Thread.Sleep(10000); // Erro genérico, espera 10s antes de tentar de novo
+                    }
+                }
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine("❌ [C#] ERRO CRÍTICO FATAL NO MOTOR:");
+            Console.WriteLine("❌ [C#] ERRO CRÍTICO FATAL NO MOTOR (FORA DO LOOP):");
             Console.WriteLine("Mensagem: " + ex.Message);
             Console.WriteLine("StackTrace: " + ex.StackTrace);
+            try
+            {
+                var logPath = Path.Combine(AppContext.BaseDirectory, "fatal_error.log");
+                File.WriteAllText(logPath, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {ex}\n");
+            }
+            catch { }
+
+            if (!Console.IsInputRedirected)
+            {
+                Console.WriteLine("\nPressione ENTER para fechar...");
+                try { Console.ReadLine(); } catch { }
+            }
+        }
+    }
+
+    private static bool DetectBotInterruption(IWebDriver driver)
+    {
+        try 
+        {
+            var url = (driver.Url ?? "").ToLowerInvariant();
+            var title = (driver.Title ?? "").ToLowerInvariant();
+
+            // 1. Verifica se a URL caiu em rotas clássicas de desafio ou bloqueio
+            bool isCheckpointUrl = url.Contains("/checkpoint/") || 
+                                   url.Contains("/challenge/") || 
+                                   url.Contains("/uas/consumer-captcha") ||
+                                   url.Contains("/security-check");
+
+            // 2. Verifica se o título da página indica explicitamente bloqueio ou erro HTTP
+            bool isBlockedTitle = title.Contains("security verification") || 
+                                  title.Contains("verificação de segurança") || 
+                                  title.Contains("quick verification") ||
+                                  title.Contains("challenge | linkedin") ||
+                                  title.Contains("429") || 
+                                  title.Contains("too many requests") || 
+                                  title.Contains("bloqueio temporário");
+
+            // 3. Verifica se há elementos visíveis de CAPTCHA ou desafio no DOM (não busca dentro de scripts minificados)
+            bool hasVisibleChallengeElement = false;
+            try
+            {
+                var challengeElements = driver.FindElements(By.CssSelector(
+                    "iframe[src*='arkose'], iframe[src*='captcha'], iframe[src*='challenge'], #captcha-internal, .checkpoint-container, .challenge-dialog, input#input__email_verification_pin, div[data-test-id*='challenge']"
+                ));
+                hasVisibleChallengeElement = challengeElements.Any(el => { try { return el.Displayed; } catch { return false; } });
+            }
+            catch { }
+
+            // Se não há indicativo real de bloqueio: sessão normal
+            if (!isCheckpointUrl && !isBlockedTitle && !hasVisibleChallengeElement)
+            {
+                return false;
+            }
+
+            Console.WriteLine($"\n⚠️ [AVISO] Possível desafio ou verificação detectada (URL: {url}, Título: {title}).");
+            
+            // Dá oportunidade de 2 minutos para resolução manual no navegador aberto se for desafio interativo
+            WaitForManualLoginIfNeeded(driver, TimeSpan.FromMinutes(2));
+
+            // Reavalia após a janela de espera
+            if (IsLoggedIn(driver))
+            {
+                Console.WriteLine("✅ [C#] Sessão normalizada após verificação! Prosseguindo...");
+                ResetFailures();
+                return false;
+            }
+
+            return true;
+        } 
+        catch 
+        { 
+            return false; 
         }
     }
 }

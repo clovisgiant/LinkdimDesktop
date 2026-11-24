@@ -16,7 +16,7 @@ partial class Program
             
             if (isLinux)
             {
-                Console.WriteLine($"[C#] Ambiente Render detectado. Usando navegação direta via URL para economizar RAM (Busca: {selectedSearchTerm}).");
+                Console.WriteLine($"[C#] Sistema Linux detectado. Usando navegação direta via URL para economizar RAM (Busca: {selectedSearchTerm}).");
                 return TryOpenJobsSearchViaUrl(driver, selectedSearchTerm);
             }
 

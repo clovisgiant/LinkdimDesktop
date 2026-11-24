@@ -1,0 +1,21 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /linkdin/
+
+  # Redireciona chamadas da API para o script PHP api/index.php
+  RewriteRule ^api/(.*)$ api/index.php?endpoint=$1 [QSA,L]
+  RewriteRule ^api$ api/index.php [QSA,L]
+
+  # Se for arquivo ou pasta física existente, entrega diretamente
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Caso contrário, entrega o index.html do React
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Charset e MIME Types para Locaweb
+AddDefaultCharset UTF-8
+AddType application/javascript .js
+AddType text/css .css

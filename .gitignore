@@ -1,6 +1,17 @@
-# ── Binários e build ────────────────────────────────────────
+# ── Binários e build (.NET / C++ / Node) ─────────────────────
 build/
 build_*/
+**/bin/
+**/obj/
+WebCrawler/publish*/
+WebCrawler_Bin/
+dist/
+LinkdimWeb/dist/
+**/node_modules/
+**/__pycache__/
+*.pyc
+*.spec
+.venv/
 *.exe
 *.obj
 *.o
@@ -29,10 +40,23 @@ moc_predefs.h
 .qt/
 QtDeployTargets.cmake
 
-# ── Credenciais (NUNCA no git!) ──────────────────────────────
+# ── Credenciais e Configurações Sensíveis (NUNCA no git!) ────
 .env
 *.env
+**/.env
+**/*.env
 !.env.example
+!**/.env.example
+**/config.local.php
+**/ChromeProfile/
+
+# ── Diagnósticos, Logs e Dados de Execução ───────────────────
+**/diagnostics/
+*vagas_enviadas*.txt
+*vagas_linkedin*.txt
+*ignored_job_links*.txt
+*teste_output*.txt
+LinkdimWeb/dashboard.json
 
 # ── Windows ──────────────────────────────────────────────────
 desktop.ini
@@ -50,3 +74,4 @@ $RECYCLE.BIN/
 *.zip
 Dashboard_Standalone/
 Deploy/
+Deploy_*/

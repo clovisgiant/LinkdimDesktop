@@ -12,9 +12,35 @@ partial class Program
             var raw = Environment.GetEnvironmentVariable("WEBCRAWLER_DB_CONNECTION");
             if (string.IsNullOrWhiteSpace(raw))
             {
-                throw new InvalidOperationException("Defina a variável de ambiente WEBCRAWLER_DB_CONNECTION.");
+                return string.Empty;
             }
             return ParsePostgresUrlIfNeeded(raw.Trim().Trim('"'));
+        }
+    }
+
+    private static string MySqlConnectionString
+    {
+        get
+        {
+            var raw = Environment.GetEnvironmentVariable("WEBCRAWLER_MYSQL_CONNECTION");
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return string.Empty;
+            }
+            return raw.Trim().Trim('"');
+        }
+    }
+
+    private static string DatabaseProvider
+    {
+        get
+        {
+            var p = Environment.GetEnvironmentVariable("WEBCRAWLER_DB_PROVIDER");
+            if (string.IsNullOrWhiteSpace(p))
+            {
+                return "dual"; // Dual: salva no MySQL e espelha no PostgreSQL
+            }
+            return p.Trim().ToLowerInvariant();
         }
     }
 
@@ -144,14 +170,27 @@ partial class Program
 
     private static void LoadEnvFileIfExists()
     {
-        var candidates = new[]
+        var candidatePaths = new List<string>
         {
             Path.Combine(Directory.GetCurrentDirectory(), ".env"),
             Path.Combine(Directory.GetCurrentDirectory(), "..", ".env"),
-            Path.Combine(Directory.GetCurrentDirectory(), "WebCrawler", ".env")
+            Path.Combine(Directory.GetCurrentDirectory(), "WebCrawler", ".env"),
+            Path.Combine(Directory.GetCurrentDirectory(), "publish-manual", ".env"),
+            Path.Combine(AppContext.BaseDirectory, ".env")
         };
 
-        foreach (var path in candidates)
+        // Sobe até 4 níveis a partir do diretório atual e do BaseDirectory
+        foreach (var startDir in new[] { Directory.GetCurrentDirectory(), AppContext.BaseDirectory })
+        {
+            var dir = new DirectoryInfo(startDir);
+            for (int i = 0; i < 4 && dir != null; i++, dir = dir.Parent)
+            {
+                candidatePaths.Add(Path.Combine(dir.FullName, ".env"));
+                candidatePaths.Add(Path.Combine(dir.FullName, "publish-manual", ".env"));
+            }
+        }
+
+        foreach (var path in candidatePaths.Distinct(StringComparer.OrdinalIgnoreCase))
         {
             try
             {

@@ -40,6 +40,38 @@ partial class Program
                     "a.job-card-container__link",
                     "a.job-card-list__title");
 
+                // Suporte ao novo layout SDUI (componentkey="job-card-component-ref-<JOB_ID>")
+                var componentKey = card.GetAttribute("componentkey") ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(link) && componentKey.StartsWith("job-card-component-ref-", StringComparison.OrdinalIgnoreCase))
+                {
+                    var jobId = componentKey.Substring("job-card-component-ref-".Length).Trim();
+                    if (!string.IsNullOrWhiteSpace(jobId))
+                    {
+                        link = $"https://www.linkedin.com/jobs/view/{jobId}/";
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(company))
+                {
+                    var paragraphs = card.FindElements(By.TagName("p"));
+                    if (string.IsNullOrWhiteSpace(title) && paragraphs.Count >= 1)
+                    {
+                        title = GetTextBySelectors(paragraphs[0], "span[aria-hidden='true']");
+                        if (string.IsNullOrWhiteSpace(title))
+                        {
+                            title = paragraphs[0].Text?.Trim() ?? string.Empty;
+                        }
+                    }
+                    if (string.IsNullOrWhiteSpace(company) && paragraphs.Count >= 2)
+                    {
+                        company = paragraphs[1].Text?.Trim() ?? string.Empty;
+                    }
+                    if (string.IsNullOrWhiteSpace(location) && paragraphs.Count >= 3)
+                    {
+                        location = paragraphs[2].Text?.Trim() ?? string.Empty;
+                    }
+                }
+
                 if (IsBudgetExhaustedJobLink(link))
                 {
                     Console.WriteLine("Vaga ignorada na coleta por eBP=BUDGET_EXHAUSTED_JOB.");
@@ -202,10 +234,14 @@ partial class Program
                 }
             }
 
-            var nextCandidates = driver.FindElements(By.XPath(
-                "//button[contains(translate(@aria-label, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'next') or " +
-                "contains(translate(@aria-label, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'próxima') or " +
-                "contains(translate(@aria-label, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'proxima')]"));
+            var nextCandidates = driver.FindElements(By.CssSelector("button[data-testid='pagination-controls-next-button-visible']"));
+            if (nextCandidates.Count == 0)
+            {
+                nextCandidates = driver.FindElements(By.XPath(
+                    "//button[contains(translate(@aria-label, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'next') or " +
+                    "contains(translate(@aria-label, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'próxima') or " +
+                    "contains(translate(@aria-label, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'proxima')]"));
+            }
 
             foreach (var candidate in nextCandidates)
             {
@@ -507,7 +543,10 @@ partial class Program
             Thread.Sleep(1000);
         } catch {}
 
-        var cards = driver.FindElements(By.CssSelector("ul.jobs-search-results__list > li, ul.scaffold-layout__list-container > li, li.jobs-search-results__list-item, .job-card-container, .job-card-list__entity-lockup"));
+        var cards = driver.FindElements(By.CssSelector(
+            "div[role='button'][componentkey^='job-card-component-ref-'], " +
+            "ul.jobs-search-results__list > li, ul.scaffold-layout__list-container > li, " +
+            "li.jobs-search-results__list-item, .job-card-container, .job-card-list__entity-lockup"));
         return cards;
     }
 
@@ -523,11 +562,16 @@ partial class Program
             // --- DIAGNÓSTICO DE TIMEOUT ---
             try {
                 string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                string diagPath = $"/app/crawler/diagnostics/{timestamp}_timeout_search.html";
-                System.IO.Directory.CreateDirectory("/app/crawler/diagnostics");
-                System.IO.File.WriteAllText(diagPath, driver.PageSource);
-                Console.WriteLine($"⚠️ [DIAG] Timeout na busca. Fonte salva em: {diagPath}");
-            } catch {}
+                string diagDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "diagnostics");
+                Directory.CreateDirectory(diagDir);
+                string diagPath = Path.Combine(diagDir, $"{timestamp}_timeout_search.html");
+                
+                File.WriteAllText(diagPath, driver.PageSource);
+                Console.WriteLine($"⚠️ [DIAG] Timeout na busca. URL Atual: {driver.Url}");
+                Console.WriteLine($"⚠️ [DIAG] Fonte da página salva em: {diagPath}");
+            } catch (Exception ex) {
+                Console.WriteLine($"Erro ao salvar diagnóstico: {ex.Message}");
+            }
 
             try {
                 driver.Navigate().Refresh();
@@ -542,16 +586,20 @@ partial class Program
     {
         try
         {
-            var cards = driver.FindElements(By.CssSelector("li.jobs-search-results__list-item, .job-card-container, .job-card-list__entity-lockup, ul.scaffold-layout__list-container li"));
+            const string cardSelector =
+                "div[role='button'][componentkey^='job-card-component-ref-'], " +
+                "li.jobs-search-results__list-item, .job-card-container, .job-card-list__entity-lockup, ul.scaffold-layout__list-container li";
+
+            var cards = driver.FindElements(By.CssSelector(cardSelector));
             if (cards.Count > 0) return true;
 
             try {
                 var js = (IJavaScriptExecutor)driver;
                 js.ExecuteScript("window.scrollBy(0, 800);");
-                js.ExecuteScript("var s = document.querySelector('.jobs-search-results-list, .scaffold-layout__list-container'); if(s) s.scrollTop += 500;");
+                js.ExecuteScript("var s = document.querySelector('.jobs-search-results-list, .scaffold-layout__list-container, [data-testid=\"lazy-column\"]'); if(s) s.scrollTop += 500;");
             } catch {}
 
-            return driver.FindElements(By.CssSelector("li.jobs-search-results__list-item, .job-card-container, .job-card-list__entity-lockup")).Count > 0;
+            return driver.FindElements(By.CssSelector(cardSelector)).Count > 0;
         }
         catch { return false; }
     }
