@@ -5,9 +5,76 @@ using System.Linq;
 
 partial class Program
 {
-    private static string ConnectionString =>
-        Environment.GetEnvironmentVariable("WEBCRAWLER_DB_CONNECTION")
-        ?? throw new InvalidOperationException("Defina a variável de ambiente WEBCRAWLER_DB_CONNECTION.");
+    private static string ConnectionString
+    {
+        get
+        {
+            var raw = Environment.GetEnvironmentVariable("WEBCRAWLER_DB_CONNECTION");
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return string.Empty;
+            }
+            return ParsePostgresUrlIfNeeded(raw.Trim().Trim('"'));
+        }
+    }
+
+    private static string MySqlConnectionString
+    {
+        get
+        {
+            var raw = Environment.GetEnvironmentVariable("WEBCRAWLER_MYSQL_CONNECTION");
+            if (string.IsNullOrWhiteSpace(raw))
+            {
+                return string.Empty;
+            }
+            return raw.Trim().Trim('"');
+        }
+    }
+
+    private static string DatabaseProvider
+    {
+        get
+        {
+            var p = Environment.GetEnvironmentVariable("WEBCRAWLER_DB_PROVIDER");
+            if (string.IsNullOrWhiteSpace(p))
+            {
+                return "dual"; // Dual: salva no MySQL e espelha no PostgreSQL
+            }
+            return p.Trim().ToLowerInvariant();
+        }
+    }
+
+    private static string ParsePostgresUrlIfNeeded(string input)
+    {
+        if (!input.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) && 
+            !input.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+        {
+            return input;
+        }
+
+        try
+        {
+            var uri = new Uri(input);
+            var userInfo = uri.UserInfo.Split(':');
+            var user = userInfo[0];
+            var pass = userInfo.Length > 1 ? userInfo[1] : "";
+            var host = uri.Host;
+            var port = uri.Port > 0 ? uri.Port : 5432;
+            var database = uri.AbsolutePath.TrimStart('/');
+
+            // Remove parâmetros de query se existirem
+            if (database.Contains('?'))
+            {
+                database = database.Split('?')[0];
+            }
+
+            return $"Host={host};Port={port};Username={user};Password={pass};Database={database};SSL Mode=Prefer;Trust Server Certificate=true";
+        }
+        catch
+        {
+            return input; // Fallback para o original se falhar ao parsear
+        }
+    }
 
     private static string GetRequiredEnv(string name)
     {
@@ -103,14 +170,27 @@ partial class Program
 
     private static void LoadEnvFileIfExists()
     {
-        var candidates = new[]
+        var candidatePaths = new List<string>
         {
             Path.Combine(Directory.GetCurrentDirectory(), ".env"),
             Path.Combine(Directory.GetCurrentDirectory(), "..", ".env"),
-            Path.Combine(Directory.GetCurrentDirectory(), "WebCrawler", ".env")
+            Path.Combine(Directory.GetCurrentDirectory(), "WebCrawler", ".env"),
+            Path.Combine(Directory.GetCurrentDirectory(), "publish-manual", ".env"),
+            Path.Combine(AppContext.BaseDirectory, ".env")
         };
 
-        foreach (var path in candidates)
+        // Sobe até 4 níveis a partir do diretório atual e do BaseDirectory
+        foreach (var startDir in new[] { Directory.GetCurrentDirectory(), AppContext.BaseDirectory })
+        {
+            var dir = new DirectoryInfo(startDir);
+            for (int i = 0; i < 4 && dir != null; i++, dir = dir.Parent)
+            {
+                candidatePaths.Add(Path.Combine(dir.FullName, ".env"));
+                candidatePaths.Add(Path.Combine(dir.FullName, "publish-manual", ".env"));
+            }
+        }
+
+        foreach (var path in candidatePaths.Distinct(StringComparer.OrdinalIgnoreCase))
         {
             try
             {

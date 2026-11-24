@@ -30,6 +30,7 @@ add_executable(DashboardProject WIN32
     main.cpp
     src/ui/LinkedInDashboard.cpp
     src/ui/RobotControlPage.cpp
+    src/ui/LinkedInJobsPage.h
 )
 add_executable(cliente_teste cliente_teste.cpp)
 
@@ -67,6 +68,7 @@ target_include_directories(LinkdimCrawler PRIVATE
 target_link_libraries(LinkdimCrawler PRIVATE
     Qt6::Core
     Qt6::Network
+    Qt6::WebSockets
     Qt6::Sql
 )
 

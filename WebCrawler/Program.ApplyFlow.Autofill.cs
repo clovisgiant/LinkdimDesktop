@@ -24,23 +24,27 @@ partial class Program
                 return false;
             }
 
-            var requiredFields = modal.FindElements(By.CssSelector(
-                "input[required], select[required], textarea[required], " +
-                "input[aria-required='true'], select[aria-required='true'], textarea[aria-required='true']"));
-
-            if (requiredFields.Count == 0)
-            {
-                return false;
-            }
-
+            // 1. Primeiro resolve grupos de radio e checkboxes (incluindo inputs SDUI com opacity:0 onde field.Displayed é false)
             var updatedFields = 0;
             var updatedKeys = new List<string>();
 
-            foreach (var field in requiredFields)
+            updatedFields += TryAutoFillAllRadioGroupsInModal(driver, modal, updatedKeys);
+            updatedFields += TryAutoFillAllCheckboxesInModal(driver, modal, updatedKeys);
+
+            // 2. Busca todos os campos interativos de texto/select/textarea no modal ativo
+            var formFields = modal.FindElements(By.CssSelector(
+                "input:not([type='hidden']):not([type='submit']):not([type='button']):not([type='file']):not([type='radio']):not([type='checkbox']), select, textarea"));
+
+            foreach (var field in formFields)
             {
                 try
                 {
-                    if (!field.Displayed || IsElementDisabledOrReadonly(field))
+                    if (IsElementDisabledOrReadonly(field))
+                    {
+                        continue;
+                    }
+
+                    if (!IsElementVisibleOrRenderable(driver, field))
                     {
                         continue;
                     }
@@ -52,18 +56,7 @@ partial class Program
 
                     if (tag == "select")
                     {
-                        if (TryFillRequiredSelectField(field, hints))
-                        {
-                            updatedFields++;
-                            updatedKeys.Add(fieldKey);
-                        }
-
-                        continue;
-                    }
-
-                    if (type == "radio" || type == "checkbox")
-                    {
-                        if (TrySetRequiredBooleanField(driver, field, modal, hints))
+                        if (TryFillRequiredSelectField(driver, field, hints))
                         {
                             updatedFields++;
                             updatedKeys.Add(fieldKey);
@@ -88,7 +81,10 @@ partial class Program
                     var value = ResolveMandatoryFieldValue(hints, tag, type);
                     if (string.IsNullOrWhiteSpace(value))
                     {
-                        continue;
+                        // Fallback universal para nunca travar em campos vazios não mapeados
+                        value = (type == "number" || IsYearsExperienceQuestion(NormalizeForMatch(hints)))
+                            ? Math.Max(1, AutoFillDefaultYearsExperience).ToString()
+                            : (!string.IsNullOrWhiteSpace(AutoFillDefaultGenericText) ? AutoFillDefaultGenericText : "Sim");
                     }
 
                     if (TrySetInputValue(driver, field, value))
@@ -99,7 +95,7 @@ partial class Program
                 }
                 catch
                 {
-                    // Ignora campo pontual e segue tentativa nos demais obrigatórios.
+                    // Ignora campo pontual e segue tentativa nos demais
                 }
             }
 
@@ -130,22 +126,13 @@ partial class Program
         }
     }
 
-    private static bool TryFillRequiredSelectField(IWebElement selectField, string hints)
+    private static bool TryFillRequiredSelectField(IWebDriver driver, IWebElement selectField, string hints)
     {
         try
         {
             var selectElement = new SelectElement(selectField);
             var currentOption = selectElement.SelectedOption;
-
-            if (currentOption != null)
-            {
-                var currentText = currentOption.Text ?? string.Empty;
-                var currentValue = currentOption.GetAttribute("value") ?? string.Empty;
-                if (!IsPlaceholderOption(currentText, currentValue))
-                {
-                    return false;
-                }
-            }
+            var normalizedHints = NormalizeForMatch(hints);
 
             var candidates = selectElement.Options
                 .Where(opt =>
@@ -174,46 +161,102 @@ partial class Program
                 return false;
             }
 
-            var normalizedHints = NormalizeForMatch(hints);
+            var isEmailQuestion = candidates.Any(opt => (opt.Text ?? string.Empty).Contains("@") || (opt.GetAttribute("value") ?? string.Empty).Contains("@")) ||
+                                  normalizedHints.Contains("email", StringComparison.Ordinal) || 
+                                  normalizedHints.Contains("e-mail", StringComparison.Ordinal);
+
+            if (currentOption != null)
+            {
+                var currentText = (currentOption.Text ?? string.Empty).Trim();
+                var currentValue = (currentOption.GetAttribute("value") ?? string.Empty).Trim();
+
+                if (isEmailQuestion)
+                {
+                    if (!string.IsNullOrWhiteSpace(AutoFillDefaultEmail) &&
+                        (currentText.Contains(AutoFillDefaultEmail, StringComparison.OrdinalIgnoreCase) ||
+                         currentValue.Contains(AutoFillDefaultEmail, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        return false;
+                    }
+                    else if (string.IsNullOrWhiteSpace(AutoFillDefaultEmail) && !IsPlaceholderOption(currentText, currentValue))
+                    {
+                        return false;
+                    }
+                }
+                else if (!IsPlaceholderOption(currentText, currentValue))
+                {
+                    return false;
+                }
+            }
+
             IWebElement? chosen = null;
 
-            if (IsSensitiveDisclosureField(normalizedHints))
+            // 1. Sim ou Não -> sempre Sim
+            if (HasYesNoOptions(candidates))
             {
-                chosen = FindOptionContaining(candidates, "prefiro nao", "prefer not", "nao informar", "not say");
+                chosen = FindYesOption(candidates);
             }
-
-            if (chosen == null && IsWorkAuthorizationQuestion(normalizedHints))
+            // 2. Pergunta de e-mail (dropdown com emails vinculados da conta)
+            else if (isEmailQuestion)
             {
-                chosen = AutoFillDefaultWorkAuthorization
-                    ? FindYesOption(candidates)
-                    : FindNoOption(candidates);
-            }
+                if (!string.IsNullOrWhiteSpace(AutoFillDefaultEmail))
+                {
+                    chosen = FindOptionContaining(candidates, AutoFillDefaultEmail);
+                }
 
-            if (chosen == null && IsVisaSponsorshipQuestion(normalizedHints))
-            {
-                chosen = AutoFillDefaultNeedVisaSponsorship
-                    ? FindYesOption(candidates)
-                    : FindNoOption(candidates);
+                if (chosen == null && !string.IsNullOrWhiteSpace(AutoFillDefaultFirstName))
+                {
+                    var fnLower = AutoFillDefaultFirstName.ToLowerInvariant();
+                    chosen = candidates.FirstOrDefault(opt =>
+                    {
+                        var txt = (opt.Text ?? string.Empty).ToLowerInvariant();
+                        var val = (opt.GetAttribute("value") ?? string.Empty).ToLowerInvariant();
+                        return (txt.Contains(fnLower) || val.Contains(fnLower)) && (txt.Contains("@") || val.Contains("@"));
+                    });
+                }
             }
-
-            if (chosen == null && HasYesNoOptions(candidates))
-            {
-                chosen = AutoFillDefaultCheckboxTrue
-                    ? FindYesOption(candidates)
-                    : FindNoOption(candidates);
-            }
-
-            if (chosen == null && IsCountryQuestion(normalizedHints))
+            // 3. País / DDI do telefone (+55 Brasil)
+            else if (IsCountryQuestion(normalizedHints) || normalizedHints.Contains("codigo", StringComparison.Ordinal) || normalizedHints.Contains("pais", StringComparison.Ordinal) || normalizedHints.Contains("phone", StringComparison.Ordinal) || normalizedHints.Contains("tel", StringComparison.Ordinal))
             {
                 chosen = FindOptionContaining(candidates, "brasil", "brazil", "+55");
             }
-
-            if (chosen == null && IsYearsExperienceQuestion(normalizedHints))
+            // 4. Dados sensíveis (gênero, raça, deficiência)
+            else if (IsSensitiveDisclosureField(normalizedHints))
+            {
+                chosen = FindOptionContaining(candidates, "prefiro nao", "prefer not", "nao informar", "not say");
+            }
+            // 5. Proficiência / Idiomas
+            else if (normalizedHints.Contains("proficiency", StringComparison.Ordinal) || normalizedHints.Contains("proficiencia", StringComparison.Ordinal) || normalizedHints.Contains("idioma", StringComparison.Ordinal) || normalizedHints.Contains("ingles", StringComparison.Ordinal) || normalizedHints.Contains("english", StringComparison.Ordinal))
+            {
+                chosen = FindOptionContaining(candidates, "fluent", "fluente", "native", "nativo", "advanced", "avancado", "professional");
+            }
+            // 6. Anos de experiência em select
+            else if (IsYearsExperienceQuestion(normalizedHints))
             {
                 chosen = FindBestYearsOption(candidates, AutoFillDefaultYearsExperience);
             }
+            // 7. Autorização de trabalho / Visto
+            else if (IsWorkAuthorizationQuestion(normalizedHints))
+            {
+                chosen = AutoFillDefaultWorkAuthorization ? FindYesOption(candidates) : FindNoOption(candidates);
+            }
+            else if (IsVisaSponsorshipQuestion(normalizedHints))
+            {
+                chosen = AutoFillDefaultNeedVisaSponsorship ? FindYesOption(candidates) : FindNoOption(candidates);
+            }
+            // 8. Escolaridade / Formação
+            else if (normalizedHints.Contains("escolaridade", StringComparison.Ordinal) || normalizedHints.Contains("education", StringComparison.Ordinal) || normalizedHints.Contains("grau", StringComparison.Ordinal) || normalizedHints.Contains("degree", StringComparison.Ordinal))
+            {
+                chosen = FindOptionContaining(candidates, "superior", "graduacao", "bacharel", "bachelor", "pos", "master");
+            }
+            // 9. Como soube da vaga
+            else if (normalizedHints.Contains("hear about us", StringComparison.Ordinal) || normalizedHints.Contains("como soube", StringComparison.Ordinal) || normalizedHints.Contains("onde viu", StringComparison.Ordinal))
+            {
+                chosen = FindOptionContaining(candidates, "linkedin", "site", "internet");
+            }
 
-            if (chosen == null)
+            // Fallback universal para campos obrigatórios: seleciona a primeira opção válida para não travar o avanço
+            if (chosen == null && candidates.Count > 0)
             {
                 chosen = candidates[0];
             }
@@ -235,6 +278,38 @@ partial class Program
                 selectElement.SelectByText(chosenText);
             }
 
+            // Garante despacho nativo de eventos do React/SDUI via JavaScript
+            try
+            {
+                if (driver is IJavaScriptExecutor js)
+                {
+                    js.ExecuteScript(@"
+                        const select = arguments[0];
+                        const targetVal = arguments[1];
+                        const targetText = arguments[2];
+                        if (select) {
+                            const setter = Object.getOwnPropertyDescriptor(window.HTMLSelectElement.prototype, 'value')?.set;
+                            if (setter && targetVal) {
+                                setter.call(select, targetVal);
+                            } else if (targetVal) {
+                                select.value = targetVal;
+                            }
+                            for (let i = 0; i < select.options.length; i++) {
+                                if ((targetVal && select.options[i].value === targetVal) || 
+                                    (targetText && select.options[i].text.trim() === targetText.trim())) {
+                                    select.selectedIndex = i;
+                                    select.options[i].selected = true;
+                                    break;
+                                }
+                            }
+                            select.dispatchEvent(new Event('input', { bubbles: true }));
+                            select.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                    ", selectField, chosenValue, chosenText);
+                }
+            }
+            catch { }
+
             var selectedNow = selectElement.SelectedOption;
             if (selectedNow == null)
             {
@@ -251,32 +326,458 @@ partial class Program
         }
     }
 
-    private static bool TrySetRequiredBooleanField(IWebDriver driver, IWebElement field, IWebElement modal, string hints)
+    private static bool IsElementVisibleOrRenderable(IWebDriver driver, IWebElement element)
     {
-        var type = (field.GetAttribute("type") ?? string.Empty).Trim().ToLowerInvariant();
-        if (type == "checkbox")
+        try
         {
-            return TrySetRequiredCheckboxField(driver, field);
-        }
+            if (element.Displayed)
+            {
+                return true;
+            }
 
-        if (type == "radio")
-        {
-            return TrySetRequiredRadioField(driver, field, modal, hints);
+            if (driver is IJavaScriptExecutor js)
+            {
+                var res = js.ExecuteScript(@"
+                    const el = arguments[0];
+                    if (!el) return false;
+                    if (el.closest('[hidden], [aria-hidden=""true""]')) return false;
+                    const s = window.getComputedStyle(el);
+                    if (s.display === 'none' || s.visibility === 'hidden') return false;
+                    el.scrollIntoView({ block: 'center' });
+                    const r = el.getBoundingClientRect();
+                    return r.width > 0 && r.height > 0;
+                ", element);
+                return res is bool b && b;
+            }
         }
+        catch { }
 
         return false;
     }
 
-    private static bool TrySetRequiredCheckboxField(IWebDriver driver, IWebElement checkbox)
+    private static int TryAutoFillAllRadioGroupsInModal(IWebDriver driver, IWebElement modal, List<string> updatedKeys)
     {
-        if (!AutoFillDefaultCheckboxTrue)
+        try
         {
-            return false;
+            if (driver is not IJavaScriptExecutor js)
+            {
+                return 0;
+            }
+
+            var preferWorkAuth = AutoFillDefaultWorkAuthorization;
+            var needVisa = AutoFillDefaultNeedVisaSponsorship;
+            var firstNameToken = (AutoFillDefaultFirstName ?? string.Empty).Trim().ToLowerInvariant();
+
+            var result = js.ExecuteScript(@"
+                const modal = arguments[0];
+                const preferWorkAuth = arguments[1];
+                const needVisa = arguments[2];
+                const firstNameToken = arguments[3] || '';
+                if (!modal) return [];
+
+                const norm = (s) => (s || '')
+                    .toString()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .toLowerCase()
+                    .replace(/\s+/g, ' ')
+                    .trim();
+
+                const isVisibleGroupItem = (r) => {
+                    if (!r || r.disabled || r.getAttribute('aria-disabled') === 'true') return false;
+                    if (r.closest('[hidden], [aria-hidden=""true""]')) return false;
+                    const lbl = r.id ? modal.querySelector('label[for=""' + CSS.escape(r.id) + '""]') : null;
+                    const target = lbl || r.parentElement || r;
+                    const s = window.getComputedStyle(target);
+                    if (s.display === 'none' || s.visibility === 'hidden') return false;
+                    const rect = target.getBoundingClientRect();
+                    return rect.width > 0 && rect.height > 0;
+                };
+
+                const getOptionText = (r) => {
+                    if (r.id) {
+                        const lbl = modal.querySelector('label[for=""' + CSS.escape(r.id) + '""]');
+                        if (lbl) {
+                            const lt = (lbl.innerText || lbl.textContent || '').trim();
+                            if (lt) return lt;
+                        }
+                    }
+                    let p = r.parentElement;
+                    while (p && p !== modal && p.tagName !== 'FIELDSET') {
+                        const radiosInside = p.querySelectorAll('input[type=""radio""]').length;
+                        if (radiosInside === 1) {
+                            const txt = (p.innerText || p.textContent || '').trim();
+                            if (txt) return txt;
+                        }
+                        p = p.parentElement;
+                    }
+                    return (r.getAttribute('value') || r.getAttribute('aria-label') || '').trim();
+                };
+
+                const getQuestionText = (firstRadio, fs) => {
+                    const parts = [];
+                    const aria = firstRadio.getAttribute('aria-label') || '';
+                    if (aria) parts.push(aria);
+                    if (fs) {
+                        const leg = fs.querySelector('legend');
+                        if (leg) parts.push(leg.innerText || leg.textContent || '');
+                        const prev = fs.previousElementSibling;
+                        if (prev) parts.push(prev.innerText || prev.textContent || '');
+                        if (fs.parentElement) {
+                            const pEl = fs.parentElement.querySelector('p, label, span');
+                            if (pEl && !fs.contains(pEl)) parts.push(pEl.innerText || pEl.textContent || '');
+                        }
+                    }
+                    return parts.join(' ').trim();
+                };
+
+                const allRadios = Array.from(modal.querySelectorAll('input[type=""radio""]'));
+                const groups = new Map();
+                let anonIdx = 0;
+                const fsMap = new Map();
+
+                for (const r of allRadios) {
+                    if (!isVisibleGroupItem(r)) continue;
+                    const fs = r.closest('fieldset');
+                    let key = (r.getAttribute('name') || '').trim();
+                    if (!key) {
+                        if (fs) {
+                            if (!fsMap.has(fs)) fsMap.set(fs, 'fs_' + (anonIdx++));
+                            key = fsMap.get(fs);
+                        } else {
+                            key = 'single_' + (anonIdx++);
+                        }
+                    }
+                    if (!groups.has(key)) groups.set(key, { radios: [], fs });
+                    groups.get(key).radios.push(r);
+                }
+
+                const filled = [];
+
+                for (const [key, grp] of groups.entries()) {
+                    const radios = grp.radios;
+                    if (radios.length === 0) continue;
+
+                    // Se algum radio do grupo já está selecionado (ex.: currículo padrão), não mexe
+                    if (radios.some(r => r.checked)) continue;
+
+                    const qNorm = norm(getQuestionText(radios[0], grp.fs));
+                    const opts = radios.map(r => ({
+                        el: r,
+                        raw: getOptionText(r),
+                        n: norm(getOptionText(r)),
+                        aria: norm(r.getAttribute('aria-label') || '')
+                    }));
+
+                    // Caso currículo (.pdf / .doc)
+                    if (opts.some(o => o.aria.includes('.pdf') || o.n.includes('.pdf') || o.aria.includes('.doc'))) {
+                        let chosenResume = (firstNameToken ? opts.find(o => o.aria.includes(firstNameToken) || o.n.includes(firstNameToken)) : null) || opts[0];
+                        if (chosenResume) {
+                            const r = chosenResume.el;
+                            const lbl = r.id ? modal.querySelector('label[for=""' + CSS.escape(r.id) + '""]') : null;
+                            (lbl || r).scrollIntoView({ block: 'center' });
+                            if (lbl) lbl.click();
+                            if (!r.checked) r.click();
+                            if (r.checked) filled.push('radio:resume:' + (chosenResume.raw || key).slice(0, 50));
+                        }
+                        continue;
+                    }
+
+                    let chosen = null;
+
+                    const isNo = (s) => s === 'nao' || s === 'no' || s === 'false' || s.startsWith('nao ') || s.startsWith('nao,') || s.startsWith('no ') || s.startsWith('no,');
+                    const isYes = (s) => s === 'sim' || s === 'yes' || s === 'true' || s.startsWith('sim ') || s.startsWith('sim,') || s.startsWith('yes ') || s.startsWith('yes,') || s.includes('concordo') || s.includes('aceito') || s.includes('autorizo');
+
+                    // 1. Visto / Sponsorship -> Não
+                    if (qNorm.includes('sponsor') || qNorm.includes('patrocin') || qNorm.includes('visa')) {
+                        chosen = needVisa ? opts.find(o => isYes(o.n)) : opts.find(o => isNo(o.n));
+                    }
+                    // 2. Autorização de trabalho -> Sim
+                    else if (qNorm.includes('authorized') || qNorm.includes('autoriza') || qNorm.includes('work permit') || qNorm.includes('direito de trabalhar')) {
+                        chosen = preferWorkAuth ? opts.find(o => isYes(o.n)) : opts.find(o => isNo(o.n));
+                    }
+                    // 3. Dados sensíveis / PCD / diversidade -> Prefiro não informar ou Não (para PCD/veterano)
+                    else if (qNorm.includes('gender') || qNorm.includes('genero') || qNorm.includes('sexo') || qNorm.includes('race') || qNorm.includes('raca') || qNorm.includes('ethnic') || qNorm.includes('etnia') || qNorm.includes('veteran') || qNorm.includes('disability') || qNorm.includes('deficiencia') || qNorm.includes('pcd')) {
+                        chosen = opts.find(o => o.n.includes('prefiro nao') || o.n.includes('prefer not') || o.n.includes('nao informar') || o.n.includes('decline'));
+                        if (!chosen && (qNorm.includes('disability') || qNorm.includes('deficiencia') || qNorm.includes('pcd') || qNorm.includes('veteran'))) {
+                            chosen = opts.find(o => isNo(o.n));
+                        }
+                    }
+                    // 4. Inglês / Idioma / Proficiência (ex.: A1/A2, B1/B2, B2+, C1/C2, Avançado, Intermediário)
+                    else if (qNorm.includes('english') || qNorm.includes('ingles') || qNorm.includes('idioma') || qNorm.includes('language') || qNorm.includes('proficiency') || qNorm.includes('proficiencia') || opts.some(o => o.n === 'b1/b2' || o.n === 'b2+' || o.n === 'c1/c2')) {
+                        const langPrefs = ['b2+', 'c1', 'avancado', 'advanced', 'fluent', 'fluente', 'professional', 'profissional', 'b2', 'b1/b2', 'intermediario', 'intermediate'];
+                        for (const p of langPrefs) {
+                            chosen = opts.find(o => o.n.includes(p));
+                            if (chosen) break;
+                        }
+                    }
+                    // 5. Disponibilidade / Início / Notice period
+                    else if (qNorm.includes('available to start') || qNorm.includes('when would you') || qNorm.includes('quando pode') || qNorm.includes('disponibilidade') || qNorm.includes('notice') || qNorm.includes('aviso prev')) {
+                        const startPrefs = ['imediata', 'immediate', 'now', 'agora', '1 week', '1 semana', 'two weeks', '2 weeks', 'duas semanas', '15 dias'];
+                        for (const p of startPrefs) {
+                            chosen = opts.find(o => o.n.includes(p));
+                            if (chosen) break;
+                        }
+                        if (!chosen) chosen = opts[0];
+                    }
+
+                    // 6. Sim / Yes explícito
+                    if (!chosen) {
+                        chosen = opts.find(o => isYes(o.n));
+                    }
+
+                    // 7. Opções de frequência/experiência positiva (evita 'Nunca', 'Não', 'No', 'Never')
+                    if (!chosen) {
+                        const positivePrefs = ['frequentemente', 'significativa', 'extensa', 'avancad', 'senior', 'pleno', 'strong', 'extensive'];
+                        for (const p of positivePrefs) {
+                            chosen = opts.find(o => o.n.includes(p));
+                            if (chosen) break;
+                        }
+                    }
+
+                    if (!chosen) {
+                        chosen = opts.find(o => !isNo(o.n) && !o.n.includes('nunca') && !o.n.includes('never') && !o.n.includes('nao tenho') && !o.n.includes('nao possuo') && !o.n.includes('none'));
+                    }
+
+                    if (!chosen) {
+                        chosen = opts[0];
+                    }
+
+                    if (chosen && chosen.el) {
+                        const r = chosen.el;
+                        const lbl = r.id ? modal.querySelector('label[for=""' + CSS.escape(r.id) + '""]') : null;
+                        (lbl || r).scrollIntoView({ block: 'center' });
+                        if (lbl) {
+                            try { lbl.click(); } catch {}
+                        }
+                        if (!r.checked) {
+                            try { r.click(); } catch {}
+                        }
+                        if (!r.checked) {
+                            const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'checked')?.set;
+                            if (setter) setter.call(r, true);
+                            else r.checked = true;
+                            r.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                            r.dispatchEvent(new Event('input', { bubbles: true }));
+                            r.dispatchEvent(new Event('change', { bubbles: true }));
+                        }
+                        if (r.checked) {
+                            filled.push('radio:' + (qNorm || key).slice(0, 40) + '=' + (chosen.raw || '').slice(0, 30));
+                        }
+                    }
+                }
+
+                return filled;
+            ", modal, preferWorkAuth, needVisa, firstNameToken);
+
+            if (result is IReadOnlyList<object> list && list.Count > 0)
+            {
+                foreach (var item in list)
+                {
+                    var k = item?.ToString();
+                    if (!string.IsNullOrWhiteSpace(k))
+                    {
+                        updatedKeys.Add(k);
+                    }
+                }
+                return list.Count;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[AUTO-FILL] Aviso em grupos de radio: {ex.Message}");
         }
 
+        return 0;
+    }
+
+    private static int TryAutoFillAllCheckboxesInModal(IWebDriver driver, IWebElement modal, List<string> updatedKeys)
+    {
+        try
+        {
+            if (driver is not IJavaScriptExecutor js)
+            {
+                return 0;
+            }
+
+            var defaultCheckSingle = AutoFillDefaultCheckboxTrue;
+
+            var result = js.ExecuteScript(@"
+                const modal = arguments[0];
+                const defaultCheckSingle = arguments[1];
+                if (!modal) return [];
+
+                const norm = (s) => (s || '')
+                    .toString()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .toLowerCase()
+                    .replace(/\s+/g, ' ')
+                    .trim();
+
+                const isVisibleItem = (cb) => {
+                    if (!cb || cb.disabled || cb.getAttribute('aria-disabled') === 'true') return false;
+                    if (cb.closest('[hidden], [aria-hidden=""true""]')) return false;
+                    const lbl = cb.id ? modal.querySelector('label[for=""' + CSS.escape(cb.id) + '""]') : null;
+                    const target = lbl || cb.parentElement || cb;
+                    const s = window.getComputedStyle(target);
+                    if (s.display === 'none' || s.visibility === 'hidden') return false;
+                    const rect = target.getBoundingClientRect();
+                    return rect.width > 0 && rect.height > 0;
+                };
+
+                const getOptionText = (cb) => {
+                    if (cb.id) {
+                        const lbl = modal.querySelector('label[for=""' + CSS.escape(cb.id) + '""]');
+                        if (lbl) {
+                            const lt = (lbl.innerText || lbl.textContent || '').trim();
+                            if (lt) return lt;
+                        }
+                    }
+                    let p = cb.parentElement;
+                    while (p && p !== modal && p.tagName !== 'FIELDSET') {
+                        const countInside = p.querySelectorAll('input[type=""checkbox""]').length;
+                        if (countInside === 1) {
+                            const txt = (p.innerText || p.textContent || '').trim();
+                            if (txt) return txt;
+                        }
+                        p = p.parentElement;
+                    }
+                    return (cb.getAttribute('aria-label') || cb.getAttribute('name') || '').trim();
+                };
+
+                const clickCheckbox = (cb) => {
+                    const lbl = cb.id ? modal.querySelector('label[for=""' + CSS.escape(cb.id) + '""]') : null;
+                    (lbl || cb).scrollIntoView({ block: 'center' });
+                    if (lbl) {
+                        try { lbl.click(); } catch {}
+                    }
+                    if (!cb.checked) {
+                        try { cb.click(); } catch {}
+                    }
+                    if (!cb.checked) {
+                        const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'checked')?.set;
+                        if (setter) setter.call(cb, true);
+                        else cb.checked = true;
+                        cb.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+                        cb.dispatchEvent(new Event('input', { bubbles: true }));
+                        cb.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                    return cb.checked;
+                };
+
+                const allCbs = Array.from(modal.querySelectorAll('input[type=""checkbox""]')).filter(isVisibleItem);
+                const fsGroups = new Map();
+                const singles = [];
+
+                for (const cb of allCbs) {
+                    const fs = cb.closest('fieldset');
+                    if (fs) {
+                        if (!fsGroups.has(fs)) fsGroups.set(fs, []);
+                        fsGroups.get(fs).push(cb);
+                    } else {
+                        singles.push(cb);
+                    }
+                }
+
+                const filled = [];
+                const skillKeywords = ['aws', 'ec2', 's3', 'sqs', 'api gateway', 'lambda', 'rds', 'azure', 'gcp', 'c#', '.net', 'dotnet', 'python', 'react', 'angular', 'javascript', 'typescript', 'node', 'sql', 'postgres', 'mysql', 'docker', 'kubernetes', 'git', 'ci/cd', 'rest', 'graphql', 'linux', 'scrum', 'agile', 'java', 'spring'];
+                const isNegativeOption = (n) => n.includes('nao possuo') || n.includes('nao tenho') || n.includes('nenhuma') || n.includes('none') || n.includes('no experience') || n.includes('sem experiencia') || n.includes('never');
+
+                // 1. Grupos de múltipla escolha em <fieldset> (ex.: Quais clouds/serviços você conhece?*)
+                for (const [fs, cbs] of fsGroups.entries()) {
+                    if (cbs.length === 1) {
+                        singles.push(cbs[0]);
+                        continue;
+                    }
+                    // Se já há pelo menos 1 marcado no grupo, não altera
+                    if (cbs.some(c => c.checked)) continue;
+
+                    const opts = cbs.map(cb => ({ el: cb, raw: getOptionText(cb), n: norm(getOptionText(cb)) }));
+                    const positiveOpts = opts.filter(o => !isNegativeOption(o.n));
+                    const matchedSkills = positiveOpts.filter(o => skillKeywords.some(k => o.n === k || o.n.includes(k)));
+
+                    const toSelect = matchedSkills.length > 0
+                        ? matchedSkills.slice(0, 3)
+                        : (positiveOpts.length > 0 ? [positiveOpts[0]] : [opts[0]]);
+
+                    for (const pick of toSelect) {
+                        if (pick && clickCheckbox(pick.el)) {
+                            filled.push('checkbox_group:' + (pick.raw || 'opt').slice(0, 40));
+                        }
+                    }
+                }
+
+                // 2. Checkboxes individuais (termos, consentimento, confirmação)
+                for (const cb of singles) {
+                    if (cb.checked) continue;
+                    const txt = norm(getOptionText(cb));
+                    // Não marca alertas de encerrar ou negar comunicação indesejada se for 'não quero'
+                    if (txt.includes('nao desejo') || txt.includes('do not')) continue;
+
+                    const isReq = cb.required || cb.getAttribute('aria-required') === 'true';
+                    const isFollowCompany = txt.includes('seguir') || txt.includes('follow ');
+                    if (isFollowCompany && !isReq) continue;
+
+                    if (isReq || defaultCheckSingle || txt.includes('concordo') || txt.includes('aceito') || txt.includes('agree') || txt.includes('terms') || txt.includes('privac') || txt.includes('consent')) {
+                        if (clickCheckbox(cb)) {
+                            filled.push('checkbox:' + (txt || 'single').slice(0, 40));
+                        }
+                    }
+                }
+
+                return filled;
+            ", modal, defaultCheckSingle);
+
+            if (result is IReadOnlyList<object> list && list.Count > 0)
+            {
+                foreach (var item in list)
+                {
+                    var k = item?.ToString();
+                    if (!string.IsNullOrWhiteSpace(k))
+                    {
+                        updatedKeys.Add(k);
+                    }
+                }
+                return list.Count;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[AUTO-FILL] Aviso em checkboxes: {ex.Message}");
+        }
+
+        return 0;
+    }
+
+    private static bool TrySetRequiredCheckboxField(IWebDriver driver, IWebElement checkbox, IWebElement modal, string hints)
+    {
         try
         {
             if (checkbox.Selected)
+            {
+                return false;
+            }
+
+            var normalizedHints = NormalizeForMatch(hints);
+            var isRequiredAttr = !string.IsNullOrWhiteSpace(checkbox.GetAttribute("required")) ||
+                                 string.Equals(checkbox.GetAttribute("aria-required"), "true", StringComparison.OrdinalIgnoreCase);
+
+            var looksRequiredOrConsent = isRequiredAttr ||
+                                         normalizedHints.Contains("concordo", StringComparison.Ordinal) ||
+                                         normalizedHints.Contains("aceito", StringComparison.Ordinal) ||
+                                         normalizedHints.Contains("autorizo", StringComparison.Ordinal) ||
+                                         normalizedHints.Contains("termos", StringComparison.Ordinal) ||
+                                         normalizedHints.Contains("privacidade", StringComparison.Ordinal) ||
+                                         normalizedHints.Contains("consent", StringComparison.Ordinal) ||
+                                         normalizedHints.Contains("agree", StringComparison.Ordinal) ||
+                                         normalizedHints.Contains("terms", StringComparison.Ordinal) ||
+                                         normalizedHints.Contains("politica", StringComparison.Ordinal) ||
+                                         normalizedHints.Contains("obrigatorio", StringComparison.Ordinal) ||
+                                         normalizedHints.Contains("required", StringComparison.Ordinal) ||
+                                         AutoFillDefaultCheckboxTrue;
+
+            if (!looksRequiredOrConsent)
             {
                 return false;
             }
@@ -285,6 +786,22 @@ partial class Program
             Thread.Sleep(120);
             ClickElementRobust(driver, checkbox);
             Thread.Sleep(120);
+
+            if (checkbox.Selected)
+            {
+                return true;
+            }
+
+            var id = (checkbox.GetAttribute("id") ?? string.Empty).Trim();
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                var label = modal.FindElements(By.CssSelector($"label[for='{id}']")).FirstOrDefault();
+                if (label != null && label.Displayed)
+                {
+                    ClickElementRobust(driver, label);
+                    Thread.Sleep(100);
+                }
+            }
 
             if (checkbox.Selected)
             {
@@ -356,30 +873,46 @@ partial class Program
                 return false;
             }
 
+            var normalizedHints = NormalizeForMatch(hints);
             IWebElement? chosen = null;
-            if (AutoFillDefaultCheckboxTrue)
-            {
-                chosen = group.FirstOrDefault(r => IsYesLikeOption(BuildRadioOptionHints(r, modal)));
-            }
-            else
+
+            // 1. Pergunta de Visto/Patrocínio -> seleciona SEMPRE "Não"
+            if (IsVisaSponsorshipQuestion(normalizedHints))
             {
                 chosen = group.FirstOrDefault(r => IsNoLikeOption(BuildRadioOptionHints(r, modal)));
             }
+            // 2. Questões afirmativas (Sim/Não) -> seleciona SEMPRE "Sim" (regra do usuário)
+            else if (group.Any(r => IsYesLikeOption(BuildRadioOptionHints(r, modal))))
+            {
+                chosen = group.FirstOrDefault(r => IsYesLikeOption(BuildRadioOptionHints(r, modal)));
+            }
+            // 3. Informações sensíveis -> prefiro não informar
+            else if (IsSensitiveDisclosureField(normalizedHints))
+            {
+                chosen = group.FirstOrDefault(r => {
+                    var h = BuildRadioOptionHints(r, modal);
+                    return h.Contains("prefiro nao") || h.Contains("prefer not") || h.Contains("nao informar");
+                });
+            }
 
-            chosen ??= group.FirstOrDefault();
+            if (chosen == null)
+            {
+                // Tenta opção afirmativa
+                chosen = group.FirstOrDefault(r => {
+                    var h = BuildRadioOptionHints(r, modal).ToLowerInvariant();
+                    return !h.Contains("nao") && !h.Contains("não") && !h.Contains("no") && !h.Contains("never");
+                });
+
+                // Fallback universal: seleciona a primeira opção do grupo
+                chosen ??= group.FirstOrDefault();
+            }
+
             if (chosen == null)
             {
                 return false;
             }
 
-            if (TryClickRadioOption(driver, chosen, modal))
-            {
-                return true;
-            }
-
-            // Fallback: tenta no primeiro da lista do grupo.
-            var first = group[0];
-            return !ReferenceEquals(first, chosen) && TryClickRadioOption(driver, first, modal);
+            return TryClickRadioOption(driver, chosen, modal);
         }
         catch
         {
@@ -636,11 +1169,9 @@ partial class Program
             {
                 var normalized = NormalizeForMatch(option.Text ?? string.Empty);
                 if (normalized == "nao" ||
-                    normalized == "não" ||
                     normalized == "no" ||
                     normalized == "false" ||
                     normalized.StartsWith("nao ", StringComparison.Ordinal) ||
-                    normalized.StartsWith("não ", StringComparison.Ordinal) ||
                     normalized.StartsWith("no ", StringComparison.Ordinal) ||
                     normalized.StartsWith("false ", StringComparison.Ordinal))
                 {
@@ -711,9 +1242,10 @@ partial class Program
             }
         }
 
+        // Regra do usuário: campos de salário pretendido/expectativa -> 8000
         if (IsSalaryQuestion(normalizedHints))
         {
-            return AutoFillDefaultSalary;
+            return !string.IsNullOrWhiteSpace(AutoFillDefaultSalary) ? AutoFillDefaultSalary : "8000";
         }
 
         if (IsYearsExperienceQuestion(normalizedHints))
@@ -742,41 +1274,108 @@ partial class Program
                 return AutoFillDefaultLinkedIn;
             }
 
-            return string.Empty;
+            return "https://www.linkedin.com";
         }
 
         if (normalizedHints.Contains("linkedin", StringComparison.Ordinal))
         {
-            if (!string.IsNullOrWhiteSpace(AutoFillDefaultLinkedIn))
-            {
-                return AutoFillDefaultLinkedIn;
-            }
-
-            if (!string.IsNullOrWhiteSpace(AutoFillDefaultWebsite))
-            {
-                return AutoFillDefaultWebsite;
-            }
-
-            return string.Empty;
+            return !string.IsNullOrWhiteSpace(AutoFillDefaultLinkedIn) ? AutoFillDefaultLinkedIn : "https://www.linkedin.com";
         }
 
         if (normalizedHints.Contains("github", StringComparison.Ordinal))
         {
-            if (!string.IsNullOrWhiteSpace(AutoFillDefaultGithub))
-            {
-                return AutoFillDefaultGithub;
-            }
+            return !string.IsNullOrWhiteSpace(AutoFillDefaultGithub) ? AutoFillDefaultGithub : "https://github.com";
+        }
 
-            return string.Empty;
+        if (normalizedHints.Contains("empresa", StringComparison.Ordinal) ||
+            normalizedHints.Contains("company", StringComparison.Ordinal) ||
+            normalizedHints.Contains("empregador", StringComparison.Ordinal))
+        {
+            return !string.IsNullOrWhiteSpace(AutoFillDefaultCurrentCompany) ? AutoFillDefaultCurrentCompany : "Confidencial";
+        }
+
+        if (normalizedHints.Contains("cargo", StringComparison.Ordinal) ||
+            normalizedHints.Contains("titulo", StringComparison.Ordinal) ||
+            normalizedHints.Contains("job title", StringComparison.Ordinal) ||
+            normalizedHints.Contains("funcao", StringComparison.Ordinal) ||
+            normalizedHints.Contains("role", StringComparison.Ordinal))
+        {
+            return !string.IsNullOrWhiteSpace(AutoFillDefaultJobTitle) ? AutoFillDefaultJobTitle : "Desenvolvedor Full Stack";
+        }
+
+        if (normalizedHints.Contains("faculdade", StringComparison.Ordinal) ||
+            normalizedHints.Contains("universidade", StringComparison.Ordinal) ||
+            normalizedHints.Contains("escola", StringComparison.Ordinal) ||
+            normalizedHints.Contains("instituicao", StringComparison.Ordinal) ||
+            normalizedHints.Contains("school", StringComparison.Ordinal) ||
+            normalizedHints.Contains("college", StringComparison.Ordinal))
+        {
+            return !string.IsNullOrWhiteSpace(AutoFillDefaultEducation) ? AutoFillDefaultEducation : "Ensino Superior";
+        }
+
+        if (normalizedHints.Contains("curso", StringComparison.Ordinal) ||
+            normalizedHints.Contains("major", StringComparison.Ordinal) ||
+            normalizedHints.Contains("degree", StringComparison.Ordinal) ||
+            normalizedHints.Contains("graduacao", StringComparison.Ordinal))
+        {
+            return !string.IsNullOrWhiteSpace(AutoFillDefaultDegree) ? AutoFillDefaultDegree : "Superior completo";
+        }
+
+        if (normalizedHints.Contains("bairro", StringComparison.Ordinal))
+        {
+            return !string.IsNullOrWhiteSpace(AutoFillDefaultCity) ? AutoFillDefaultCity : "Centro";
         }
 
         if (normalizedHints.Contains("location", StringComparison.Ordinal) ||
             normalizedHints.Contains("localizacao", StringComparison.Ordinal) ||
-            normalizedHints.Contains("localização", StringComparison.Ordinal) ||
             normalizedHints.Contains("cidade", StringComparison.Ordinal) ||
             normalizedHints.Contains("city", StringComparison.Ordinal))
         {
-            return AutoFillDefaultLocation;
+            return !string.IsNullOrWhiteSpace(AutoFillDefaultCity) ? AutoFillDefaultCity : "São Paulo";
+        }
+
+        if (normalizedHints.Contains("estado", StringComparison.Ordinal) ||
+            normalizedHints.Contains("state", StringComparison.Ordinal) ||
+            normalizedHints.Contains("uf", StringComparison.Ordinal))
+        {
+            return !string.IsNullOrWhiteSpace(AutoFillDefaultState) ? AutoFillDefaultState : "São Paulo";
+        }
+
+        if (normalizedHints.Contains("pais", StringComparison.Ordinal) ||
+            normalizedHints.Contains("country", StringComparison.Ordinal))
+        {
+            return "Brasil";
+        }
+
+        if (normalizedHints.Contains("endereco", StringComparison.Ordinal) ||
+            normalizedHints.Contains("address", StringComparison.Ordinal) ||
+            normalizedHints.Contains("rua", StringComparison.Ordinal) ||
+            normalizedHints.Contains("street", StringComparison.Ordinal))
+        {
+            return !string.IsNullOrWhiteSpace(AutoFillDefaultAddress) ? AutoFillDefaultAddress : AutoFillDefaultCity;
+        }
+
+        if (normalizedHints.Contains("cep", StringComparison.Ordinal) ||
+            normalizedHints.Contains("zip", StringComparison.Ordinal) ||
+            normalizedHints.Contains("postal", StringComparison.Ordinal))
+        {
+            return !string.IsNullOrWhiteSpace(AutoFillDefaultZip) ? AutoFillDefaultZip : "01000-000";
+        }
+
+        if (normalizedHints.Contains("aviso", StringComparison.Ordinal) ||
+            normalizedHints.Contains("disponibilidade", StringComparison.Ordinal) ||
+            normalizedHints.Contains("notice", StringComparison.Ordinal) ||
+            normalizedHints.Contains("quando pode", StringComparison.Ordinal) ||
+            normalizedHints.Contains("start", StringComparison.Ordinal))
+        {
+            return "Imediata";
+        }
+
+        if (normalizedHints.Contains("ingles", StringComparison.Ordinal) ||
+            normalizedHints.Contains("english", StringComparison.Ordinal) ||
+            normalizedHints.Contains("idioma", StringComparison.Ordinal))
+        {
+            return "Avançado";
         }
 
         if (tag == "textarea" ||
@@ -789,7 +1388,27 @@ partial class Program
             return AutoFillDefaultGenericText;
         }
 
-        return string.Empty;
+        // Fallback para campos numéricos
+        if (type == "number" ||
+            normalizedHints.Contains("quant", StringComparison.Ordinal) ||
+            normalizedHints.Contains("how many", StringComparison.Ordinal) ||
+            normalizedHints.Contains("meses", StringComparison.Ordinal) ||
+            normalizedHints.Contains("dias", StringComparison.Ordinal) ||
+            normalizedHints.Contains("horas", StringComparison.Ordinal) ||
+            normalizedHints.Contains("level", StringComparison.Ordinal) ||
+            normalizedHints.Contains("escala", StringComparison.Ordinal) ||
+            normalizedHints.Contains("nota", StringComparison.Ordinal))
+        {
+            return Math.Max(1, AutoFillDefaultYearsExperience).ToString();
+        }
+
+        // Fallback genérico para qualquer campo de texto
+        if (!string.IsNullOrWhiteSpace(AutoFillDefaultGenericText))
+        {
+            return AutoFillDefaultGenericText;
+        }
+
+        return "Tenho experiencia compativel com a vaga e disponibilidade para atuar no escopo solicitado.";
     }
 
     private static bool TrySetInputValue(IWebDriver driver, IWebElement field, string value)
@@ -799,7 +1418,7 @@ partial class Program
             ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView({block: 'center'});", field);
             Thread.Sleep(120);
 
-            field.Clear();
+            try { field.Clear(); } catch { }
             field.SendKeys(value);
 
             var finalValue = (field.GetAttribute("value") ?? string.Empty).Trim();
@@ -811,7 +1430,13 @@ partial class Program
             ((IJavaScriptExecutor)driver).ExecuteScript(@"
                 const el = arguments[0];
                 const v = arguments[1];
-                el.value = v;
+                const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set
+                    || Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, 'value')?.set;
+                if (nativeInputValueSetter) {
+                    nativeInputValueSetter.call(el, v);
+                } else {
+                    el.value = v;
+                }
                 el.dispatchEvent(new Event('input', { bubbles: true }));
                 el.dispatchEvent(new Event('change', { bubbles: true }));
             ", field, value);
@@ -955,7 +1580,6 @@ partial class Program
     {
         return normalizedHints.Contains("country", StringComparison.Ordinal) ||
                normalizedHints.Contains("pais", StringComparison.Ordinal) ||
-               normalizedHints.Contains("país", StringComparison.Ordinal) ||
                normalizedHints.Contains("codigo do pais", StringComparison.Ordinal) ||
                normalizedHints.Contains("codigo de pais", StringComparison.Ordinal) ||
                normalizedHints.Contains("country code", StringComparison.Ordinal);
@@ -973,13 +1597,12 @@ partial class Program
     {
         return normalizedHints.Contains("salary", StringComparison.Ordinal) ||
                normalizedHints.Contains("salario", StringComparison.Ordinal) ||
-               normalizedHints.Contains("pretensao", StringComparison.Ordinal) ||
-               normalizedHints.Contains("pretensão", StringComparison.Ordinal) ||
-               normalizedHints.Contains("remuneracao", StringComparison.Ordinal) ||
-               normalizedHints.Contains("remuneração", StringComparison.Ordinal) ||
+               normalizedHints.Contains("salar", StringComparison.Ordinal) ||
+               normalizedHints.Contains("pretens", StringComparison.Ordinal) ||
+               normalizedHints.Contains("expectativa", StringComparison.Ordinal) ||
+               normalizedHints.Contains("remuner", StringComparison.Ordinal) ||
                normalizedHints.Contains("compensation", StringComparison.Ordinal) ||
-               normalizedHints.Contains("compensacao", StringComparison.Ordinal) ||
-               normalizedHints.Contains("compensação", StringComparison.Ordinal) ||
+               normalizedHints.Contains("compensac", StringComparison.Ordinal) ||
                normalizedHints.Contains("faixa salarial", StringComparison.Ordinal);
     }
 

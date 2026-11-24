@@ -29,13 +29,19 @@ partial class Program
             try
             {
                 var modal = TryFindActiveEasyApplyModal(driver);
+                if (modal == null && !(driver.Url ?? string.Empty).Contains("/apply/", StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
                 ISearchContext root = modal != null ? (ISearchContext)modal : driver;
                 var candidates = root.FindElements(By.CssSelector(
                     "button[data-live-test-easy-apply-submit-button], " +
                     "button[data-easy-apply-submit-button], " +
                     "button[aria-label*='Enviar'], " +
                     "button[aria-label*='Submit']"
-                ));
+                )).Concat(root.FindElements(By.XPath(
+                    ".//button[contains(@aria-label,'Enviar') or contains(@aria-label,'Submit') or contains(normalize-space(.),'Enviar') or contains(normalize-space(.),'Submit')]"
+                )));
 
                 return candidates.Any(btn =>
                 {
@@ -68,10 +74,15 @@ partial class Program
             try
             {
                 var modal = TryFindActiveEasyApplyModal(driver);
+                if (modal == null && !(driver.Url ?? string.Empty).Contains("/apply/", StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
                 ISearchContext root = modal != null ? (ISearchContext)modal : driver;
                 var candidates = root.FindElements(By.XPath(
-                    ".//button[contains(@aria-label,'Revise sua candidatura') or contains(@aria-label,'Review your application') or contains(@aria-label,'Revis') or contains(@aria-label,'Review') or " +
-                    ".//span[contains(normalize-space(.),'Revis')] or .//span[contains(normalize-space(.),'Review')]]"
+                    ".//button[contains(@aria-label,'Revise sua candidatura') or contains(@aria-label,'Review your application') or contains(@aria-label,'Revis') or contains(@aria-label,'Review') or contains(@aria-label,'Avaliar') or contains(@aria-label,'Evaluar') or " +
+                    "contains(normalize-space(.),'Revisar') or contains(normalize-space(.),'Review') or contains(normalize-space(.),'Avaliar') or contains(normalize-space(.),'Evaluar') or " +
+                    ".//span[contains(normalize-space(.),'Revis')] or .//span[contains(normalize-space(.),'Review')] or .//span[contains(normalize-space(.),'Avaliar')] or .//span[contains(normalize-space(.),'Evaluar')]]"
                 ));
 
                 return candidates.Any(btn =>
@@ -90,13 +101,19 @@ partial class Program
             try
             {
                 var modal = TryFindActiveEasyApplyModal(driver);
+                if (modal == null && !(driver.Url ?? string.Empty).Contains("/apply/", StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
                 ISearchContext root = modal != null ? (ISearchContext)modal : driver;
                 var candidates = root.FindElements(By.CssSelector(
                     "button[data-easy-apply-next-button], " +
                     "button[data-live-test-easy-apply-next-button], " +
                     "footer button, " +
                     "button.artdeco-button--primary"
-                ));
+                )).Concat(root.FindElements(By.XPath(
+                    ".//button[contains(normalize-space(.),'Avançar') or contains(normalize-space(.),'Next') or contains(normalize-space(.),'Continuar') or contains(normalize-space(.),'Próximo')]"
+                )));
 
                 foreach (var btn in candidates)
                 {
@@ -122,7 +139,9 @@ partial class Program
                         var looksLikeSubmitOrReview = combined.Contains("enviar") ||
                                                       combined.Contains("submit") ||
                                                       combined.Contains("revis") ||
-                                                      combined.Contains("review");
+                                                      combined.Contains("review") ||
+                                                      combined.Contains("avaliar") ||
+                                                      combined.Contains("evaluar");
 
                         if (looksLikeNext && !looksLikeSubmitOrReview)
                         {
@@ -145,72 +164,146 @@ partial class Program
 
         bool TryHandleMandatoryGate(string stageContext)
         {
-            if (TryDetectScreeningQuestionsGate(driver, out var screeningGateDetails))
+            Console.WriteLine($"[AUTO-FILL] Identificando e preenchendo campos obrigatórios/questionário na etapa '{stageContext}'...");
+            TryAutoFillMandatoryFieldsInModal(driver, link, stageContext);
+            Thread.Sleep(450);
+
+            // Tenta avançar se houver botão 'Avançar'
+            if (HasVisibleNextButton())
             {
-                Console.WriteLine("[ETAPA] Questionário obrigatório detectado. Pulando vaga por enquanto.");
-                Console.WriteLine($"[DEBUG SCREENING] {screeningGateDetails}");
-                LogApplicationStep(link, $"screening_questions_detected_{stageContext}", false, screeningGateDetails);
-                IgnoreJobLinkInCurrentRun(link, "REQUIRES_SELECT_QUESTIONNAIRE");
-                MarkJobAsUnavailable(link, "REQUIRES_SCREENING_QUESTIONS");
-                TryDismissEasyApplyModal(driver, link, $"screening_{stageContext}");
-                return true;
+                if (TryClickNextButtonInPopup(driver, new WebDriverWait(driver, TimeSpan.FromSeconds(8)), $"autofill_next_{stageContext}", link))
+                {
+                    Thread.Sleep(600);
+                    return false;
+                }
             }
 
-            var requiredSummary = BuildRequiredFieldsSummary(driver);
-            var hasRequiredSignals =
-                !string.IsNullOrWhiteSpace(requiredSummary) &&
-                !requiredSummary.Contains("(nenhum campo obrigatório vazio detectado automaticamente)", StringComparison.OrdinalIgnoreCase) &&
-                !requiredSummary.Contains("(modal não identificado)", StringComparison.OrdinalIgnoreCase);
-
-            if (!hasRequiredSignals)
+            // Tenta avançar se houver botão 'Revisar'
+            if (HasVisibleReviewButton())
             {
+                if (TryClickReviewButtonInPopup(driver, new WebDriverWait(driver, TimeSpan.FromSeconds(8)), link))
+                {
+                    Thread.Sleep(600);
+                    return false;
+                }
+            }
+
+            // Segunda passada de preenchimento com tentativa adicional
+            TryAutoFillMandatoryFieldsInModal(driver, link, $"{stageContext}_retry");
+            Thread.Sleep(400);
+
+            if (HasVisibleNextButton() && TryClickNextButtonInPopup(driver, new WebDriverWait(driver, TimeSpan.FromSeconds(8)), $"autofill_next_retry_{stageContext}", link))
+            {
+                Thread.Sleep(600);
                 return false;
             }
 
-            Console.WriteLine("[ETAPA] Campos obrigatórios detectados. Pulando vaga por enquanto.");
-            Console.WriteLine($"[DEBUG REQUIRED] {requiredSummary}");
-            LogApplicationStep(link, $"mandatory_fields_detected_{stageContext}", false, requiredSummary);
-            IgnoreJobLinkInCurrentRun(link, "REQUIRES_MANDATORY_FIELDS");
-            MarkJobAsUnavailable(link, "REQUIRES_MANDATORY_FIELDS");
-            TryDismissEasyApplyModal(driver, link, $"mandatory_fields_{stageContext}");
-            return true;
+            if (HasVisibleReviewButton() && TryClickReviewButtonInPopup(driver, new WebDriverWait(driver, TimeSpan.FromSeconds(8)), link))
+            {
+                Thread.Sleep(600);
+                return false;
+            }
+
+            // Retorna false para não abortar o fluxo e permitir que etapas seguintes tentem avançar
+            return false;
         }
 
-        // Tenta encontrar o botão principal de candidatura simplificada por id.
+        // Localiza rapidamente o botão real de Candidatura Simplificada (clássico ou SDUI), sem confundir com filtros do topo ou cards laterais!
         IWebElement? applyButton = null;
+        var alreadyAppliedOrClosed = string.Empty;
         try
         {
-            applyButton = wait.Until(d => d.FindElement(By.Id("jobs-apply-button-id")));
+            var applyWait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            applyButton = applyWait.Until(d =>
+            {
+                // 1. Seletores de alta precisão (SDUI aria-label específico da vaga e IDs clássicos)
+                var exactCandidates = d.FindElements(By.CssSelector(
+                    "#jobs-apply-button-id, " +
+                    "button[aria-label*='Usar a candidatura simplificada'], " +
+                    "a[aria-label*='Usar a candidatura simplificada'], " +
+                    "button[aria-label*='Easy Apply to'], " +
+                    "a[aria-label*='Easy Apply to'], " +
+                    "button.jobs-apply-button, a.jobs-apply-button, " +
+                    "button[data-live-test-job-apply-button], a[data-live-test-job-apply-button], " +
+                    "a[data-view-name='job-apply-button'], button[data-view-name='job-apply-button'], " +
+                    "a[href*='/apply/?openSDUIApplyFlow=true']"
+                ));
+
+                foreach (var c in exactCandidates)
+                {
+                    try
+                    {
+                        if (c.Displayed && c.Enabled)
+                        {
+                            return c;
+                        }
+                    }
+                    catch { }
+                }
+
+                // 2. Fallback para botões <button> reais na área da vaga (ignorando filtros 'Filtrar Candidatura simplificada' e links <a> de cards da lista)
+                if (d is IJavaScriptExecutor js)
+                {
+                    var foundOrStatus = js.ExecuteScript(@"
+                        const buttons = Array.from(document.querySelectorAll('button'));
+                        for (const b of buttons) {
+                            const s = window.getComputedStyle(b);
+                            const r = b.getBoundingClientRect();
+                            if (s.display === 'none' || s.visibility === 'hidden' || r.width <= 0 || r.height <= 0) continue;
+                            if (b.disabled || b.getAttribute('aria-disabled') === 'true') continue;
+                            const aria = (b.getAttribute('aria-label') || '').toLowerCase();
+                            if (aria.includes('filtrar') || aria.includes('filter')) continue;
+                            const txt = (b.innerText || b.textContent || '').replace(/\s+/g, ' ').trim().toLowerCase();
+                            if (txt === 'candidatura simplificada' || txt === 'easy apply') {
+                                return b;
+                            }
+                        }
+                        const bodyText = (document.body?.innerText || '').toLowerCase();
+                        if (bodyText.includes('não aceita mais candidaturas') || bodyText.includes('no longer accepting applications')) {
+                            return 'JOB_CLOSED';
+                        }
+                        if (bodyText.includes('candidatura enviada') || bodyText.includes('applied ')) {
+                            return 'ALREADY_APPLIED';
+                        }
+                        return null;
+                    ");
+
+                    if (foundOrStatus is IWebElement webBtn)
+                    {
+                        return webBtn;
+                    }
+                    if (foundOrStatus is string statusStr && !string.IsNullOrWhiteSpace(statusStr))
+                    {
+                        alreadyAppliedOrClosed = statusStr;
+                        return null;
+                    }
+                }
+
+                return null;
+            });
         }
         catch (WebDriverTimeoutException)
         {
-            // Fallbacks: variantes de layout/idioma para Easy Apply.
-            var candidates = driver.FindElements(By.CssSelector(
-                "#jobs-apply-button-id, " +
-                "button.jobs-apply-button, a.jobs-apply-button, " +
-                "button[data-live-test-job-apply-button], a[data-live-test-job-apply-button], " +
-                "a[data-view-name='job-apply-button'], button[data-view-name='job-apply-button'], " +
-                "a[href*='/apply/?openSDUIApplyFlow=true']"
-            ));
-
-            if (candidates.Count == 0)
-            {
-                // Fallback por texto/aria-label em PT/EN para cenários sem atributos estáveis.
-                candidates = driver.FindElements(By.XPath(
-                    "//a[contains(@aria-label,'candidatura simplificada') or contains(@aria-label,'Easy Apply') or " +
-                    "contains(normalize-space(.),'Candidatura simplificada') or contains(normalize-space(.),'Easy Apply')] | " +
-                    "//button[contains(@aria-label,'candidatura simplificada') or contains(@aria-label,'Easy Apply') or " +
-                    "contains(normalize-space(.),'Candidatura simplificada') or contains(normalize-space(.),'Easy Apply')]"));
-            }
-
-            if (candidates.Count > 0)
-            {
-                applyButton = candidates[0];
-            }
+            // Tratado logo abaixo.
         }
 
         if (applyButton == null)
         {
+            if (alreadyAppliedOrClosed == "ALREADY_APPLIED")
+            {
+                Console.WriteLine("Esta vaga já consta como 'Candidatura enviada' no LinkedIn. Marcando no banco e seguindo...");
+                MarkJobAsApplied(link);
+                IgnoreJobLinkInCurrentRun(link, "ALREADY_APPLIED_ON_LINKEDIN");
+                return false;
+            }
+            if (alreadyAppliedOrClosed == "JOB_CLOSED")
+            {
+                Console.WriteLine("Vaga encerrada ('Não aceita mais candidaturas'). Marcando como indisponível...");
+                MarkJobAsUnavailable(link, "JOB_CLOSED");
+                IgnoreJobLinkInCurrentRun(link, "JOB_CLOSED");
+                return false;
+            }
+
             Console.WriteLine("Botão de candidatura simplificada não encontrado nesta vaga.");
             var diagnostics = SaveFailureDiagnostics(driver, link, "easy_apply_not_found");
             LogApplicationStep(link, "easy_apply_not_found", false, "Botão inicial Easy Apply não encontrado.", diagnostics.HtmlPath, diagnostics.ScreenshotPath);
@@ -229,9 +322,13 @@ partial class Program
             applyHref.Contains("/apply/?openSDUIApplyFlow=true", StringComparison.OrdinalIgnoreCase);
         var ebp = isSduiApplyHref ? (TryGetQueryParamValue(applyHref, "eBP") ?? string.Empty) : string.Empty;
 
-        // 1) Clique primeiro (prioriza popup/modal)
+        // 1) Simulação Humana: Lê a vaga e rola a página antes de agir
+        SimulateReadingPause();
+        HumanizeCollectionEntry(driver); // Reutiliza o scroll irregular para simular inspeção da vaga
+
+        // 2) Clique primeiro (prioriza popup/modal)
         ClickElementRobust(driver, applyButton);
-        PauseBetweenFlowSteps();
+        PauseBetweenFlowSteps("Aguardando abertura do popup após clique");
 
         // 2) Se o clique não mudou nada e for SDUI, navega direto para o href
         try
@@ -305,6 +402,10 @@ partial class Program
             return true;
         }
 
+        // Tenta auto-preencher campos obrigatórios da primeira etapa (ex.: select de email, país, etc.)
+        TryAutoFillMandatoryFieldsInModal(driver, link, "primeira etapa_pre");
+        Thread.Sleep(300);
+
         // Primeiro avanço no popup após abrir candidatura simplificada.
         Console.WriteLine("[ETAPA] Tentando primeiro 'Avançar'...");
         if (!TryClickNextButtonInPopup(driver, wait, "primeira etapa", link))
@@ -326,8 +427,21 @@ partial class Program
         // Aguarda estabilização real da etapa seguinte.
         if (!WaitForStepTransitionAfterFirstNext(driver, link))
         {
-            if (!TryFinalizeWithoutNextIfPossible(driver, wait, link))
+            if (TryFinalizeWithoutNextIfPossible(driver, wait, link))
             {
+                LogApplicationStep(link, "application_completed_via_post_first_next_fallback", true, "Fluxo concluído por fallback após transição do primeiro Avançar.");
+                return true;
+            }
+
+            var activeModal = TryFindActiveEasyApplyModal(driver);
+            if (activeModal != null)
+            {
+                Console.WriteLine("[ETAPA] Transição após primeiro Avançar demorou ou mudou layout, mas o modal continua aberto. Prosseguindo para currículo e campos...");
+                LogApplicationStep(link, "post_first_next_transition_modal_recovered", true, "Modal ativo após transição do primeiro Avançar; prosseguindo fluxo.");
+            }
+            else
+            {
+                Console.WriteLine("[ETAPA] Modal de candidatura não encontrado após primeiro Avançar.");
                 if (TryHandleMandatoryGate("post_first_next_transition"))
                 {
                     return false;
@@ -335,19 +449,20 @@ partial class Program
 
                 return false;
             }
-
-            LogApplicationStep(link, "application_completed_via_post_first_next_fallback", true, "Fluxo concluído por fallback após transição incerta do primeiro Avançar.");
-            return true;
         }
 
         // Pequena folga adicional para componentes internos do modal renderizarem totalmente.
-        PauseBetweenFlowSteps();
+        PauseBetweenFlowSteps("Processando modal de candidatura");
 
         // Seleciona currículo na etapa seguinte quando necessário.
         Console.WriteLine("[ETAPA] Tentando selecionar currículo...");
         TrySelectResumeInPopup(driver);
         Thread.Sleep(350);
         LogApplicationStep(link, "resume_step_processed", true, "Etapa de currículo processada.");
+
+        // Preenche campos obrigatórios da etapa de currículo se houver
+        TryAutoFillMandatoryFieldsInModal(driver, link, "etapa_curriculo_pre");
+        Thread.Sleep(250);
 
         // Segundo avanço no popup após seleção de currículo.
         Console.WriteLine("[ETAPA] Tentando segundo 'Avançar'...");
@@ -356,154 +471,131 @@ partial class Program
             Console.WriteLine("[ETAPA] Segundo 'Avançar' falhou na primeira tentativa; aguardando e tentando novamente...");
             Thread.Sleep(900);
             TrySelectResumeInPopup(driver);
+            TryAutoFillMandatoryFieldsInModal(driver, link, "etapa_curriculo_retry");
             Thread.Sleep(350);
 
             if (!TryClickNextButtonInPopup(driver, wait, "etapa de currículo_retry", link))
             {
-                if (TryHandleMandatoryGate("resume_next_retry"))
+                if (TryFinalizeWithoutNextIfPossible(driver, wait, link))
                 {
-                    return false;
+                    LogApplicationStep(link, "application_completed_via_resume_fallback", true, "Fluxo concluído por fallback na etapa de currículo.");
+                    return true;
                 }
 
-                return false;
-            }
-        }
-
-        // Algumas vagas (ex.: Screening questions) exigem etapas extras com mais de um botão Avançar.
-        const int maxExtraNextSteps = 3;
-        for (var extraStep = 1; extraStep <= maxExtraNextSteps; extraStep++)
-        {
-            if (HasVisibleSubmitButton() || HasVisibleReviewButton())
-            {
-                break;
-            }
-
-            if (!HasVisibleNextButton())
-            {
-                break;
-            }
-
-            Console.WriteLine($"[ETAPA] Detectada etapa adicional. Tentando 'Avançar' extra #{extraStep}...");
-            if (!TryClickNextButtonInPopup(driver, new WebDriverWait(driver, TimeSpan.FromSeconds(10)), $"etapa extra {extraStep}", link))
-            {
-                Console.WriteLine($"[ETAPA] 'Avançar' extra #{extraStep} não pôde ser concluído.");
-                break;
-            }
-
-            Thread.Sleep(850);
-            TrySelectResumeInPopup(driver);
-            Thread.Sleep(250);
-            LogApplicationStep(link, $"extra_next_step_{extraStep}_processed", true, "Etapa adicional de avanço processada.");
-        }
-
-        if (TryDetectScreeningQuestionsGate(driver, out var screeningGateDetailsBeforeReview))
-        {
-            Console.WriteLine("[ETAPA] Perguntas adicionais obrigatórias detectadas antes de revisar. Tentando preenchimento automático...");
-            Console.WriteLine($"[DEBUG SCREENING] {screeningGateDetailsBeforeReview}");
-
-            var autoFilledScreening = TryAutoFillMandatoryFieldsInModal(driver, link, "screening_before_review");
-            if (autoFilledScreening)
-            {
-                Thread.Sleep(700);
-
-                if (!HasVisibleSubmitButton() && HasVisibleNextButton())
+                var activeModal = TryFindActiveEasyApplyModal(driver);
+                if (activeModal != null && (HasVisibleNextButton() || HasVisibleReviewButton() || HasVisibleSubmitButton()))
                 {
-                    Console.WriteLine("[AUTO-FILL] Tentando avançar após preencher perguntas obrigatórias.");
-                    TryClickNextButtonInPopup(driver, new WebDriverWait(driver, TimeSpan.FromSeconds(10)), "screening_autofill_advance", link);
-                    Thread.Sleep(650);
+                    Console.WriteLine("[ETAPA] Segundo 'Avançar' não foi clicado, mas modal continua ativo com próximas ações. Prosseguindo...");
                 }
-
-                if (!TryDetectScreeningQuestionsGate(driver, out _))
+                else
                 {
-                    Console.WriteLine("[AUTO-FILL] Gate de questionário obrigatório removido. Continuando fluxo.");
-                }
-            }
-
-            if (TryDetectScreeningQuestionsGate(driver, out var screeningGateDetailsAfterAutofill))
-            {
-                Console.WriteLine("[ETAPA] Perguntas obrigatórias ainda bloqueando envio. Pulando vaga por enquanto.");
-                Console.WriteLine($"[DEBUG SCREENING] {screeningGateDetailsAfterAutofill}");
-                LogApplicationStep(link, "screening_questions_detected_before_review", false, screeningGateDetailsAfterAutofill);
-                IgnoreJobLinkInCurrentRun(link, "REQUIRES_SELECT_QUESTIONNAIRE");
-                MarkJobAsUnavailable(link, "REQUIRES_SCREENING_QUESTIONS");
-                TryDismissEasyApplyModal(driver, link, "screening_before_review");
-                return false;
-            }
-        }
-
-        // Algumas vagas exibem etapa de revisão antes do envio.
-        Console.WriteLine("[ETAPA] Tentando etapa 'Revisar' (quando existir)...");
-        var reviewed = TryClickReviewButtonInPopup(driver, wait, link);
-        if (reviewed)
-        {
-            // Aguarda transição para a tela de envio após revisão.
-            PauseBetweenFlowSteps();
-        }
-
-        // Aguarda transição para a etapa final de envio.
-        PauseBetweenFlowSteps();
-
-        IWebElement? FindSubmitButtonCandidate()
-        {
-            try
-            {
-                var modal = TryFindActiveEasyApplyModal(driver);
-                ISearchContext searchRoot = modal != null ? (ISearchContext)modal : driver;
-
-                var submitCandidates = searchRoot.FindElements(By.CssSelector(
-                    "button[data-live-test-easy-apply-submit-button], " +
-                    "button[data-easy-apply-submit-button], " +
-                    "button[aria-label*='Enviar'], " +
-                    "button[aria-label*='Submit']"
-                ));
-
-                if (submitCandidates.Count == 0)
-                {
-                    submitCandidates = searchRoot.FindElements(By.XPath(
-                        ".//button[" +
-                        "contains(@aria-label,'Enviar candidatura') or contains(@aria-label,'Enviar') or contains(@aria-label,'Submit application') or contains(@aria-label,'Submit') or " +
-                        ".//span[contains(normalize-space(.),'Enviar candidatura')] or .//span[contains(normalize-space(.),'Enviar')] or " +
-                        ".//span[contains(normalize-space(.),'Submit application')] or .//span[contains(normalize-space(.),'Submit')]" +
-                        "]"));
-                }
-
-                if (submitCandidates.Count == 0)
-                {
-                    return null;
-                }
-
-                return submitCandidates.FirstOrDefault(btn =>
-                {
-                    try
-                    {
-                        if (!btn.Displayed)
-                        {
-                            return false;
-                        }
-
-                        var text = (btn.Text ?? string.Empty).Trim();
-                        var aria = (btn.GetAttribute("aria-label") ?? string.Empty).Trim();
-                        var combined = (text + " " + aria).ToLowerInvariant();
-
-                        return combined.Contains("enviar") || combined.Contains("submit");
-                    }
-                    catch
+                    if (TryHandleMandatoryGate("resume_next_retry"))
                     {
                         return false;
                     }
-                }) ?? submitCandidates[0];
-            }
-            catch
-            {
-                return null;
+
+                    return false;
+                }
             }
         }
 
-        // Tenta localizar botão final de envio da candidatura.
+        // Algumas vagas (ex.: questionários e screening questions) exigem etapas extras com botões Avançar ou Avaliar/Revisar.
+        const int maxExtraNextSteps = 12;
+        for (var extraStep = 1; extraStep <= maxExtraNextSteps; extraStep++)
+        {
+            if (HasVisibleSubmitButton())
+            {
+                break;
+            }
+
+            if (!HasVisibleReviewButton() && !HasVisibleNextButton())
+            {
+                break;
+            }
+
+            // SEMPRE seleciona currículo (se aplicável) e auto-preenche campos ANTES de clicar em Avançar ou Revisar/Avaliar!
+            TrySelectResumeInPopup(driver);
+            TryAutoFillMandatoryFieldsInModal(driver, link, $"extra_step_pre_{extraStep}");
+            Thread.Sleep(300);
+
+            if (HasVisibleSubmitButton())
+            {
+                break;
+            }
+
+            if (HasVisibleReviewButton())
+            {
+                Console.WriteLine($"[ETAPA] Botão 'Revisar/Avaliar' detectado na etapa #{extraStep}. Preenchendo e avançando para revisão...");
+                var beforeReviewSig = CaptureApplyStepSignature(driver);
+                TryClickReviewButtonInPopup(driver, wait, link);
+
+                if (!ConfirmNextStepProgress(driver, link, $"revisar_extra_{extraStep}", beforeReviewSig))
+                {
+                    Console.WriteLine($"[ETAPA] 'Revisar/Avaliar' retido por validação na etapa #{extraStep}. Re-preenchendo campos obrigatórios...");
+                    TryAutoFillMandatoryFieldsInModal(driver, link, $"revisar_retry_{extraStep}");
+                    Thread.Sleep(400);
+                    TryClickReviewButtonInPopup(driver, wait, link);
+                    Thread.Sleep(700);
+                }
+                else
+                {
+                    Thread.Sleep(550);
+                }
+
+                if (HasVisibleSubmitButton())
+                {
+                    break;
+                }
+                continue;
+            }
+
+            Console.WriteLine($"[ETAPA] Detectada etapa adicional #{extraStep}. Tentando 'Avançar'...");
+            if (!TryClickNextButtonInPopup(driver, new WebDriverWait(driver, TimeSpan.FromSeconds(10)), $"etapa extra {extraStep}", link))
+            {
+                if (HasVisibleSubmitButton() || HasVisibleReviewButton())
+                {
+                    continue;
+                }
+
+                Console.WriteLine($"[ETAPA] 'Avançar' extra #{extraStep} não pôde ser concluído. Verificando se é possível prosseguir...");
+                if (!TryFinalizeWithoutNextIfPossible(driver, wait, link))
+                {
+                    TryDismissEasyApplyModal(driver, link, $"extra_step_failed_{extraStep}");
+                    return false;
+                }
+                return true;
+            }
+
+            Thread.Sleep(650);
+            LogApplicationStep(link, $"extra_next_step_{extraStep}_processed", true, $"Etapa adicional #{extraStep} de avanço processada.");
+        }
+
+        // Caso ainda haja etapa 'Revisar/Avaliar' visível antes do envio final
+        if (!HasVisibleSubmitButton() && HasVisibleReviewButton())
+        {
+            TryAutoFillMandatoryFieldsInModal(driver, link, "screening_before_review");
+            Thread.Sleep(300);
+            Console.WriteLine("[ETAPA] Tentando etapa 'Revisar/Avaliar'...");
+            if (TryClickReviewButtonInPopup(driver, wait, link))
+            {
+                PauseBetweenFlowSteps();
+            }
+        }
+
+        // Aguarda transição para a etapa final de envio.
+        PauseBetweenFlowSteps("Preparando envio final");
+
+        IWebElement? FindSubmitButtonCandidate()
+        {
+            return TryFindSubmitButtonRobust(driver);
+        }
+
+        // Tenta localizar botão final de envio da candidatura (wait curto de 6s para não travar 25s em falhas).
         IWebElement? submitButton = null;
         try
         {
-            submitButton = wait.Until(_ => FindSubmitButtonCandidate());
+            var submitWait = new WebDriverWait(driver, TimeSpan.FromSeconds(6));
+            submitButton = submitWait.Until(_ => FindSubmitButtonCandidate());
         }
         catch (WebDriverTimeoutException)
         {
@@ -557,25 +649,14 @@ partial class Program
                     var submitDescription = DescribeElementForLog(submitButton);
                     var requiredSummary = BuildRequiredFieldsSummary(driver);
 
-                    if (TryDetectScreeningQuestionsGate(driver, out var screeningGateDetailsDisabledSubmit))
-                    {
-                        Console.WriteLine("[ETAPA] Submit desabilitado por questionário obrigatório. Pulando vaga por enquanto.");
-                        Console.WriteLine($"[DEBUG SCREENING] {screeningGateDetailsDisabledSubmit}");
-                        LogApplicationStep(link, "screening_questions_detected_submit_disabled", false, screeningGateDetailsDisabledSubmit);
-                        IgnoreJobLinkInCurrentRun(link, "REQUIRES_SELECT_QUESTIONNAIRE");
-                        MarkJobAsUnavailable(link, "REQUIRES_SCREENING_QUESTIONS");
-                        TryDismissEasyApplyModal(driver, link, "screening_submit_disabled");
-                        return false;
-                    }
-
-                    Console.WriteLine("Botão de envio identificado, porém desabilitado (provável etapa/validação obrigatória).");
+                    Console.WriteLine("Botão de envio identificado, porém desabilitado (provável validação pendente).");
                     Console.WriteLine($"[DEBUG SUBMIT DISABLED] aria-disabled='{ariaDisabled}', disabledAttr='{disabledAttr}', {submitDescription}");
                     Console.WriteLine($"[DEBUG REQUIRED] {requiredSummary}");
 
                     var diagnosticsDisabled = SaveFailureDiagnostics(driver, link, "submit_disabled_or_validation");
                     LogApplicationStep(link, "submit_disabled_or_validation", false, $"Botão Enviar/Submit presente porém desabilitado. aria-disabled='{ariaDisabled}', disabled='{disabledAttr}'. {submitDescription}. REQUIRED: {requiredSummary}", diagnosticsDisabled.HtmlPath, diagnosticsDisabled.ScreenshotPath);
-                    IgnoreJobLinkInCurrentRun(link, "REQUIRES_MANDATORY_FIELDS");
-                    MarkJobAsUnavailable(link, "REQUIRES_MANDATORY_FIELDS");
+                    IgnoreJobLinkInCurrentRun(link, "SUBMIT_DISABLED", persistToDisk: false);
+                    // Não marca como indisponível definitivo no banco para não queimar a vaga
                     TryDismissEasyApplyModal(driver, link, "mandatory_fields_submit_disabled");
                     return false;
                     }
@@ -643,26 +724,33 @@ partial class Program
 
         if (submitButton == null)
         {
-            Console.WriteLine("Vaga com etapas obrigatórias adicionais detectada. Ignorando por enquanto.");
-
-            if (TryDetectScreeningQuestionsGate(driver, out var screeningGateDetailsNoSubmit))
+            Console.WriteLine("Botão de envio direto não encontrado. Tentando verificar se há botões de avanço ou revisão...");
+            if (HasVisibleReviewButton())
             {
-                Console.WriteLine("[ETAPA] Questionário obrigatório detectado (sem botão de envio). Pulando vaga por enquanto.");
-                Console.WriteLine($"[DEBUG SCREENING] {screeningGateDetailsNoSubmit}");
-                LogApplicationStep(link, "screening_questions_detected_no_submit", false, screeningGateDetailsNoSubmit);
-                IgnoreJobLinkInCurrentRun(link, "REQUIRES_SELECT_QUESTIONNAIRE");
-                MarkJobAsUnavailable(link, "REQUIRES_SCREENING_QUESTIONS");
-                TryDismissEasyApplyModal(driver, link, "screening_no_submit");
-                return false;
+                TryClickReviewButtonInPopup(driver, wait, link);
+                Thread.Sleep(700);
+                submitButton = FindSubmitButtonCandidate();
             }
+            else if (HasVisibleNextButton())
+            {
+                TryAutoFillMandatoryFieldsInModal(driver, link, "submit_null_fallback_autofill");
+                Thread.Sleep(300);
+                TryClickNextButtonInPopup(driver, wait, "submit_null_fallback_advance", link);
+                Thread.Sleep(700);
+                submitButton = FindSubmitButtonCandidate();
+            }
+        }
 
+        if (submitButton == null)
+        {
+            Console.WriteLine("Vaga com etapas não finalizáveis detectada.");
             var requiredSummary = BuildRequiredFieldsSummary(driver);
             Console.WriteLine($"[DEBUG REQUIRED] {requiredSummary}");
-            var diagnostics = SaveFailureDiagnostics(driver, link, "submit_not_found_or_required_questions");
-            LogApplicationStep(link, "submit_not_found_or_required_questions", false, $"Fluxo exige etapas adicionais/perguntas obrigatórias. REQUIRED: {requiredSummary}", diagnostics.HtmlPath, diagnostics.ScreenshotPath);
-            IgnoreJobLinkInCurrentRun(link, "REQUIRES_MANDATORY_FIELDS");
-            MarkJobAsUnavailable(link, "REQUIRES_MANDATORY_FIELDS");
-            TryDismissEasyApplyModal(driver, link, "mandatory_fields_no_submit");
+            var diagnostics = SaveFailureDiagnostics(driver, link, "submit_not_found");
+            LogApplicationStep(link, "submit_not_found", false, $"Botão de envio não localizado após tentativas de avanço. REQUIRED: {requiredSummary}", diagnostics.HtmlPath, diagnostics.ScreenshotPath);
+            IgnoreJobLinkInCurrentRun(link, "SUBMIT_NOT_FOUND", persistToDisk: false);
+            // Não marca como indisponível definitivo no banco para não queimar a vaga
+            TryDismissEasyApplyModal(driver, link, "submit_not_found");
             return false;
         }
 
@@ -672,7 +760,139 @@ partial class Program
         Console.WriteLine("Botão 'Enviar candidatura' clicado com sucesso.");
         LogApplicationStep(link, "submit_clicked", true, "Botão Enviar candidatura clicado com sucesso.");
 
+        // Aguarda confirmação de envio e clica no botão "Concluído" (ou fecha modal)
+        WaitForAndDismissPostSubmitSuccessModal(driver, link);
+
         return true;
+    }
+
+    private static void WaitForAndDismissPostSubmitSuccessModal(IWebDriver driver, string link)
+    {
+        try
+        {
+            Console.WriteLine("[ETAPA] Aguardando confirmação de envio e fechamento do modal...");
+            var deadline = DateTime.UtcNow.AddSeconds(12);
+            var startTime = DateTime.UtcNow;
+            var clickedDone = false;
+
+            while (DateTime.UtcNow < deadline)
+            {
+                // 1. Tenta encontrar e clicar no botão "Concluído" / "Done" via JS nativo
+                try
+                {
+                    if (driver is IJavaScriptExecutor js)
+                    {
+                        var jsResult = js.ExecuteScript(@"
+                            const buttons = Array.from(document.querySelectorAll('button, [role=""button""]'));
+                            const doneBtn = buttons.find(b => {
+                                const t = (b.innerText || b.textContent || '').trim().toLowerCase();
+                                const a = (b.getAttribute('aria-label') || '').toLowerCase();
+                                return t === 'concluído' || t === 'concluido' || t === 'done' || 
+                                       a === 'concluído' || a === 'concluido' || a === 'done' ||
+                                       t.includes('concluído') || t.includes('concluido') || a.includes('concluído');
+                            });
+                            if (doneBtn && doneBtn.offsetParent !== null) {
+                                doneBtn.scrollIntoView({block: 'center'});
+                                doneBtn.click();
+                                return true;
+                            }
+                            return false;
+                        ");
+
+                        if (jsResult is bool clicked && clicked)
+                        {
+                            Console.WriteLine("[SUCESSO] Botão 'Concluído' clicado com sucesso via JS!");
+                            LogApplicationStep(link, "done_button_clicked", true, "Botão Concluído clicado após envio.");
+                            clickedDone = true;
+                            Thread.Sleep(800);
+                            break;
+                        }
+                    }
+
+                    // 1b. Fallback Selenium XPath para "Concluído"
+                    var doneCandidates = driver.FindElements(By.XPath(
+                        "//button[contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚÂÊÔÃÕÀ', 'abcdefghijklmnopqrstuvwxyzáéíóúâêôãõà'), 'concluído') or " +
+                        "contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚÂÊÔÃÕÀ', 'abcdefghijklmnopqrstuvwxyzáéíóúâêôãõà'), 'concluido') or " +
+                        "contains(translate(normalize-space(.), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'done') or " +
+                        "contains(@aria-label,'Concluído') or contains(@aria-label,'Concluido') or contains(@aria-label,'Done')]"
+                    ));
+
+                    foreach (var btn in doneCandidates)
+                    {
+                        if (btn.Displayed && btn.Enabled)
+                        {
+                            ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].scrollIntoView({block: 'center'});", btn);
+                            Thread.Sleep(150);
+                            ClickElementRobust(driver, btn);
+                            Console.WriteLine("[SUCESSO] Botão 'Concluído' clicado com sucesso via Selenium!");
+                            LogApplicationStep(link, "done_button_clicked", true, "Botão Concluído clicado após envio.");
+                            clickedDone = true;
+                            Thread.Sleep(800);
+                            break;
+                        }
+                    }
+
+                    if (clickedDone)
+                    {
+                        break;
+                    }
+                }
+                catch { }
+
+                // 2. Se aparecer o prompt "Salvar esta candidatura?", clica em "Descartar"
+                try
+                {
+                    if (driver is IJavaScriptExecutor js)
+                    {
+                        var jsDiscard = js.ExecuteScript(@"
+                            const buttons = Array.from(document.querySelectorAll('button, [role=""button""]'));
+                            const discardBtn = buttons.find(b => {
+                                const t = (b.innerText || b.textContent || '').trim().toLowerCase();
+                                const a = (b.getAttribute('aria-label') || '').toLowerCase();
+                                const c = (b.getAttribute('data-control-name') || '').toLowerCase();
+                                return t === 'descartar' || t === 'discard' || a.includes('descartar') || a.includes('discard') || c.includes('discard');
+                            });
+                            if (discardBtn && discardBtn.offsetParent !== null) {
+                                discardBtn.scrollIntoView({block: 'center'});
+                                discardBtn.click();
+                                return true;
+                            }
+                            return false;
+                        ");
+                        if (jsDiscard is bool discarded && discarded)
+                        {
+                            Console.WriteLine("[POPUP] Botão 'Descartar' clicado via JS.");
+                            Thread.Sleep(500);
+                            break;
+                        }
+                    }
+                }
+                catch { }
+
+                // 3. Só encerra por ausência de modais após aguardar pelo menos 2.5s (dá tempo do LinkedIn renderizar a confirmação de envio)
+                if ((DateTime.UtcNow - startTime).TotalSeconds >= 2.5)
+                {
+                    try
+                    {
+                        var openModals = driver.FindElements(By.CssSelector("dialog[open], div[role='dialog'], div.jobs-easy-apply-modal"));
+                        var anyVisible = openModals.Any(m => { try { return m.Displayed; } catch { return false; } });
+                        if (!anyVisible)
+                        {
+                            break;
+                        }
+                    }
+                    catch { }
+                }
+
+                Thread.Sleep(400);
+            }
+
+            Thread.Sleep(500);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[AVISO] Finalização do modal pós-envio: {ex.Message}");
+        }
     }
 
     // Abre cada link vindo do banco e executa o fluxo de candidatura simplificada.
@@ -698,9 +918,22 @@ partial class Program
             // Percorre cada URL retornada no SELECT.
             foreach (var link in links)
             {
-                if (maxJobsToProcess > 0 && processedJobs >= maxJobsToProcess)
+                int successfulInCycle;
+                lock (SuccessfulJobLinksLock)
                 {
-                    Console.WriteLine($"Limite de vagas para candidatura por ciclo atingido ({maxJobsToProcess}).");
+                    successfulInCycle = SuccessfulJobLinksCurrentCycle.Count;
+                }
+
+                if (maxJobsToProcess > 0 && successfulInCycle >= maxJobsToProcess)
+                {
+                    Console.WriteLine($"Meta de candidaturas enviadas com sucesso no ciclo atingida ({successfulInCycle}/{maxJobsToProcess}).");
+                    break;
+                }
+
+                int maxAttemptsLimit = maxJobsToProcess > 0 ? Math.Max(maxJobsToProcess * 5, 80) : 80;
+                if (processedJobs >= maxAttemptsLimit)
+                {
+                    Console.WriteLine($"Limite máximo de tentativas do ciclo atingido ({processedJobs} tentativas, {successfulInCycle} enviadas com sucesso).");
                     break;
                 }
 
@@ -823,9 +1056,22 @@ partial class Program
 
             foreach (var link in links)
             {
-                if (maxJobsToProcess > 0 && processedJobs >= maxJobsToProcess)
+                int successfulInCycle;
+                lock (SuccessfulJobLinksLock)
                 {
-                    Console.WriteLine($"Limite de vagas para candidatura por ciclo atingido ({maxJobsToProcess}).");
+                    successfulInCycle = SuccessfulJobLinksCurrentCycle.Count;
+                }
+
+                if (maxJobsToProcess > 0 && successfulInCycle >= maxJobsToProcess)
+                {
+                    Console.WriteLine($"Meta de candidaturas enviadas com sucesso no ciclo atingida ({successfulInCycle}/{maxJobsToProcess}).");
+                    break;
+                }
+
+                int maxAttemptsLimit = maxJobsToProcess > 0 ? Math.Max(maxJobsToProcess * 5, 80) : 80;
+                if (processedJobs >= maxAttemptsLimit)
+                {
+                    Console.WriteLine($"Limite máximo de tentativas do ciclo atingido ({processedJobs} tentativas, {successfulInCycle} enviadas com sucesso).");
                     break;
                 }
 

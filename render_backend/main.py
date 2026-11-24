@@ -1,16 +1,32 @@
 # =============================================================
-# render_backend/main.py — Orquestrador FastAPI
-# Deploy no Render.com como "Web Service"
+# render_backend/main.py — Orquestrador FastAPI para Linkdim
+# Suporta execução local e em servidor remoto
 # =============================================================
-import asyncio, os, subprocess, signal, time, threading
+import asyncio, os, sys, subprocess, signal, time, threading
 from datetime import datetime
-from typing import Optional
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from typing import Optional, List
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 import psycopg2
+import glob
 
-app = FastAPI(title="LinkDim Crawler API", version="1.0")
+# ── Lifespan events (novo padrão FastAPI) ────────────────────
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Salva o loop principal para ser usado pelas threads de log
+    app.main_loop = asyncio.get_running_loop()
+    yield
+    # Shutdown: Cleanup se necessário
+    pass
+
+app = FastAPI(
+    title="LinkDim Crawler API",
+    version="1.0",
+    lifespan=lifespan
+)
 app.add_middleware(CORSMiddleware, allow_origins=["*"],
                    allow_methods=["*"], allow_headers=["*"])
 
@@ -19,14 +35,38 @@ class CrawlerState:
     process: Optional[subprocess.Popen] = None
     status: str = "stopped"
     last_heartbeat: Optional[str] = None
+    log_buffer: list = [] # Guarda os últimos 100 logs
     config: dict = {
         "max_apply_per_cycle": 15,
         "cycle_wait_minutes":  45,
-        "active_hours_start":  8,
-        "active_hours_end":    22,
-        "search_terms":        "C#, Python, Qt"
+        "active_hours_start":  0,
+        "active_hours_end":    0,
+        "search_terms":        "C#, Python, Qt",
+        "session_cookie":      ""
     }
     log_subscribers: list = []
+    
+    # Detecção de ambiente para execução local
+    is_windows = os.name == 'nt'
+    
+    # Se estiver rodando compilado pelo PyInstaller (frozen), o executável fica na raiz
+    if getattr(sys, 'frozen', False):
+        root_dir = os.path.dirname(sys.executable)
+    else:
+        root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        
+    # Prioridade: Env Var > Pasta 'WebCrawler_Bin' ou 'WebCrawler' no root > /app/crawler (Render)
+    if is_windows:
+        default_crawler_dir = os.path.join(root_dir, "WebCrawler_Bin")
+        if not os.path.exists(default_crawler_dir):
+            default_crawler_dir = os.path.join(root_dir, "WebCrawler")
+    else:
+        # Para Linux/Mac: usar /app/crawler apenas se não for Windows
+        default_crawler_dir = os.path.join(root_dir, "WebCrawler_Bin")
+        if not os.path.exists(default_crawler_dir):
+            default_crawler_dir = os.path.join(root_dir, "WebCrawler")
+        
+    crawler_dir = os.environ.get("WEBCRAWLER_DIR", default_crawler_dir)
 
 state = CrawlerState()
 
@@ -34,9 +74,10 @@ state = CrawlerState()
 class StartRequest(BaseModel):
     max_apply_per_cycle: int = 15
     cycle_wait_minutes:  int = 45
-    active_hours_start:  int = 8
-    active_hours_end:    int = 22
+    active_hours_start:  int = 0
+    active_hours_end:    int = 0
     search_terms:        str = ""
+    session_cookie:      str = ""
 
 class ConfigRequest(BaseModel):
     max_apply_per_cycle: int = 15
@@ -44,52 +85,163 @@ class ConfigRequest(BaseModel):
     active_hours_start:  int = 8
     active_hours_end:    int = 22
     search_terms:        str = ""
+    session_cookie:      str = ""
 
 # ── Broadcast de logs para todos os WebSocket conectados ──────
 async def broadcast_log(msg: str):
+    # Salva no buffer
+    ts_msg = f"[{datetime.now().strftime('%H:%M:%S')}] {msg}"
+    state.log_buffer.append(ts_msg)
+    if len(state.log_buffer) > 100:
+        state.log_buffer.pop(0)
+
     dead = []
     for ws in state.log_subscribers:
         try:
-            await ws.send_text(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
+            await ws.send_text(ts_msg)
         except Exception:
             dead.append(ws)
     for ws in dead:
-        state.log_subscribers.remove(ws)
+        if ws in state.log_subscribers:
+            state.log_subscribers.remove(ws)
 
 def sync_broadcast(msg: str):
-    """Chama broadcast de threads síncronas (ex: reader do subprocess)"""
-    loop = asyncio.get_event_loop()
-    asyncio.run_coroutine_threadsafe(broadcast_log(msg), loop)
+    """Chama broadcast de threads síncronas usando o loop global"""
+    try:
+        # Se não tiver loop salvo, tenta pegar o atual
+        loop = getattr(app, 'main_loop', None)
+        if not loop:
+            loop = asyncio.get_event_loop()
+        
+        if loop and loop.is_running():
+            asyncio.run_coroutine_threadsafe(broadcast_log(msg), loop)
+    except Exception:
+        pass
 
 # ── Lê stdout/stderr do subprocess e envia via WebSocket ─────
 def stream_process_output(proc: subprocess.Popen):
-    for line in iter(proc.stdout.readline, b""):
-        decoded = line.decode("utf-8", errors="replace").strip()
-        if decoded:
-            sync_broadcast(decoded)
-    proc.wait()
-    state.status = "stopped"
-    sync_broadcast("⏹ Processo do crawler encerrado.")
+    sync_broadcast("🚀 [SISTEMA] Conectado ao fluxo de saída do robô. Aguardando mensagens...")
+    
+    # Thread para ler logs em tempo real
+    def stream_logs():
+        try:
+            # Lê stdout e stderr (combinados via subprocess.STDOUT)
+            for line in iter(proc.stdout.readline, ""):
+                if line:
+                    clean_line = line.strip()
+                    sync_broadcast(clean_line)
+            
+            # Se o loop acabar, o processo terminou
+            rc = proc.wait()
+            sync_broadcast(f"⚠️ [C#] Processo encerrado. Código de saída: {rc}")
+        except Exception as e:
+            sync_broadcast(f"❌ [Orquestrador] Erro ao ler logs: {e}")
+        finally:
+            state.process = None
+            state.status = "stopped"
+            sync_broadcast("ℹ️ Crawler parado.")
+
+    thread = threading.Thread(target=stream_logs, daemon=True)
+    thread.start()
+
+# ── Endpoints REST ────────────────────────────────────────────
+# Status endpoint moved to line 207 below
+def connect_to_db(uri):
+    if not uri: return None, "URI vazia"
+    
+    # Limpeza profunda (remove aspas, espaços e caracteres de escape)
+    uri = uri.strip().strip("'").strip('"').replace("\\n", "").replace("\\r", "")
+    
+    # Log de diagnóstico (seguro: oculta senha)
+    masked_uri = uri
+    if "@" in uri:
+        parts = uri.split("@")
+        prefix = parts[0].split("://")
+        if len(prefix) > 1:
+            masked_uri = f"{prefix[0]}://***:***@{parts[1]}"
+    
+    errs = []
+    # sync_broadcast(f"🔍 [DB] Tentando conectar ao banco: {masked_uri[:60]}...")
+
+    # Garantir prefixo correto para psycopg2
+    if uri.startswith("postgres://"):
+        uri = uri.replace("postgres://", "postgresql://", 1)
+    
+    # Tentativa 1: Conexão Direta (LibPQ)
+    try:
+        return psycopg2.connect(uri, connect_timeout=10), None
+    except Exception as e:
+        errs.append(f"Erro URI: {str(e)}")
+
+    # Tentativa 2: Parsing Manual (Blindagem contra erros de DSN do LibPQ)
+    if "://" in uri:
+        try:
+            import urllib.parse
+            res = urllib.parse.urlparse(uri)
+            # Extrai componentes manualmente para evitar o erro "missing =" do libpq
+            conn = psycopg2.connect(
+                host=res.hostname,
+                port=res.port or 5432,
+                database=res.path[1:],
+                user=res.username,
+                password=res.password,
+                connect_timeout=10,
+                sslmode="require"
+            )
+            return conn, None
+        except Exception as e:
+            errs.append(f"Erro Manual: {str(e)}")
+
+    return None, " | ".join(errs)
 
 # ── Endpoints REST ────────────────────────────────────────────
 @app.get("/crawler/status")
 def get_status():
     # Verifica último heartbeat no banco
     last_hb = None
+    conn_str = os.environ.get("WEBCRAWLER_DB_CONNECTION")
+    
+    if not conn_str:
+        last_hb = "Erro: Variável WEBCRAWLER_DB_CONNECTION não configurada. Configure a variável de ambiente."
+        return {"status": state.status, "pid": state.process.pid if state.process else None, "last_heartbeat": last_hb, "config": state.config}
+
+    conn, db_err = connect_to_db(conn_str)
     try:
-        conn = psycopg2.connect(os.environ["WEBCRAWLER_DB_CONNECTION"])
-        cur = conn.cursor()
-        cur.execute("SELECT last_heartbeat FROM crawler_jobs ORDER BY last_heartbeat DESC LIMIT 1")
-        row = cur.fetchone()
-        if row and row[0]:
-            last_hb = row[0].isoformat()
-            # Se heartbeat < 5 min → considera online
-            delta = (datetime.utcnow() - row[0]).total_seconds() / 60
-            if state.status != "running" and delta < 5:
-                state.status = "running"
-        conn.close()
+        if conn:
+            cur = conn.cursor()
+            # Garante que a tabela de status existe (caso o C# ainda não tenha rodado)
+            cur.execute("""
+                CREATE TABLE IF NOT EXISTS crawler_runtime_status (
+                    instance_name TEXT PRIMARY KEY,
+                    state TEXT NOT NULL,
+                    detail TEXT NULL,
+                    is_running BOOLEAN NOT NULL DEFAULT TRUE,
+                    process_id INTEGER NULL,
+                    host_name TEXT NULL,
+                    started_at TIMESTAMP NOT NULL DEFAULT NOW(),
+                    last_heartbeat TIMESTAMP NOT NULL DEFAULT NOW(),
+                    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+                );
+            """)
+            conn.commit()
+
+            # Consulta o status
+            cur.execute("SELECT state, last_heartbeat, is_running FROM crawler_runtime_status WHERE instance_name = 'default' LIMIT 1")
+            row = cur.fetchone()
+            if row:
+                st, lb, is_run = row
+                last_hb = lb.isoformat() if lb else "N/A"
+                if is_run:
+                    state.status = "running"
+                else:
+                    state.status = "stopped"
+            else:
+                last_hb = "Aguardando primeira execução do robô..."
+            conn.close()
+        else:
+            last_hb = f"Erro de Conexão: {db_err}"
     except Exception as e:
-        last_hb = f"DB error: {e}"
+        last_hb = f"Erro de Operação: {e}"
 
     return {
         "status":         state.status,
@@ -97,6 +249,35 @@ def get_status():
         "last_heartbeat": last_hb,
         "config":         state.config
     }
+
+# --- DIAGNÓSTICOS ---
+
+@app.get("/diagnostics")
+async def list_diagnostics():
+    diag_dir = "/app/crawler/diagnostics"
+    if not os.path.exists(diag_dir):
+        return {"files": []}
+    
+    files = []
+    for f in glob.glob(f"{diag_dir}/*.*"):
+        files.append({
+            "name": os.path.basename(f),
+            "size": os.path.getsize(f),
+            "mtime": os.path.getmtime(f)
+        })
+    # Ordenar por mais recentes
+    files.sort(key=lambda x: x["mtime"], reverse=True)
+    return {"files": files}
+
+@app.get("/diagnostics/{filename}")
+async def get_diagnostic(filename: str):
+    diag_dir = "/app/crawler/diagnostics"
+    file_path = os.path.join(diag_dir, filename)
+    
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="Arquivo não encontrado")
+    
+    return FileResponse(file_path)
 
 @app.post("/crawler/start")
 async def start_crawler(req: StartRequest):
@@ -109,7 +290,8 @@ async def start_crawler(req: StartRequest):
         "cycle_wait_minutes":  req.cycle_wait_minutes,
         "active_hours_start":  req.active_hours_start,
         "active_hours_end":    req.active_hours_end,
-        "search_terms":        req.search_terms or state.config["search_terms"]
+        "search_terms":        req.search_terms or state.config["search_terms"],
+        "session_cookie":      req.session_cookie or state.config["session_cookie"]
     })
 
     # Monta variáveis de ambiente para o processo C#
@@ -120,23 +302,104 @@ async def start_crawler(req: StartRequest):
     env["WEBCRAWLER_ACTIVE_HOURS_END"]    = str(req.active_hours_end)
     if req.search_terms:
         env["WEBCRAWLER_JOB_SEARCH_TERMS"] = req.search_terms
+    if req.session_cookie or state.config["session_cookie"]:
+        env["LINKEDIN_SESSION_COOKIE"] = req.session_cookie or state.config["session_cookie"]
+
+    # Força ativação do banco de dados para salvar as vagas
+    env["WEBCRAWLER_DISABLE_DATABASE"] = "false"
 
     try:
+        crawler_dir = state.crawler_dir
+        
+        # Define caminhos baseados no SO
+        if state.is_windows:
+            binary_name = os.environ.get("WEBCRAWLER_BINARY", "WebCrawler.exe")
+            # Tenta encontrar no diretório configurado
+            binary_path = os.path.join(crawler_dir, binary_name)
+            # Se não achar, tenta fallback para WebCrawler.exe se for o caso
+            if not os.path.exists(binary_path) and binary_name == "LinkdimCrawler.exe":
+                fallback = os.path.join(crawler_dir, "WebCrawler.exe")
+                if os.path.exists(fallback):
+                    binary_path = fallback
+                    binary_name = "WebCrawler.exe"
+            
+            # Se ainda não achar, tenta na pasta de build se estiver rodando do root
+            if not os.path.exists(binary_path):
+                if getattr(sys, 'frozen', False):
+                    root_dir = os.path.dirname(sys.executable)
+                else:
+                    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                build_path = os.path.join(root_dir, "build_crawler", binary_name)
+                if os.path.exists(build_path):
+                    binary_path = build_path
+                    crawler_dir = os.path.dirname(build_path)
+        else:
+            binary_path = os.path.join(crawler_dir, "WebCrawler")
+            dll_path = os.path.join(crawler_dir, "WebCrawler.dll")
+        
+        await broadcast_log("🔍 [SISTEMA] Iniciando verificação de lançamento...")
+        
+        # Log de variáveis (sem senhas)
+        await broadcast_log(f"📦 [SISTEMA] Termos: {req.search_terms} | Ciclo: {req.cycle_wait_minutes}min")
+
+        # Passa a conexão limpa para o C#
+        raw_conn = os.environ.get("WEBCRAWLER_DB_CONNECTION", "")
+        clean_conn = raw_conn.strip().replace('"', '').replace("'", "")
+        env["WEBCRAWLER_DB_CONNECTION"] = clean_conn
+
+        # 3. Verifica se o executável existe
+        if os.path.exists(binary_path):
+            await broadcast_log(f"✅ Usando execução direta: {binary_path}")
+            if not state.is_windows:
+                os.chmod(binary_path, 0o755)
+            cmd = [binary_path]
+        elif not state.is_windows:
+            cmd = ["dotnet", dll_path]
+        else:
+            await broadcast_log(f"❌ [ERRO] Binário não encontrado em: {binary_path}")
+            return {"ok": False, "msg": "Executável do crawler não encontrado."}
+
+        await broadcast_log(f"🚀 Lançando processo: {' '.join(cmd)}")
+        
+        env["DOTNET_RUNNING_IN_CONTAINER"] = "true"
+        env["COMPlus_EnableDiagnostics"] = "0"
+        
+        # Lança com redirecionamento total
         proc = subprocess.Popen(
-            ["dotnet", "/app/WebCrawler.dll"],  # Caminho no container
+            cmd, 
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             env=env,
+            cwd=crawler_dir,
+            text=True,
             bufsize=1
         )
         state.process = proc
         state.status  = "running"
 
-        # Thread que lê a saída e faz broadcast
-        t = threading.Thread(target=stream_process_output, args=(proc,), daemon=True)
-        t.start()
+        # Captura imediata da primeira saída (evita perder erro de startup)
+        def read_output():
+            try:
+                while True:
+                    line = proc.stdout.readline()
+                    if not line and proc.poll() is not None:
+                        break
+                    if line:
+                        msg = line.strip()
+                        print(f"🤖 [C#] {msg}") # Espelhamento no console do servidor
+                        sync_broadcast(msg)
+                
+                rc = proc.wait()
+                sync_broadcast(f"🏁 Processo encerrado (Código: {rc})")
+            except Exception as e:
+                sync_broadcast(f"❌ Erro no fluxo de log: {e}")
+            finally:
+                state.status = "stopped"
+                state.process = None
 
-        await broadcast_log("▶ Crawler iniciado! PID: " + str(proc.pid))
+        threading.Thread(target=read_output, daemon=True).start()
+
+        await broadcast_log(f"▶ Robô em execução (PID: {proc.pid})")
         return {"ok": True, "pid": proc.pid}
     except FileNotFoundError:
         state.status = "error"
@@ -164,25 +427,118 @@ async def update_config(req: ConfigRequest):
     await broadcast_log("⚙️  Configuração atualizada pelo painel Qt.")
     return {"ok": True, "config": state.config}
 
+@app.get("/crawler/view_logs")
+async def view_logs():
+    """Endpoint de emergência para ver logs caso o WebSocket falhe"""
+    return {
+        "status": state.status,
+        "logs": state.log_buffer[-100:] if state.log_buffer else ["Nenhum log capturado ainda."]
+    }
+
 # ── WebSocket para streaming de logs ─────────────────────────
 @app.websocket("/ws/logs")
 async def ws_logs(ws: WebSocket):
     await ws.accept()
     state.log_subscribers.append(ws)
-    await ws.send_text("✅ Conectado ao servidor LinkDim. Aguardando logs...")
+    
+    # Envia histórico de logs
+    for log_msg in state.log_buffer:
+        await ws.send_text(log_msg)
+        
+    await ws.send_text("✅ Conectado ao servidor LinkDim. Aguardando novos logs...")
     try:
         while True:
-            await asyncio.sleep(30)
-            await ws.send_text("♥ ping")  # keepalive
+            await asyncio.sleep(60)
+            # Ping silencioso (sem texto no log)
+            try: await ws.send_bytes(b"")
+            except: break
     except WebSocketDisconnect:
         if ws in state.log_subscribers:
             state.log_subscribers.remove(ws)
 
-# ── Healthcheck (Render chama isso para manter online) ───────
+@app.get("/crawler/test")
+async def test_env():
+    results = {}
+    # Teste .NET
+    try:
+        dn = subprocess.check_output(["dotnet", "--version"], text=True).strip()
+        results["dotnet"] = f"OK ({dn})"
+    except: results["dotnet"] = "ERRO"
+    
+    # Teste Chrome
+    try:
+        cv = subprocess.check_output(["chromium", "--version"], text=True).strip()
+        results["chrome"] = f"OK ({cv})"
+    except: results["chrome"] = "ERRO (Chromium não encontrado)"
+
+    # Teste DB
+    conn_str = os.environ.get("WEBCRAWLER_DB_CONNECTION")
+    conn, err = connect_to_db(conn_str)
+    if conn:
+        results["database"] = "OK (Conectado)"
+        conn.close()
+    else:
+        results["database"] = f"ERRO ({err})"
+
+    await broadcast_log(f"📋 [DIAGNÓSTICO COMPLETO] .NET: {results['dotnet']} | Chrome: {results['chrome']} | DB: {results['database']}")
+    return {"ok": True, "results": results}
+
 @app.get("/health")
 def health():
     return {"ok": True, "time": datetime.utcnow().isoformat()}
 
+@app.get("/diag")
+async def list_diagnostics():
+    """Lista arquivos de diagnóstico (capturas de tela HTML)"""
+    diag_dir = os.path.join(state.crawler_dir, "diagnostics")
+    if not os.path.exists(diag_dir):
+        return {"ok": False, "msg": f"Diretório de diagnósticos não existe: {diag_dir}"}
+    
+    files = [f for f in os.listdir(diag_dir) if f.endswith(".html")]
+    files.sort(reverse=True)
+    return {"ok": True, "files": files}
+
+@app.get("/diag/{filename}")
+async def view_diagnostic(filename: str):
+    """Exibe o conteúdo de um arquivo de diagnóstico"""
+    diag_path = os.path.join(state.crawler_dir, "diagnostics", filename)
+    if not os.path.exists(diag_path):
+        return {"error": "Arquivo não encontrado."}
+    
+    from fastapi.responses import HTMLResponse
+    with open(diag_path, "r", encoding="utf-8") as f:
+        return HTMLResponse(content=f.read())
+
+@app.post("/crawler/reset_session")
+async def reset_session():
+    """Limpa o diretório de perfil do Chrome para forçar novo login"""
+    import shutil
+    crawler_dir = state.crawler_dir
+    profile_dir = os.path.join(crawler_dir, "ChromeProfile")
+    
+    if state.status == "running":
+        return {"ok": False, "msg": "Pare o robô antes de resetar a sessão."}
+        
+    try:
+        if os.path.exists(profile_dir):
+            shutil.rmtree(profile_dir)
+            await broadcast_log("🧹 [SISTEMA] Diretório de perfil limpo com sucesso.")
+            return {"ok": True, "msg": "Sessão resetada."}
+        else:
+            return {"ok": True, "msg": "Diretório de perfil não encontrado, já está limpo."}
+    except Exception as e:
+        return {"ok": False, "msg": str(e)}
+
 @app.get("/")
 def root():
     return {"service": "LinkDim Crawler API", "status": state.status}
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(
+        app,
+        host="0.0.0.0",
+        port=port,
+        log_level="info"
+    )

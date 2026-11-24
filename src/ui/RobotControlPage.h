@@ -18,12 +18,16 @@
 #include <QNetworkReply>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonArray>
 #include <QWebSocket>
 #include <QUrl>
 #include <QPainter>
 #include <QPainterPath>
 #include <QPropertyAnimation>
 #include <QEasingCurve>
+#include <QListWidget>
+#include <QDesktopServices>
+#include <QScrollArea>
 
 // ─────────────────────────────────────────────────────────────
 // PulseIndicator — bolinha animada de status
@@ -89,6 +93,78 @@ static QHBoxLayout* makeConfigRow(const QString& label, QWidget* input) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// LinkedInButton — Botão estilo InfoJobs (como solicitado)
+// ─────────────────────────────────────────────────────────────
+class LinkedInButton : public QPushButton {
+public:
+    LinkedInButton(QWidget* parent = nullptr) : QPushButton(parent) {
+        setCursor(Qt::PointingHandCursor);
+        setFixedHeight(50);
+        setMinimumWidth(300);
+        
+        // Estilo Premium White (estilo InfoJobs)
+        setStyleSheet(
+            "QPushButton {"
+            "  background-color: white;"
+            "  color: #1F2937;"
+            "  border: 1px solid #D1D5DB;"
+            "  border-radius: 20px;"
+            "  font-size: 14px;"
+            "  font-weight: 600;"
+            "  padding: 0 15px;"
+            "}"
+            "QPushButton:hover {"
+            "  background-color: #F9FAFB;"
+            "  border: 1px solid #0A66C2;"
+            "}"
+        );
+
+        auto* lay = new QHBoxLayout(this);
+        lay->setContentsMargins(10, 0, 10, 0);
+        lay->setSpacing(8);
+
+        // Ícone LinkedIn (Desenhado via Painter)
+        m_iconPlaceholder = new QWidget();
+        m_iconPlaceholder->setFixedSize(24, 24);
+        
+        auto* textLabel = new QLabel("LinkedIn");
+        textLabel->setStyleSheet("color: #1F2937; font-weight: bold; font-size: 16px; background: transparent;");
+
+        lay->addStretch();
+        lay->addWidget(m_iconPlaceholder);
+        lay->addWidget(textLabel);
+        lay->addStretch();
+    }
+
+protected:
+    void paintEvent(QPaintEvent* e) override {
+        QPushButton::paintEvent(e);
+        QPainter p(this);
+        p.setRenderHint(QPainter::Antialiasing);
+        
+        // Geometria do ícone baseado no placeholder
+        QRect r = m_iconPlaceholder->geometry();
+        
+        // Desenha o fundo azul do LinkedIn
+        p.setBrush(QColor("#0A66C2"));
+        p.setPen(Qt::NoPen);
+        p.drawRoundedRect(r, 4, 4);
+        
+        // Desenha o "in" estilizado (simplificado com texto, mas fiel à marca)
+        p.setPen(Qt::white);
+        QFont f = p.font();
+        f.setFamily("Arial");
+        f.setBold(true);
+        f.setPixelSize(16);
+        p.setFont(f);
+        p.drawText(r.adjusted(0, -1, 0, 0), Qt::AlignCenter, "in");
+    }
+
+private:
+    QWidget* m_iconPlaceholder;
+};
+
+// ─────────────────────────────────────────────────────────────
 // RobotControlPage — tela de controle do WebCrawler
 // ─────────────────────────────────────────────────────────────
 class RobotControlPage : public QWidget {
@@ -116,60 +192,77 @@ private:
     QLabel*         m_uptimeLabel = nullptr;
     QPushButton*    m_startBtn    = nullptr;
     QPushButton*    m_stopBtn     = nullptr;
+    QPushButton*    m_resetBtn    = nullptr;
     QTextEdit*      m_logArea     = nullptr;
     QLineEdit*      m_apiUrlInput = nullptr;
     QSpinBox*       m_maxApply    = nullptr;
     QSpinBox*       m_cycleWait   = nullptr;
-    QSpinBox*       m_activeStart = nullptr;
-    QSpinBox*       m_activeEnd   = nullptr;
     QLineEdit*      m_termsInput  = nullptr;
+    
+    // Autenticação
+    LinkedInButton* m_loginBtn     = nullptr;
+    QLineEdit*      m_cookieInput  = nullptr;
+    QPushButton*    m_saveCookieBtn = nullptr;
 
     // ── Membros de rede ──────────────────────────────────────
     QNetworkAccessManager* m_nam = nullptr;
     QWebSocket             m_ws;
-    QString m_apiBase = "https://linkdim-api.onrender.com"; // ← URL do Render
+    QString m_apiBase = "http://localhost:8000"; // ← Servidor local por padrão
 
     void buildUI() {
         auto* root = new QVBoxLayout(this);
-        root->setContentsMargins(40, 36, 40, 36);
-        root->setSpacing(24);
+        root->setContentsMargins(0, 0, 0, 0);
+        root->setSpacing(0);
 
-        // ── Cabeçalho ────────────────────────────────────────
-        auto* hdr = new QHBoxLayout();
+        // ── 1. CABEÇALHO FIXO ────────────────────────────────
+        auto* hdrContainer = new QWidget();
+        hdrContainer->setFixedHeight(80);
+        hdrContainer->setStyleSheet("background:#1A1D24; border-bottom:1px solid #252830;");
+        auto* hdr = new QHBoxLayout(hdrContainer);
+        hdr->setContentsMargins(32, 10, 32, 10);
+        
         auto* titleV = new QVBoxLayout();
         auto* title = new QLabel("Controle do Robô");
-        title->setStyleSheet("color:#F0F4F8;font-size:28px;font-weight:bold;");
-        auto* sub = new QLabel("Orquestra o WebCrawler rodando no Render.com via API.");
-        sub->setStyleSheet("color:#A39C93;font-size:13px;");
+        title->setStyleSheet("color:#F0F4F8;font-size:22px;font-weight:bold;");
+        auto* sub = new QLabel("Orquestrador LinkDim via API");
+        sub->setStyleSheet("color:#A39C93;font-size:11px;");
         titleV->addWidget(title); titleV->addWidget(sub);
         hdr->addLayout(titleV);
         hdr->addStretch();
 
-        // Campo URL da API
         m_apiUrlInput = new QLineEdit(m_apiBase);
-        m_apiUrlInput->setFixedWidth(360);
-        m_apiUrlInput->setStyleSheet(
-            "QLineEdit{background:#1A1D24;color:#F0F4F8;border:1px solid #252830;"
-            "border-radius:8px;padding:8px 14px;font-size:12px;}"
-            "QLineEdit:focus{border:1px solid #E39B35;}");
-        connect(m_apiUrlInput, &QLineEdit::editingFinished, this, [this]{
-            m_apiBase = m_apiUrlInput->text().trimmed();
-            connectWebSocket();
-            appendLog("🔗 API URL atualizada: " + m_apiBase);
+        m_apiUrlInput->setFixedWidth(300);
+        styleInput(m_apiUrlInput);
+        connect(m_apiUrlInput, &QLineEdit::textChanged, this, [this](const QString& text){
+            m_apiBase = text.trimmed();
+            QTimer::singleShot(1000, this, &RobotControlPage::connectWebSocket);
         });
-        auto* apiLbl = new QLabel("API URL:");
-        apiLbl->setStyleSheet("color:#A39C93;font-size:12px;");
+        
         auto* apiRow = new QVBoxLayout();
+        auto* apiLbl = new QLabel("API URL:");
+        apiLbl->setStyleSheet("color:#A39C93;font-size:10px;font-weight:bold;");
         apiRow->addWidget(apiLbl); apiRow->addWidget(m_apiUrlInput);
         hdr->addLayout(apiRow);
-        root->addLayout(hdr);
+        root->addWidget(hdrContainer);
 
-        // ── Status Card ──────────────────────────────────────
+        // ── 2. ÁREA SCROLLABLE ───────────────────────────────
+        auto* scroll = new QScrollArea(this);
+        scroll->setWidgetResizable(true);
+        scroll->setFrameShape(QFrame::NoFrame);
+        scroll->setStyleSheet("background:transparent; QScrollBar:vertical { width: 8px; background: #111216; } "
+                            "QScrollBar::handle:vertical { background: #252830; border-radius: 4px; }");
+        
+        auto* scrollContent = new QWidget();
+        scrollContent->setStyleSheet("background:transparent;");
+        auto* scrollLayout = new QVBoxLayout(scrollContent);
+        scrollLayout->setContentsMargins(32, 24, 32, 24);
+        scrollLayout->setSpacing(24);
+
+        // --- CARD DE STATUS ---
         auto* statusCard = makeCard();
         auto* sclay = new QHBoxLayout(statusCard);
         sclay->setContentsMargins(24, 20, 24, 20); sclay->setSpacing(32);
 
-        // Indicador + status
         m_pulse = new PulseIndicator(this);
         m_statusLabel = new QLabel("Verificando...");
         m_statusLabel->setStyleSheet("color:#F0F4F8;font-size:20px;font-weight:bold;");
@@ -180,86 +273,94 @@ private:
         m_cycleLabel->setStyleSheet("color:#A39C93;font-size:12px;");
         m_uptimeLabel = new QLabel("Último heartbeat: —");
         m_uptimeLabel->setStyleSheet("color:#A39C93;font-size:12px;");
-        stV->addLayout(stRow);
-        stV->addWidget(m_cycleLabel);
-        stV->addWidget(m_uptimeLabel);
+        stV->addLayout(stRow); stV->addWidget(m_cycleLabel); stV->addWidget(m_uptimeLabel);
         sclay->addLayout(stV, 1);
 
-        // Botões START / STOP
+        auto* btnV = new QVBoxLayout();
         m_startBtn = makeActionBtn("▶  INICIAR CRAWLER", "#22C55E");
         m_stopBtn  = makeActionBtn("■  PARAR CRAWLER",   "#EF4444");
         m_stopBtn->setEnabled(false);
+        m_resetBtn = makeActionBtn("🧹  LIMPAR SESSÃO", "#6B7280");
+        m_resetBtn->setFixedHeight(32); m_resetBtn->setStyleSheet(m_resetBtn->styleSheet().replace("14px", "11px"));
+        btnV->addWidget(m_startBtn); btnV->addWidget(m_stopBtn); btnV->addWidget(m_resetBtn);
+        sclay->addLayout(btnV);
+
         connect(m_startBtn, &QPushButton::clicked, this, &RobotControlPage::startCrawler);
         connect(m_stopBtn,  &QPushButton::clicked, this, &RobotControlPage::stopCrawler);
-        auto* btnV = new QVBoxLayout();
-        btnV->addWidget(m_startBtn); btnV->addWidget(m_stopBtn);
-        sclay->addLayout(btnV);
-        root->addWidget(statusCard);
+        connect(m_resetBtn, &QPushButton::clicked, this, &RobotControlPage::resetSession);
 
-        // ── Layout horizontal: Config + Log ─────────────────
-        auto* midRow = new QHBoxLayout(); midRow->setSpacing(20);
+        scrollLayout->addWidget(statusCard);
 
-        // ── Painel de Configuração ───────────────────────────
+        // --- GRID: CONFIG + AUTH | LOGS ---
+        auto* gridRow = new QHBoxLayout(); gridRow->setSpacing(20);
+        
+        auto* leftCol = new QVBoxLayout(); leftCol->setSpacing(20);
+        
+        // CARD DE CONFIGURAÇÃO
         auto* cfgCard = makeCard();
-        cfgCard->setFixedWidth(360);
         auto* cfglay = new QVBoxLayout(cfgCard);
-        cfglay->setContentsMargins(24, 20, 24, 20); cfglay->setSpacing(16);
-
+        cfglay->setContentsMargins(24, 20, 24, 20); cfglay->setSpacing(12);
         auto* cfgTitle = new QLabel("⚙️  Configuração do Ciclo");
         cfgTitle->setStyleSheet("color:#E39B35;font-size:14px;font-weight:bold;");
         cfglay->addWidget(cfgTitle);
         addSeparator(cfglay);
-
         m_maxApply = makeSpinBox(1, 100, 15);
         m_cycleWait = makeSpinBox(1, 480, 45);
-        m_activeStart = makeSpinBox(0, 23, 8);
-        m_activeEnd   = makeSpinBox(0, 23, 22);
-        m_termsInput  = new QLineEdit("C#, Python, Qt, PostgreSQL");
-        styleInput(m_termsInput);
-
-        cfglay->addLayout(makeConfigRow("Candidaturas / ciclo:", m_maxApply));
-        cfglay->addLayout(makeConfigRow("Espera entre ciclos (min):", m_cycleWait));
-        cfglay->addLayout(makeConfigRow("Horário início (h):", m_activeStart));
-        cfglay->addLayout(makeConfigRow("Horário fim (h):", m_activeEnd));
-        cfglay->addLayout(makeConfigRow("Termos de busca:", m_termsInput));
-
-        addSeparator(cfglay);
-
-        auto* applyBtn = new QPushButton("Salvar e Aplicar Configuração");
+        m_termsInput  = new QLineEdit("C#, Python, Qt"); styleInput(m_termsInput);
+        cfglay->addLayout(makeConfigRow("Vagas / ciclo:", m_maxApply));
+        cfglay->addLayout(makeConfigRow("Espera (min):", m_cycleWait));
+        cfglay->addLayout(makeConfigRow("Termos:", m_termsInput));
+        auto* applyBtn = new QPushButton("Aplicar Configuração");
+        applyBtn->setFixedHeight(36);
         applyBtn->setCursor(Qt::PointingHandCursor);
-        applyBtn->setStyleSheet(
-            "QPushButton{background:#E39B35;color:#111216;border:none;border-radius:8px;"
-            "padding:10px;font-weight:bold;font-size:13px;}"
-            "QPushButton:hover{background:#f0ab45;}");
+        applyBtn->setStyleSheet("QPushButton{background:#E39B35;color:#111216;border-radius:6px;font-weight:bold; font-size:12px;}");
         connect(applyBtn, &QPushButton::clicked, this, &RobotControlPage::applyConfig);
         cfglay->addWidget(applyBtn);
-        cfglay->addStretch();
-        midRow->addWidget(cfgCard);
+        leftCol->addWidget(cfgCard);
 
-        // ── Log em Tempo Real ────────────────────────────────
+        // CARD DE AUTENTICAÇÃO
+        auto* authCard = makeCard();
+        auto* authlay = new QVBoxLayout(authCard);
+        authlay->setContentsMargins(24, 20, 24, 20); authlay->setSpacing(12);
+        auto* authTitle = new QLabel("🔐  LinkedIn & Sessão");
+        authTitle->setStyleSheet("color:#3B82F6;font-size:14px;font-weight:bold;");
+        authlay->addWidget(authTitle);
+        addSeparator(authlay);
+        m_loginBtn = new LinkedInButton(this);
+        m_loginBtn->setFixedWidth(200);
+        connect(m_loginBtn, &QPushButton::clicked, this, [this]{ QDesktopServices::openUrl(QUrl("https://www.linkedin.com/login")); });
+        authlay->addWidget(m_loginBtn, 0, Qt::AlignCenter);
+        m_cookieInput = new QLineEdit(); m_cookieInput->setPlaceholderText("Cole o cookie li_at..."); styleInput(m_cookieInput);
+        authlay->addLayout(makeConfigRow("Cookie:", m_cookieInput));
+        m_saveCookieBtn = new QPushButton("Atualizar Cookie");
+        m_saveCookieBtn->setFixedHeight(36);
+        m_saveCookieBtn->setCursor(Qt::PointingHandCursor);
+        m_saveCookieBtn->setStyleSheet("QPushButton{background:#3B82F6;color:white;border-radius:6px;font-weight:bold; font-size:12px;}");
+        connect(m_saveCookieBtn, &QPushButton::clicked, this, &RobotControlPage::saveSessionCookie);
+        authlay->addWidget(m_saveCookieBtn);
+        leftCol->addWidget(authCard);
+        
+        gridRow->addLayout(leftCol, 0);
+
+        // CARD DE LOGS
         auto* logCard = makeCard();
         auto* loglay = new QVBoxLayout(logCard);
         loglay->setContentsMargins(20, 16, 20, 16); loglay->setSpacing(10);
-
         auto* logHdr = new QHBoxLayout();
-        auto* logTitle = new QLabel("📋  Log em Tempo Real (WebSocket)");
+        auto* logTitle = new QLabel("📋 Log em Tempo Real");
         logTitle->setStyleSheet("color:#F0F4F8;font-size:14px;font-weight:bold;");
-        auto* wsStatus = new QLabel("● Conectando...");
-        wsStatus->setObjectName("wsStatus");
+        auto* wsStatus = new QLabel("● ..."); wsStatus->setObjectName("wsStatus");
         wsStatus->setStyleSheet("color:#E39B35;font-size:11px;");
         logHdr->addWidget(logTitle); logHdr->addStretch(); logHdr->addWidget(wsStatus);
-
+        
         auto* clearBtn = new QPushButton("Limpar");
         clearBtn->setCursor(Qt::PointingHandCursor);
         clearBtn->setFixedHeight(28);
-        clearBtn->setStyleSheet(
-            "QPushButton{background:transparent;color:#A39C93;border:1px solid #252830;"
-            "border-radius:5px;padding:0 10px;font-size:11px;}"
-            "QPushButton:hover{color:#F0F4F8;}");
+        clearBtn->setStyleSheet("QPushButton{background:transparent;color:#A39C93;border:1px solid #252830;border-radius:5px;padding:0 10px;font-size:11px;}QPushButton:hover{color:#F0F4F8;}");
         connect(clearBtn, &QPushButton::clicked, this, [this]{ m_logArea->clear(); });
         logHdr->addWidget(clearBtn);
         loglay->addLayout(logHdr);
-
+        
         m_logArea = new QTextEdit();
         m_logArea->setReadOnly(true);
         m_logArea->setStyleSheet(
@@ -273,7 +374,7 @@ private:
         connect(&m_ws, &QWebSocket::connected, this, [wsStatus, this]{
             wsStatus->setText("● WebSocket conectado");
             wsStatus->setStyleSheet("color:#22C55E;font-size:11px;");
-            appendLog("✅ WebSocket conectado ao servidor Render.");
+            appendLog("✅ WebSocket conectado ao Servidor.");
         });
         connect(&m_ws, &QWebSocket::disconnected, this, [wsStatus, this]{
             wsStatus->setText("● Desconectado");
@@ -285,8 +386,11 @@ private:
             appendLog(msg);
         });
 
-        midRow->addWidget(logCard, 1);
-        root->addLayout(midRow, 1);
+        gridRow->addWidget(logCard, 1);
+        scrollLayout->addLayout(gridRow, 1);
+
+        scroll->setWidget(scrollContent);
+        root->addWidget(scroll);
     }
 
     // ── Helpers de UI ────────────────────────────────────────
@@ -357,19 +461,28 @@ private:
     // ── API Calls ─────────────────────────────────────────────
     void connectWebSocket() {
         if (m_ws.state() == QAbstractSocket::ConnectedState) m_ws.close();
-        QString wsUrl = m_apiBase;
+        
+        // Limpa a URL (remove barras extras no final)
+        QString base = m_apiBase.trimmed();
+        while(base.endsWith('/')) base.chop(1);
+        
+        QString wsUrl = base;
         wsUrl.replace("https://", "wss://").replace("http://", "ws://");
         wsUrl += "/ws/logs";
         m_ws.open(QUrl(wsUrl));
     }
 
-    QString buildAuthHeader() {
-        // Por hora sem auth — para MVP; adicionar JWT depois
-        return "";
-    }
-
     QNetworkRequest makeRequest(const QString& endpoint) {
-        QNetworkRequest req(QUrl(m_apiBase + endpoint));
+        // Limpa a URL base
+        QString base = m_apiBase.trimmed();
+        while(base.endsWith('/')) base.chop(1);
+        
+        // Garante que o endpoint comece com barra
+        QString path = endpoint;
+        if (!path.startsWith('/')) path = "/" + path;
+        
+        QUrl url(base + path);
+        QNetworkRequest req(url);
         req.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
         return req;
     }
@@ -399,12 +512,10 @@ private slots:
 
     // POST /crawler/start
     void startCrawler() {
-        appendLog("▶ Enviando comando START ao Render...");
+        appendLog("▶ Enviando comando START ao Servidor...");
         QJsonObject body;
         body["max_apply_per_cycle"] = m_maxApply->value();
         body["cycle_wait_minutes"]  = m_cycleWait->value();
-        body["active_hours_start"]  = m_activeStart->value();
-        body["active_hours_end"]    = m_activeEnd->value();
         body["search_terms"] = m_termsInput->text().trimmed();
 
         auto* reply = m_nam->post(makeRequest("/crawler/start"),
@@ -416,14 +527,14 @@ private slots:
                 m_pulse->setState(PulseIndicator::Error);
                 return;
             }
-            appendLog("✅ Crawler iniciado no Render!");
+            appendLog("✅ Crawler iniciado no Servidor!");
             setRunningState(true);
         });
     }
 
     // POST /crawler/stop
     void stopCrawler() {
-        appendLog("■ Enviando comando STOP ao Render...");
+        appendLog("■ Enviando comando STOP ao Servidor...");
         auto* reply = m_nam->post(makeRequest("/crawler/stop"), QByteArray("{}"));
         connect(reply, &QNetworkReply::finished, this, [this, reply]{
             reply->deleteLater();
@@ -436,14 +547,29 @@ private slots:
         });
     }
 
+    void resetSession() {
+        if (m_statusLabel->text().contains("RODANDO")) {
+            appendLog("⚠️ Pare o robô antes de limpar a sessão.");
+            return;
+        }
+        appendLog("🧹 Solicitando limpeza de sessão no Servidor...");
+        auto* reply = m_nam->post(makeRequest("/crawler/reset_session"), QByteArray("{}"));
+        connect(reply, &QNetworkReply::finished, this, [this, reply]{
+            reply->deleteLater();
+            if (reply->error() != QNetworkReply::NoError) {
+                appendLog("❌ Erro ao resetar: " + reply->errorString());
+                return;
+            }
+            appendLog("✅ Sessão e cache limpos no servidor.");
+        });
+    }
+
     // POST /crawler/config
     void applyConfig() {
         appendLog("⚙️  Aplicando configuração...");
         QJsonObject cfg;
         cfg["max_apply_per_cycle"] = m_maxApply->value();
         cfg["cycle_wait_minutes"]  = m_cycleWait->value();
-        cfg["active_hours_start"]  = m_activeStart->value();
-        cfg["active_hours_end"]    = m_activeEnd->value();
         cfg["search_terms"]        = m_termsInput->text().trimmed();
 
         auto* reply = m_nam->post(makeRequest("/crawler/config"),
@@ -454,6 +580,37 @@ private slots:
                 appendLog("❌ Erro ao salvar config: " + reply->errorString());
             else
                 appendLog("✅ Configuração salva com sucesso!");
+        });
+    }
+
+    // Métodos de diagnóstico removidos para limpeza
+
+    void saveSessionCookie() {
+        QString cookie = m_cookieInput->text().trimmed();
+        if (cookie.isEmpty()) {
+            appendLog("⚠️ Por favor, cole um cookie válido.");
+            return;
+        }
+
+        appendLog("🍪 Enviando cookie de sessão ao servidor...");
+        QJsonObject cfg;
+        cfg["session_cookie"] = cookie;
+        
+        // Também envia as configs atuais para não sobrescrever com padrão
+        cfg["max_apply_per_cycle"] = m_maxApply->value();
+        cfg["cycle_wait_minutes"]  = m_cycleWait->value();
+        cfg["search_terms"]        = m_termsInput->text().trimmed();
+
+        auto* reply = m_nam->post(makeRequest("/crawler/config"),
+                                  QJsonDocument(cfg).toJson());
+        connect(reply, &QNetworkReply::finished, this, [this, reply]{
+            reply->deleteLater();
+            if (reply->error() != QNetworkReply::NoError)
+                appendLog("❌ Erro ao salvar cookie: " + reply->errorString());
+            else {
+                appendLog("✅ Cookie de sessão atualizado! O robô usará sua conta no próximo ciclo.");
+                m_cookieInput->clear();
+            }
         });
     }
 };

@@ -12,30 +12,36 @@ partial class Program
 
         try
         {
-            if (!TryOpenJobsAreaByNavigation(driver))
+            var isLinux = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux);
+            
+            if (isLinux)
             {
-                Console.WriteLine("Não foi possível clicar no menu de Vagas. Usando navegação direta para /jobs/.");
-                driver.Navigate().GoToUrl("https://www.linkedin.com/jobs/");
-                WaitForJobPageReady(driver);
-            }
-
-            if (!TrySubmitJobsSearchKeyword(driver, selectedSearchTerm))
-            {
-                Console.WriteLine("Campo de busca não encontrado/interagível. Usando fallback de URL com termo e filtro Easy Apply.");
+                Console.WriteLine($"[C#] Sistema Linux detectado. Usando navegação direta via URL para economizar RAM (Busca: {selectedSearchTerm}).");
                 return TryOpenJobsSearchViaUrl(driver, selectedSearchTerm);
             }
 
-            if (TryEnableEasyApplyFilterFromResults(driver))
+            Console.WriteLine($"[HUMAN] Iniciando busca humana para: {selectedSearchTerm}");
+            // Removida navegação redundante para economizar RAM
+            WaitForJobPageReady(driver);
+            Thread.Sleep(1000);
+
+            if (TrySubmitJobsSearchKeyword(driver, selectedSearchTerm))
             {
-                return true;
+                Console.WriteLine("[HUMAN] Busca submetida. Tentando ativar filtro Easy Apply manualmente...");
+                Thread.Sleep(3000);
+                if (TryEnableEasyApplyFilterFromResults(driver))
+                {
+                    Console.WriteLine("[HUMAN] Filtro Easy Apply ativado com sucesso!");
+                    return true;
+                }
             }
 
-            Console.WriteLine("Filtro de Candidatura simplificada não foi confirmado por UI. Aplicando fallback por URL.");
+            Console.WriteLine("[HUMAN] Sequência manual falhou. Usando fallback de URL...");
             return TryOpenJobsSearchViaUrl(driver, selectedSearchTerm);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Falha ao preparar entrada via busca de vagas: {ex.Message}");
+            Console.WriteLine($"Falha na busca humana: {ex.Message}. Usando fallback.");
             return TryOpenJobsSearchViaUrl(driver, selectedSearchTerm);
         }
     }
@@ -134,7 +140,7 @@ partial class Program
     {
         try
         {
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(15));
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(50));
             var navigated = wait.Until(d => IsJobsPageUrl(d.Url));
             if (!navigated)
             {
@@ -429,7 +435,7 @@ partial class Program
     {
         try
         {
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(50));
             var transitioned = wait.Until(d =>
             {
                 var currentUrl = d.Url ?? string.Empty;

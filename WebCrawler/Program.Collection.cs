@@ -6,7 +6,7 @@ using System.Threading;
 
 partial class Program
 {
-    private static (List<string> RawLines, List<(string Titulo, string Empresa, string Localizacao, string Link)> StructuredJobs) ExtractSimplifiedJobs(IReadOnlyCollection<IWebElement> jobCards)
+    private static (List<string> RawLines, List<(string Titulo, string Empresa, string Localizacao, string Link)> StructuredJobs) ExtractSimplifiedJobs(IWebDriver driver, IReadOnlyCollection<IWebElement> jobCards)
     {
         var rawLines = new List<string>();
         var structuredJobs = new List<(string Titulo, string Empresa, string Localizacao, string Link)>();
@@ -15,7 +15,8 @@ partial class Program
         {
             try
             {
-                if (!HasSimplifiedApplication(card))
+                bool isEasyApplyUrl = driver.Url.Contains("f_AL=true", StringComparison.OrdinalIgnoreCase);
+                if (!HasSimplifiedApplication(card) && !isEasyApplyUrl)
                 {
                     continue;
                 }
@@ -38,6 +39,38 @@ partial class Program
                 var link = GetAttributeBySelectors(card, "href",
                     "a.job-card-container__link",
                     "a.job-card-list__title");
+
+                // Suporte ao novo layout SDUI (componentkey="job-card-component-ref-<JOB_ID>")
+                var componentKey = card.GetAttribute("componentkey") ?? string.Empty;
+                if (string.IsNullOrWhiteSpace(link) && componentKey.StartsWith("job-card-component-ref-", StringComparison.OrdinalIgnoreCase))
+                {
+                    var jobId = componentKey.Substring("job-card-component-ref-".Length).Trim();
+                    if (!string.IsNullOrWhiteSpace(jobId))
+                    {
+                        link = $"https://www.linkedin.com/jobs/view/{jobId}/";
+                    }
+                }
+
+                if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(company))
+                {
+                    var paragraphs = card.FindElements(By.TagName("p"));
+                    if (string.IsNullOrWhiteSpace(title) && paragraphs.Count >= 1)
+                    {
+                        title = GetTextBySelectors(paragraphs[0], "span[aria-hidden='true']");
+                        if (string.IsNullOrWhiteSpace(title))
+                        {
+                            title = paragraphs[0].Text?.Trim() ?? string.Empty;
+                        }
+                    }
+                    if (string.IsNullOrWhiteSpace(company) && paragraphs.Count >= 2)
+                    {
+                        company = paragraphs[1].Text?.Trim() ?? string.Empty;
+                    }
+                    if (string.IsNullOrWhiteSpace(location) && paragraphs.Count >= 3)
+                    {
+                        location = paragraphs[2].Text?.Trim() ?? string.Empty;
+                    }
+                }
 
                 if (IsBudgetExhaustedJobLink(link))
                 {
@@ -96,7 +129,7 @@ partial class Program
         Console.WriteLine($"Cards encontrados na pagina inicial para {sourceLabel}: {initialJobCards.Count}");
 
         Console.WriteLine($"Extraindo vagas da pagina inicial para {sourceLabel}...");
-        var initialExtraction = ExtractSimplifiedJobs(initialJobCards);
+        var initialExtraction = ExtractSimplifiedJobs(driver, initialJobCards);
 
         foreach (var job in initialExtraction.RawLines)
         {
@@ -160,7 +193,7 @@ partial class Program
             var pageCards = FindJobCards(driver);
             Console.WriteLine($"Cards encontrados na página: {pageCards.Count}");
 
-            var pageExtraction = ExtractSimplifiedJobs(pageCards);
+            var pageExtraction = ExtractSimplifiedJobs(driver, pageCards);
             allJobsLines.AddRange(pageExtraction.RawLines);
             allJobsData.AddRange(pageExtraction.StructuredJobs);
         }
@@ -201,10 +234,14 @@ partial class Program
                 }
             }
 
-            var nextCandidates = driver.FindElements(By.XPath(
-                "//button[contains(translate(@aria-label, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'next') or " +
-                "contains(translate(@aria-label, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'próxima') or " +
-                "contains(translate(@aria-label, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'proxima')]"));
+            var nextCandidates = driver.FindElements(By.CssSelector("button[data-testid='pagination-controls-next-button-visible']"));
+            if (nextCandidates.Count == 0)
+            {
+                nextCandidates = driver.FindElements(By.XPath(
+                    "//button[contains(translate(@aria-label, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'next') or " +
+                    "contains(translate(@aria-label, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'próxima') or " +
+                    "contains(translate(@aria-label, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz'), 'proxima')]"));
+            }
 
             foreach (var candidate in nextCandidates)
             {
@@ -496,7 +533,20 @@ partial class Program
 
     private static IReadOnlyCollection<IWebElement> FindJobCards(IWebDriver driver)
     {
-        var cards = driver.FindElements(By.CssSelector("ul.jobs-search-results__list > li, ul.scaffold-layout__list-container > li, li.jobs-search-results__list-item, ul.jobs-search__results-list > li, ul.scaffold-layout__list-container li, div.job-card-container, a.job-card-container__link"));
+        try {
+            var js = (IJavaScriptExecutor)driver;
+            js.ExecuteScript(@"
+                var sidebar = document.querySelector('.jobs-search-results-list, .scaffold-layout__list-container, div.jobs-search-results-list__container');
+                if (sidebar) { sidebar.scrollTop = sidebar.scrollHeight; }
+                window.scrollBy(0, 500);
+            ");
+            Thread.Sleep(1000);
+        } catch {}
+
+        var cards = driver.FindElements(By.CssSelector(
+            "div[role='button'][componentkey^='job-card-component-ref-'], " +
+            "ul.jobs-search-results__list > li, ul.scaffold-layout__list-container > li, " +
+            "li.jobs-search-results__list-item, .job-card-container, .job-card-list__entity-lockup"));
         return cards;
     }
 
@@ -504,21 +554,31 @@ partial class Program
     {
         try
         {
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(60));
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(45));
             return wait.Until(d => HasAnyJobCard(d));
         }
-        catch (WebDriverTimeoutException)
+        catch
         {
-            try
-            {
+            // --- DIAGNÓSTICO DE TIMEOUT ---
+            try {
+                string timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string diagDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "diagnostics");
+                Directory.CreateDirectory(diagDir);
+                string diagPath = Path.Combine(diagDir, $"{timestamp}_timeout_search.html");
+                
+                File.WriteAllText(diagPath, driver.PageSource);
+                Console.WriteLine($"⚠️ [DIAG] Timeout na busca. URL Atual: {driver.Url}");
+                Console.WriteLine($"⚠️ [DIAG] Fonte da página salva em: {diagPath}");
+            } catch (Exception ex) {
+                Console.WriteLine($"Erro ao salvar diagnóstico: {ex.Message}");
+            }
+
+            try {
                 driver.Navigate().Refresh();
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(60));
+                Thread.Sleep(5000);
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(30));
                 return wait.Until(d => HasAnyJobCard(d));
-            }
-            catch
-            {
-                return false;
-            }
+            } catch { return false; }
         }
     }
 
@@ -526,29 +586,22 @@ partial class Program
     {
         try
         {
-            var cards = driver.FindElements(By.CssSelector("li.jobs-search-results__list-item, div.job-card-container, a.job-card-container__link, ul.jobs-search__results-list li"));
-            if (cards.Count > 0)
-            {
-                return true;
-            }
+            const string cardSelector =
+                "div[role='button'][componentkey^='job-card-component-ref-'], " +
+                "li.jobs-search-results__list-item, .job-card-container, .job-card-list__entity-lockup, ul.scaffold-layout__list-container li";
 
-            try
-            {
+            var cards = driver.FindElements(By.CssSelector(cardSelector));
+            if (cards.Count > 0) return true;
+
+            try {
                 var js = (IJavaScriptExecutor)driver;
-                js.ExecuteScript("window.scrollBy(0, 600);");
-            }
-            catch
-            {
-                // Ignora falha de script e continua tentativa.
-            }
+                js.ExecuteScript("window.scrollBy(0, 800);");
+                js.ExecuteScript("var s = document.querySelector('.jobs-search-results-list, .scaffold-layout__list-container, [data-testid=\"lazy-column\"]'); if(s) s.scrollTop += 500;");
+            } catch {}
 
-            cards = driver.FindElements(By.CssSelector("li.jobs-search-results__list-item, div.job-card-container, a.job-card-container__link, ul.jobs-search__results-list li"));
-            return cards.Count > 0;
+            return driver.FindElements(By.CssSelector(cardSelector)).Count > 0;
         }
-        catch
-        {
-            return false;
-        }
+        catch { return false; }
     }
 
     private static string GetTextBySelectors(IWebElement root, params string[] selectors)

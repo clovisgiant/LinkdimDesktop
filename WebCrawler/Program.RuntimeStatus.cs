@@ -1,5 +1,6 @@
 using System;
 using System.Threading;
+using MySqlConnector;
 using Npgsql;
 
 partial class Program
@@ -52,13 +53,52 @@ partial class Program
         cmd.ExecuteNonQuery();
     }
 
-    private static void UpdateCrawlerRuntimeStatus(string state, string? detail = null, bool isRunning = true)
+    private static void UpdateCrawlerRuntimeStatusInMySql(string state, string? detail = null, bool isRunning = true)
     {
-        if (!DatabaseEnabled || string.IsNullOrWhiteSpace(state))
+        try
         {
-            return;
-        }
+            using var conn = new MySqlConnection(MySqlConnectionString);
+            conn.Open();
+            EnsureMySqlRuntimeStatusSchema(conn);
 
+            var now = DateTime.Now;
+            var hostName = Environment.MachineName;
+            var processId = Environment.ProcessId;
+
+            using var cmd = new MySqlCommand(@"
+                INSERT INTO crawler_runtime_status (
+                    instance_name, state, detail, is_running, process_id, host_name, started_at, last_heartbeat, updated_at
+                ) VALUES (
+                    @instance_name, @state, @detail, @is_running, @process_id, @host_name, @now, @now, @now
+                )
+                ON DUPLICATE KEY UPDATE
+                    state = VALUES(state),
+                    detail = VALUES(detail),
+                    is_running = VALUES(is_running),
+                    process_id = VALUES(process_id),
+                    host_name = VALUES(host_name),
+                    started_at = IF(process_id <> VALUES(process_id), VALUES(started_at), started_at),
+                    last_heartbeat = VALUES(last_heartbeat),
+                    updated_at = VALUES(updated_at);
+            ", conn);
+
+            cmd.Parameters.AddWithValue("@instance_name", RuntimeStatusInstanceName);
+            cmd.Parameters.AddWithValue("@state", state.Trim().ToLowerInvariant());
+            cmd.Parameters.AddWithValue("@detail", (object?)detail ?? DBNull.Value);
+            cmd.Parameters.AddWithValue("@is_running", isRunning);
+            cmd.Parameters.AddWithValue("@process_id", processId);
+            cmd.Parameters.AddWithValue("@host_name", hostName);
+            cmd.Parameters.AddWithValue("@now", now);
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[BANCO MySQL] Falha ao atualizar crawler_runtime_status: {ex.Message}");
+        }
+    }
+
+    private static void UpdateCrawlerRuntimeStatusInPostgres(string state, string? detail = null, bool isRunning = true)
+    {
         try
         {
             using var conn = new NpgsqlConnection(ConnectionString);
@@ -115,8 +155,27 @@ partial class Program
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[BANCO] Falha ao atualizar heartbeat do crawler: {ex.Message}");
+            Console.WriteLine($"[BANCO PostgreSQL] Falha ao atualizar heartbeat do crawler: {ex.Message}");
             PrintDatabaseAuthenticationHint(ex);
+        }
+    }
+
+    private static void UpdateCrawlerRuntimeStatus(string state, string? detail = null, bool isRunning = true)
+    {
+        if (!DatabaseEnabled || string.IsNullOrWhiteSpace(state))
+        {
+            return;
+        }
+
+        var provider = DatabaseProvider;
+        if (provider == "mysql" || provider == "dual")
+        {
+            UpdateCrawlerRuntimeStatusInMySql(state, detail, isRunning);
+        }
+
+        if (provider == "postgres" || provider == "dual")
+        {
+            UpdateCrawlerRuntimeStatusInPostgres(state, detail, isRunning);
         }
     }
 

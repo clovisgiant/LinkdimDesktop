@@ -227,7 +227,7 @@ partial class Program
         }
     }
 
-    private static void IgnoreJobLinkInCurrentRun(string? link, string reason)
+    private static void IgnoreJobLinkInCurrentRun(string? link, string reason, bool persistToDisk = true)
     {
         var normalizedLink = NormalizeLinkedInJobLink(link);
         if (string.IsNullOrWhiteSpace(normalizedLink))
@@ -248,7 +248,10 @@ partial class Program
         }
 
         Console.WriteLine($"Link adicionado à lista de ignorados desta execução: {normalizedLink} (motivo: {reason})");
-        PersistIgnoredJobLinkToDisk(normalizedLink);
+        if (persistToDisk)
+        {
+            PersistIgnoredJobLinkToDisk(normalizedLink);
+        }
     }
 
     private static bool IsIgnoredJobLinkInCurrentRun(string? link)
@@ -370,7 +373,11 @@ partial class Program
     {
         try
         {
-            var modals = driver.FindElements(By.CssSelector("div.jobs-easy-apply-modal[role='dialog'], div.jobs-easy-apply-modal, div[role='dialog']"));
+            var modals = driver.FindElements(By.CssSelector(
+                "dialog[data-testid='dialog'][open], dialog[open], [data-testid='dialog'], " +
+                "div.jobs-easy-apply-modal[role='dialog'], div.jobs-easy-apply-modal, " +
+                "div[data-sdui-screen*='easyapply'], div[data-testid='dialog-content'], " +
+                "div[role='dialog'], dialog"));
             foreach (var modal in modals)
             {
                 try
